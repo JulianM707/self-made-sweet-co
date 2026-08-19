@@ -9,7 +9,7 @@ export default function Hero({ onExploreMenu, onOpenAbout }) {
       background: 'radial-gradient(circle at 80% 20%, #F5EBE1 0%, #FAF7F2 60%)',
       overflow: 'hidden'
     }}>
-      <div className="container" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '48px', alignItems: 'center' }}>
+      <div className="container hero-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '48px', alignItems: 'center' }}>
         
         {/* Left Hero Content */}
         <div>

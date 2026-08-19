@@ -207,3 +207,76 @@ a {
   margin: 0 auto;
   padding: 0 24px;
 }
+
+/* Mobile Responsiveness Rules */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 16px !important;
+  }
+
+  /* Responsive Headers */
+  h1 {
+    font-size: 2.2rem !important;
+  }
+  h2 {
+    font-size: 1.8rem !important;
+  }
+  h3 {
+    font-size: 1.4rem !important;
+  }
+
+  /* Navbar Responsive Layout */
+  header .container {
+    padding: 12px 14px !important;
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+
+  header .brand-wrap {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  nav {
+    display: flex !important;
+    overflow-x: auto !important;
+    width: 100% !important;
+    padding-bottom: 6px;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    gap: 6px !important;
+  }
+
+  nav button {
+    flex-shrink: 0;
+    padding: 6px 12px !important;
+    font-size: 0.82rem !important;
+  }
+
+  /* Hero Section Grid Stack */
+  .hero-grid {
+    grid-template-columns: 1fr !important;
+    gap: 28px !important;
+  }
+
+  /* Footer Layout Grid Stack */
+  .footer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+
+  /* Modal Responsiveness */
+  .modal-container {
+    max-width: 100% !important;
+    width: 95% !important;
+    padding: 24px 18px !important;
+    margin: 12px !important;
+  }
+
+  /* Touch Friendly Target Sizes */
+  .btn-primary, .btn-secondary, .btn-gold {
+    padding: 12px 20px !important;
+    font-size: 0.9rem !important;
+  }
+}

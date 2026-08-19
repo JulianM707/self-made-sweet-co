@@ -20,7 +20,7 @@ export default function AboutJulianModal({ isOpen, onClose }) {
       padding: '24px'
     }} onClick={onClose}>
 
-      <div className="animate-fade-in" style={{
+      <div className="animate-fade-in modal-container" style={{
         backgroundColor: '#FFFFFF',
         borderRadius: 'var(--radius-lg)',
         maxWidth: '720px',

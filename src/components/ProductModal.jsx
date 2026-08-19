@@ -68,7 +68,7 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
       padding: '24px'
     }} onClick={onClose}>
       
-      <div className="animate-fade-in" style={{
+      <div className="animate-fade-in modal-container grid-hero" style={{
         backgroundColor: '#FFFFFF',
         borderRadius: 'var(--radius-lg)',
         maxWidth: '840px',

@@ -6,7 +6,7 @@ export default function Footer({ onOpenAbout, onOpenBakerLogin }) {
     <footer style={{ backgroundColor: 'var(--color-espresso)', color: '#FFFFFF', paddingTop: '60px', paddingBottom: '40px' }}>
       <div className="container">
         
-        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr', gap: '48px', marginBottom: '48px' }}>
+        <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr', gap: '48px', marginBottom: '48px' }}>
           
           {/* Col 1: Julian's Story & Mission */}
           <div>
