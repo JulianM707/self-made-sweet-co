@@ -17,7 +17,7 @@ export const PRODUCTS = [
     rating: 4.99,
     reviewsCount: 230,
     image: '/images/basque_cheesecake_1786065253639.jpg',
-    description: 'Our signature velvety cream cheese, sour cream & fresh lemon zest filling baked low and slow in a buttery Graham cracker crust. Top with house-made jammy strawberry sauce or wild blueberry compote!',
+    description: 'My signature velvety cream cheese, sour cream & fresh lemon zest filling baked low and slow in a buttery Graham cracker crust. Top with house-made jammy strawberry sauce or wild blueberry compote!',
     dietary: ['Gluten-Free Available', 'Custom Crust Option'],
     prepTime: 'Same Day Pickup',
     ingredients: [
@@ -131,78 +131,96 @@ export const PRODUCTS = [
 export const CUSTOMIZER_OPTIONS = {
   bases: [
     { id: 'classic-cheesecake', name: 'Classic Artisan Cheesecake Base', price: 0, desc: 'Sour cream & lemon zest cream cheese base' },
-    { id: 'tiramisu-soaked', name: 'Venetian Tiramisu Base', price: 6, desc: 'Espresso-soaked Savoiardi & mascarpone whip' },
-    { id: 'blueberry-muffin-base', name: 'Wild Blueberry Muffin Base', price: 3, desc: 'Fresh blueberry batter & brown sugar streusel' },
-    { id: 'cinnamon-coffee', name: 'Cinnamon Swirl Coffee Cake Base', price: 4, desc: 'Brown sugar cinnamon swirl cake' }
+    { id: 'vanilla-sponge', name: 'Tender Vanilla Bean Sponge Cake Base', price: 0, desc: 'Fluffy organic vanilla sponge cake' }
   ],
   sizes: [
-    { id: 'mini-6', name: 'Mini 6" (Serves 4-6)', multiplier: 1, basePrice: 35 },
-    { id: 'standard-8', name: 'Standard 8" (Serves 8-10)', multiplier: 1.5, basePrice: 48 },
-    { id: 'party-10', name: 'Party 10" (Serves 14-16)', multiplier: 2.0, basePrice: 68 }
+    { id: '8inch', name: '8" Whole Cake / Pie (Serves 8-10)', price: 42.00 },
+    { id: '10inch', name: '10" Large Party Size (Serves 14-16)', price: 58.00 }
   ],
   fillings: [
-    { id: 'mascarpone', name: 'Whipped Heavy Cream Mascarpone', price: 0 },
-    { id: 'strawberry-compote', name: 'Jammy Strawberry Sauce', price: 4 },
-    { id: 'cinnamon-swirl', name: 'Extra Cinnamon Brown Sugar Layer', price: 3.50 }
+    { id: 'none', name: 'No Filling (Classic Base Only)', price: 0 },
+    { id: 'strawberry-sauce', name: 'House Jammy Strawberry Compote', price: 3.00 },
+    { id: 'espresso-mascarpone', name: 'Whipped Italian Mascarpone Cream', price: 4.00 }
   ],
   toppings: [
-    { id: 'macadamia-crust-option', name: 'Macadamia Nut Crust Upgrade', price: 2.50 },
-    { id: 'strawberry-topping', name: 'Fresh Jammy Strawberry Topping', price: 3 },
-    { id: 'butter-cinnamon-drizzle', name: 'Warm Butter & Cinnamon Streusel Drizzle', price: 2 }
+    { id: 'cinnamon-crumble', name: 'Cinnamon Streusel Crumble', price: 2.00 },
+    { id: 'macadamia', name: 'Toasted Macadamia Nut Crumble', price: 3.00 },
+    { id: 'chocolate-drizzle', name: 'Gourmet Dark Chocolate Drizzle', price: 2.50 }
   ]
 };
 
-export const INITIAL_ORDERS = [
+export const QUIZ_QUESTIONS = [
   {
-    id: 'ORD-1092',
-    customerName: 'Coffee & Cookie Enthusiast',
-    email: 'cookie.fan@example.com',
-    phone: '(555) 321-9876',
-    items: [
-      { name: 'Cinnamon Streusel Coffee Cake (Whole)', qty: 1, price: 36.00 },
-      { name: 'Gourmet Chocolate Chip Cookie (6-Pack Box)', qty: 1, price: 18.00 }
-    ],
-    total: 54.00,
-    fulfillment: 'Store Pickup',
-    dateSlot: 'Today at 4:30 PM',
-    status: 'In Oven',
-    createdAt: '5 mins ago',
-    note: 'Fresh cookies with gooey centers!'
+    id: 1,
+    title: "Step 1 of 3: Occasion & Vibe",
+    subtitle: "When or how do you plan to enjoy your sweet treat?",
+    question: "What's the occasion?",
+    options: [
+      { label: "🌅 Morning coffee or breakfast treat", category: "muffins" },
+      { label: "☕ Afternoon coffee break or mid-day pick-me-up", category: "cakes" },
+      { label: "🍷 Evening dinner party or special celebration", category: "cheesecake" },
+      { label: "🇮🇹 Sophisticated dessert after a delicious meal", category: "tiramisu" },
+      { label: "🍪 Late-night snack or quick comfort treat", category: "cookies" }
+    ]
+  },
+  {
+    id: 2,
+    title: "Step 2 of 3: Flavor Notes",
+    subtitle: "Which taste profile sounds most irresistible to you right now?",
+    question: "Which flavor note speaks to your soul?",
+    options: [
+      { label: "🍋 Creamy lemon zest & sweet strawberry jam", category: "cheesecake" },
+      { label: "☕ Dark roasted espresso & cocoa powder", category: "tiramisu" },
+      { label: "🫐 Fresh wild berries & cinnamon streusel", category: "muffins" },
+      { label: "🥮 Warm brown sugar cinnamon swirl", category: "cakes" },
+      { label: "🍫 Rich melted dark chocolate chunks", category: "cookies" }
+    ]
+  },
+  {
+    id: 3,
+    title: "Step 3 of 3: Texture Preference",
+    subtitle: "How do you like your baked goods to feel when you take a bite?",
+    question: "What is your favorite dessert texture?",
+    options: [
+      { label: "🍰 Smooth, velvety & rich cream cheese density", category: "cheesecake" },
+      { label: "☁️ Silky, airy & light whipped cream layers", category: "tiramisu" },
+      { label: "🧁 Soft moist sponge with a buttery streusel crunch", category: "muffins" },
+      { label: "🍰 Tender crumb cake with gooey cinnamon swirl", category: "cakes" },
+      { label: "🍪 Crisp golden edges with a warm, soft center", category: "cookies" }
+    ]
   }
 ];
 
-export const QUIZ_QUESTIONS = [
+export const INITIAL_ORDERS = [
   {
-    id: 'occasion',
-    question: 'What vibe or occasion are you indulging in today?',
-    options: [
-      { label: '☕ Morning coffee & cozy breakfast indulgence', score: 'muffins' },
-      { label: '🍷 Sophisticated evening dessert after dinner', score: 'tiramisu' },
-      { label: '🎉 Special celebration or family gathering', score: 'cheesecake' },
-      { label: '🍪 Mid-day sweet reward or snack craving', score: 'cookies' },
-      { label: '☕ Afternoon coffee break with brown sugar crumble', score: 'cakes' }
-    ]
+    id: 'ORD-9021',
+    customerName: 'Marcus Vance',
+    email: 'marcus.vance@gmail.com',
+    phone: '(916) 555-0142',
+    fulfillment: 'Store Pickup',
+    dateSlot: 'Today @ 2:30 PM',
+    paymentMethod: 'Venmo (@SelfMadeSweetCo)',
+    items: [
+      { name: 'Classic Artisan Cheesecake (Slice)', qty: 2, price: 15.00 },
+      { name: 'Wild Blueberry Streusel Muffin', qty: 1, price: 4.50 }
+    ],
+    total: 19.50,
+    status: 'In Oven',
+    note: 'Extra strawberry sauce on the side please!'
   },
   {
-    id: 'flavor',
-    question: 'Which key flavor note speaks to your soul right now?',
-    options: [
-      { label: '🍋 Rich, velvety cream cheese with lemon zest & fruit', score: 'cheesecake' },
-      { label: '☕ Cold-brewed espresso & light Italian mascarpone whip', score: 'tiramisu' },
-      { label: '🫐 Fresh wild blueberries bursting in every bite', score: 'muffins' },
-      { label: '🧈 Warm cinnamon swirl with buttery streusel drizzle', score: 'cakes' },
-      { label: '🍫 Creamy butter & warm melted chocolate chunks', score: 'cookies' }
-    ]
-  },
-  {
-    id: 'texture',
-    question: 'What is your absolute favorite dessert texture?',
-    options: [
-      { label: '🍮 Smooth & velvety with a crunchy Graham / Macadamia crust', score: 'cheesecake' },
-      { label: '☁️ Silky, airy whipped cream layered with soft ladyfingers', score: 'tiramisu' },
-      { label: '🧁 Tender bakery-dome cake crowned with streusel crumble', score: 'muffins' },
-      { label: '🥮 Moist vanilla sponge split with a brown sugar cinnamon swirl', score: 'cakes' },
-      { label: '🍪 Crisp golden-brown edges with a soft, gooey chocolate center', score: 'cookies' }
-    ]
+    id: 'ORD-8944',
+    customerName: 'Elena Rostova',
+    email: 'elena.r@yahoo.com',
+    phone: '(707) 555-0199',
+    fulfillment: 'Sacramento Local Delivery',
+    dateSlot: 'Tomorrow @ 11:00 AM',
+    paymentMethod: 'Cash App ($SelfMadeSweetCo)',
+    items: [
+      { name: 'Classic Venetian Tiramisu (Whole Tray)', qty: 1, price: 48.00 }
+    ],
+    total: 48.00,
+    status: 'Pending Prep',
+    note: 'Delivery to front lobby receptionist'
   }
 ];

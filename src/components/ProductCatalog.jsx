@@ -30,10 +30,10 @@ export default function ProductCatalog({ onSelectProduct, onAddToCart }) {
         
         {/* Section Header */}
         <div style={{ textAlign: 'center', maxWidth: '640px', margin: '0 auto 40px auto' }}>
-          <span className="badge badge-caramel" style={{ marginBottom: '12px' }}>Baked Fresh Daily</span>
-          <h2 style={{ fontSize: '2.5rem', marginBottom: '12px' }}>Our Handcrafted Confections</h2>
+          <span className="badge badge-caramel" style={{ marginBottom: '12px' }}>Baked Fresh Daily by Julian</span>
+          <h2 style={{ fontSize: '2.5rem', marginBottom: '12px' }}>My Handcrafted Bakes</h2>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '1.05rem' }}>
-            Every treat is prepared in small batches using premium single-origin ingredients, organic dairy, and authentic recipes.
+            Every treat is personally handcrafted by me in small batches using premium organic ingredients, real cream cheese, and house recipes.
           </p>
         </div>
 
@@ -64,7 +64,8 @@ export default function ProductCatalog({ onSelectProduct, onAddToCart }) {
                   color: isActive ? '#FFFFFF' : 'var(--color-text-main)',
                   border: isActive ? '1px solid var(--color-espresso)' : '1px solid var(--color-border)',
                   boxShadow: isActive ? 'var(--shadow-sm)' : 'none',
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
+                  cursor: 'pointer'
                 }}
               >
                 <IconComp size={16} color={isActive ? '#D4AF37' : 'var(--color-caramel)'} />
@@ -125,7 +126,8 @@ export default function ProductCatalog({ onSelectProduct, onAddToCart }) {
                   fontWeight: 600,
                   backgroundColor: selectedDietary === filter.id ? 'var(--color-cream)' : 'transparent',
                   color: selectedDietary === filter.id ? 'var(--color-caramel)' : 'var(--color-text-muted)',
-                  border: selectedDietary === filter.id ? '1px solid var(--color-caramel)' : '1px solid transparent'
+                  border: selectedDietary === filter.id ? '1px solid var(--color-caramel)' : '1px solid transparent',
+                  cursor: 'pointer'
                 }}
               >
                 {filter.label}
@@ -137,7 +139,7 @@ export default function ProductCatalog({ onSelectProduct, onAddToCart }) {
         {/* Product Grid */}
         {filteredProducts.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--color-text-muted)' }}>
-            <p style={{ fontSize: '1.2rem', marginBottom: '8px' }}>No confections found matching your filters.</p>
+            <p style={{ fontSize: '1.2rem', marginBottom: '8px' }}>No bakes found matching your filters.</p>
             <button 
               onClick={() => { setSelectedCategory('all'); setSearchQuery(''); setSelectedDietary('all'); }}
               className="btn-secondary"
@@ -152,170 +154,109 @@ export default function ProductCatalog({ onSelectProduct, onAddToCart }) {
             gap: '32px'
           }}>
             {filteredProducts.map(product => (
-              <ProductCard 
-                key={product.id} 
-                product={product} 
-                onSelect={() => onSelectProduct(product)}
-                onAddToCart={(type) => onAddToCart(product, type)}
-              />
+              <div 
+                key={product.id}
+                className="card-interactive"
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: 'var(--radius-lg)',
+                  overflow: 'hidden',
+                  boxShadow: 'var(--shadow-sm)',
+                  border: '1px solid var(--color-border)',
+                  display: 'flex',
+                  flexDirection: 'column'
+                }}
+              >
+                {/* Product Image & Badges */}
+                <div style={{ position: 'relative', height: '230px', overflow: 'hidden' }}>
+                  <img 
+                    src={product.image} 
+                    alt={product.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                  {product.badge && (
+                    <span className="badge badge-gold" style={{ position: 'absolute', top: '16px', left: '16px' }}>
+                      {product.badge}
+                    </span>
+                  )}
+                </div>
+
+                {/* Content */}
+                <div style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <div>
+                    <h3 
+                      onClick={() => onSelectProduct(product)}
+                      style={{
+                        fontSize: '1.3rem',
+                        marginBottom: '8px',
+                        cursor: 'pointer',
+                        color: 'var(--color-espresso)'
+                      }}
+                    >
+                      {product.name}
+                    </h3>
+
+                    <p style={{
+                      color: 'var(--color-text-muted)',
+                      fontSize: '0.9rem',
+                      lineHeight: 1.55,
+                      marginBottom: '16px',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden'
+                    }}>
+                      {product.description}
+                    </p>
+                  </div>
+
+                  {/* Pricing & Add Actions */}
+                  <div>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'baseline',
+                      gap: '8px',
+                      marginBottom: '16px',
+                      paddingTop: '16px',
+                      borderTop: '1px solid var(--color-border)'
+                    }}>
+                      <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-espresso)' }}>
+                        ${product.priceSlice.toFixed(2)}
+                      </span>
+                      <span style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>
+                        / Slice • ${product.priceWhole.toFixed(2)} Whole
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '10px' }}>
+                      <button 
+                        onClick={() => onSelectProduct(product)}
+                        className="btn-secondary"
+                        style={{ padding: '10px', fontSize: '0.85rem' }}
+                      >
+                        <Eye size={15} />
+                        <span>Details</span>
+                      </button>
+
+                      <button 
+                        onClick={() => onAddToCart(product, 'slice')}
+                        className="btn-primary"
+                        style={{ padding: '10px', fontSize: '0.85rem' }}
+                      >
+                        <Plus size={15} />
+                        <span>Add Slice</span>
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
             ))}
           </div>
         )}
 
       </div>
     </section>
-  );
-}
-
-function ProductCard({ product, onSelect, onAddToCart }) {
-  const [optionType, setOptionType] = useState(product.priceSlice ? 'slice' : 'whole');
-  const activePrice = optionType === 'slice' ? product.priceSlice : product.priceWhole;
-
-  return (
-    <div className="animate-fade-in" style={{
-      backgroundColor: '#FFFFFF',
-      borderRadius: 'var(--radius-lg)',
-      overflow: 'hidden',
-      boxShadow: 'var(--shadow-md)',
-      border: '1px solid var(--color-border)',
-      display: 'flex',
-      flexDirection: 'column',
-      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.transform = 'translateY(-6px)';
-      e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = 'translateY(0)';
-      e.currentTarget.style.boxShadow = 'var(--shadow-md)';
-    }}
-    >
-      {/* Product Image Header */}
-      <div style={{ position: 'relative', height: '220px', overflow: 'hidden' }}>
-        <img 
-          src={product.image} 
-          alt={product.name}
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-        />
-        
-        {/* Badge */}
-        {product.badge && (
-          <div style={{ position: 'absolute', top: '16px', left: '16px' }}>
-            <span className="badge badge-gold">{product.badge}</span>
-          </div>
-        )}
-
-        {/* Quick View Button Overlay */}
-        <button 
-          onClick={onSelect}
-          className="glass-panel"
-          style={{
-            position: 'absolute',
-            bottom: '16px',
-            right: '16px',
-            padding: '8px 14px',
-            borderRadius: 'var(--radius-full)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            fontSize: '0.82rem',
-            fontWeight: 600,
-            color: 'var(--color-espresso)'
-          }}
-        >
-          <Eye size={15} />
-          <span>Quick View</span>
-        </button>
-      </div>
-
-      {/* Card Content */}
-      <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-        {/* Prep Time */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '8px' }}>
-          <span style={{ fontSize: '0.78rem', color: 'var(--color-caramel)', fontWeight: 600 }}>{product.prepTime}</span>
-        </div>
-
-        {/* Title & Description */}
-        <h3 style={{ fontSize: '1.25rem', marginBottom: '8px', cursor: 'pointer' }} onClick={onSelect}>
-          {product.name}
-        </h3>
-        <p style={{
-          fontSize: '0.88rem',
-          color: 'var(--color-text-muted)',
-          marginBottom: '16px',
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
-          overflow: 'hidden',
-          flex: 1
-        }}>
-          {product.description}
-        </p>
-
-        {/* Option Switcher (Slice vs Whole / 6-Pack for Muffins) */}
-        {product.priceSlice && (
-          <div style={{
-            display: 'flex',
-            backgroundColor: 'var(--color-cream-light)',
-            padding: '4px',
-            borderRadius: 'var(--radius-md)',
-            marginBottom: '16px',
-            border: '1px solid var(--color-border)'
-          }}>
-            <button
-              onClick={() => setOptionType('slice')}
-              style={{
-                flex: 1,
-                padding: '6px 0',
-                borderRadius: 'var(--radius-sm)',
-                fontSize: '0.8rem',
-                fontWeight: 600,
-                backgroundColor: optionType === 'slice' ? '#FFFFFF' : 'transparent',
-                color: optionType === 'slice' ? 'var(--color-espresso)' : 'var(--color-text-muted)',
-                boxShadow: optionType === 'slice' ? 'var(--shadow-sm)' : 'none'
-              }}
-            >
-              {product.category === 'muffins' ? 'Single Muffin' : product.category === 'cookies' ? 'Single Cookie' : 'Single Slice'} (${product.priceSlice.toFixed(2)})
-            </button>
-            <button
-              onClick={() => setOptionType('whole')}
-              style={{
-                flex: 1,
-                padding: '6px 0',
-                borderRadius: 'var(--radius-sm)',
-                fontSize: '0.8rem',
-                fontWeight: 600,
-                backgroundColor: optionType === 'whole' ? '#FFFFFF' : 'transparent',
-                color: optionType === 'whole' ? 'var(--color-espresso)' : 'var(--color-text-muted)',
-                boxShadow: optionType === 'whole' ? 'var(--shadow-sm)' : 'none'
-              }}
-            >
-              {product.category === 'muffins' || product.category === 'cookies' ? '6-Pack Box' : 'Full Cake'} (${product.priceWhole.toFixed(2)})
-            </button>
-          </div>
-        )}
-
-        {/* Price & Add Button */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '12px', borderTop: '1px solid var(--color-border)' }}>
-          <div>
-            <span style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', display: 'block' }}>Price</span>
-            <span style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--color-espresso)' }}>
-              ${activePrice.toFixed(2)}
-            </span>
-          </div>
-
-          <button 
-            onClick={() => onAddToCart(optionType)}
-            className="btn-primary"
-            style={{ padding: '10px 18px', fontSize: '0.88rem' }}
-          >
-            <Plus size={16} />
-            <span>Add to Cart</span>
-          </button>
-        </div>
-
-      </div>
-    </div>
   );
 }
