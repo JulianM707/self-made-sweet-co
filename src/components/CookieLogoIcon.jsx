@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function CookieLogoIcon({ size = 28, color = '#FFF', cookieBg = '#C88D51', chipColor = '#2A1B17' }) {
+export default function CookieLogoIcon({ size = 28, color = '#2A1B17', cookieBg = '#C88D51', chipColor = '#2A1B17' }) {
   return (
     <svg 
       width={size} 
@@ -24,7 +24,7 @@ export default function CookieLogoIcon({ size = 28, color = '#FFF', cookieBg = '
       <circle cx="22" cy="7" r="2" fill={chipColor} opacity="0.8" />
       <circle cx="22" cy="37" r="2" fill={chipColor} opacity="0.8" />
 
-      {/* SM Monogram Text in Center */}
+      {/* SM Monogram Text in Center (Dark Chocolate #2A1B17) */}
       <text 
         x="22" 
         y="27" 
