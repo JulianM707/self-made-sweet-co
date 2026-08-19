@@ -1,5 +1,6 @@
 import React from 'react';
-import { ShoppingBag, Sparkles, Cake, Heart, Star } from 'lucide-react';
+import { ShoppingBag, Sparkles, Heart, Star } from 'lucide-react';
+import CookieLogoIcon from './CookieLogoIcon';
 
 export default function Navbar({ 
   cartCount, 
@@ -8,7 +9,7 @@ export default function Navbar({
   onOpenAbout,
   activeTab, 
   setActiveTab,
-  reviewsCount = 5
+  reviewsCount = 0
 }) {
   return (
     <header className="glass-panel" style={{ position: 'sticky', top: 0, zIndex: 100, borderBottom: '1px solid var(--color-border)' }}>
@@ -20,17 +21,15 @@ export default function Navbar({
           style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}
         >
           <div style={{
-            width: '44px',
-            height: '44px',
+            width: '46px',
+            height: '46px',
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, var(--color-caramel) 0%, var(--color-espresso) 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#FFF',
             boxShadow: 'var(--shadow-sm)'
           }}>
-            <Cake size={24} />
+            <CookieLogoIcon size={44} />
           </div>
           <div>
             <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.45rem', fontWeight: 800, color: 'var(--color-espresso)', letterSpacing: '-0.3px', display: 'block', lineHeight: 1 }}>

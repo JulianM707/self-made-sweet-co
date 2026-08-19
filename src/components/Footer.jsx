@@ -1,5 +1,6 @@
 import React from 'react';
-import { Cake, Heart, Mail, Phone, MapPin, GraduationCap, Lock } from 'lucide-react';
+import { Heart, Mail, Phone, MapPin, GraduationCap, Lock } from 'lucide-react';
+import CookieLogoIcon from './CookieLogoIcon';
 
 export default function Footer({ onOpenAbout, onOpenBakerLogin }) {
   return (
@@ -11,111 +12,100 @@ export default function Footer({ onOpenAbout, onOpenBakerLogin }) {
           {/* Col 1: Julian's Story & Mission */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <div style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                backgroundColor: 'var(--color-caramel)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#FFF'
-              }}>
-                <Cake size={20} />
-              </div>
+              <CookieLogoIcon size={42} />
               <h3 style={{ color: '#FFFFFF', fontSize: '1.5rem', fontFamily: 'var(--font-heading)' }}>
                 Self-Made Sweet Co.
               </h3>
             </div>
 
-            <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.92rem', lineHeight: 1.65, marginBottom: '20px' }}>
-              Welcome to <strong>Self-Made Sweet Co.</strong>! Founded by Julian Medrano, MBA—Vallejo native, UC Santa Cruz B.S. & SDSU MBA Alum, 1st gen Mexican-American, and self-made baker passionate about bringing genuine smiles to people’s faces.
+            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.92rem', lineHeight: 1.65, marginBottom: '20px' }}>
+              Founded by <strong>Julian Medrano</strong>, a 1st generation Mexican-American from Vallejo, CA. 
+              Armed with a <strong>Bachelor's Degree from UC Santa Cruz</strong> and an <strong>MBA from San Diego State University (SDSU)</strong>, 
+              Julian brings passion, fitness discipline, and artisan baking craft to every treat.
             </p>
 
             <button 
               onClick={onOpenAbout}
               className="badge badge-gold"
-              style={{ padding: '8px 16px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              style={{ padding: '8px 16px', cursor: 'pointer' }}
             >
               <Heart size={14} fill="currentColor" />
-              <span>Read Julian's Full Story</span>
+              <span>Read Julian’s Full Founder Story</span>
             </button>
           </div>
 
-          {/* Col 2: Signature Items */}
+          {/* Col 2: Signature Bakes Menu */}
           <div>
-            <h4 style={{ color: 'var(--color-gold)', fontSize: '1.1rem', marginBottom: '18px', fontFamily: 'var(--font-heading)' }}>
-              Our Signature Bakes
+            <h4 style={{ color: 'var(--color-caramel)', fontSize: '1.1rem', marginBottom: '18px', fontWeight: 700 }}>
+              My Signature Bakes
             </h4>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.9rem', color: 'rgba(255,255,255,0.8)' }}>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.9rem', color: 'rgba(255,255,255,0.75)' }}>
               <li>• Classic Artisan Cheesecake</li>
-              <li>• Fresh Jammy Strawberry Cheesecake</li>
-              <li>• Wild Blueberry Streusel Muffin</li>
               <li>• Classic Venetian Tiramisu</li>
+              <li>• Wild Blueberry Streusel Muffin</li>
               <li>• Cinnamon Streusel Coffee Cake</li>
               <li>• Gourmet Chocolate Chip Cookie</li>
             </ul>
           </div>
 
-          {/* Col 3: Kitchen Info */}
+          {/* Col 3: Sacramento Order & Pickup Hours */}
           <div>
-            <h4 style={{ color: 'var(--color-gold)', fontSize: '1.1rem', marginBottom: '18px', fontFamily: 'var(--font-heading)' }}>
-              Sacramento Kitchen Info
+            <h4 style={{ color: 'var(--color-caramel)', fontSize: '1.1rem', marginBottom: '18px', fontWeight: 700 }}>
+              Sacramento Kitchen & Delivery
             </h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '0.9rem', color: 'rgba(255,255,255,0.8)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <MapPin size={16} color="var(--color-gold)" />
-                <span>Sacramento, California (Vallejo Roots)</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '0.88rem', color: 'rgba(255,255,255,0.75)' }}>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <MapPin size={18} color="var(--color-caramel)" style={{ flexShrink: 0 }} />
+                <span>Sacramento, California (Local Delivery & Store Pickup Available)</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Mail size={16} color="var(--color-gold)" />
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <Mail size={18} color="var(--color-caramel)" style={{ flexShrink: 0 }} />
                 <span>julian@selfmadesweetco.com</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <GraduationCap size={16} color="var(--color-gold)" />
-                <span>UC Santa Cruz & SDSU MBA Alum</span>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <Phone size={18} color="var(--color-caramel)" style={{ flexShrink: 0 }} />
+                <span>(916) 555-BAKE</span>
+              </div>
+              <div style={{ marginTop: '6px', fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>
+                ⏰ Kitchen Hours: Tuesday – Sunday: 8:00 AM – 7:00 PM
               </div>
             </div>
           </div>
 
         </div>
 
-        {/* Bottom Row */}
+        {/* Bottom Copyright & Secret Baker Portal Link */}
         <div style={{
-          borderTop: '1px solid rgba(255,255,255,0.1)',
-          paddingTop: '28px',
+          borderTop: '1px solid rgba(255,255,255,0.12)',
+          paddingTop: '24px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: '16px',
-          fontSize: '0.85rem',
-          color: 'rgba(255,255,255,0.6)'
+          fontSize: '0.82rem',
+          color: 'rgba(255,255,255,0.5)'
         }}>
           <div>
-            © {new Date().getFullYear()} Self-Made Sweet Co. All Rights Reserved. Crafted with <Heart size={13} display="inline" color="var(--color-terracotta)" fill="var(--color-terracotta)" /> for dessert lovers.
+            © {new Date().getFullYear()} Self-Made Sweet Co. • All Rights Reserved • Handcrafted with ❤️ by Julian
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <span>Vallejo Roots</span>
-            <span>•</span>
-            <span>UCSC & SDSU MBA Alum</span>
-            <span>•</span>
+            {/* Discreet Kitchen Staff Link */}
             <button 
               onClick={onOpenBakerLogin}
               style={{
                 background: 'none',
                 border: 'none',
-                color: 'rgba(255,255,255,0.4)',
-                fontSize: '0.78rem',
-                cursor: 'pointer',
-                display: 'inline-flex',
+                color: 'rgba(255,255,255,0.35)',
+                fontSize: '0.75rem',
+                display: 'flex',
                 alignItems: 'center',
-                gap: '4px'
+                gap: '4px',
+                cursor: 'pointer'
               }}
-              title="Kitchen Staff Portal Login"
             >
-              <Lock size={12} />
+              <Lock size={11} />
               <span>Kitchen Staff</span>
             </button>
           </div>
