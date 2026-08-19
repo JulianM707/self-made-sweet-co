@@ -50,11 +50,16 @@ export default function App() {
     }
   });
 
-  // Persist reviews in localStorage
+  // Persist reviews in localStorage (filter out any old demo reviews)
   const [reviews, setReviews] = useState(() => {
     try {
       const saved = localStorage.getItem('julians_bakery_reviews');
-      return saved ? JSON.parse(saved) : INITIAL_REVIEWS;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const realOnly = parsed.filter(r => !['REV-101', 'REV-102', 'REV-103', 'REV-104', 'REV-105', 'REV-106', 'rev-1', 'rev-2', 'rev-3', 'rev-4', 'rev-5'].includes(r.id));
+        return realOnly;
+      }
+      return INITIAL_REVIEWS;
     } catch (e) {
       return INITIAL_REVIEWS;
     }
@@ -258,9 +263,7 @@ export default function App() {
           /* Customer Reviews & Dish Photos Tab */
           <ReviewsSection 
             reviews={reviews}
-            products={PRODUCTS}
-            onOpenAddReview={() => setIsAddReviewOpen(true)}
-            onLikeReview={handleLikeReview}
+            onAddReview={handleAddReview}
           />
         ) : (
           /* Customer Bakery Menu Experience */
@@ -313,13 +316,6 @@ export default function App() {
         }}
       />
 
-      <AddReviewModal
-        isOpen={isAddReviewOpen}
-        onClose={() => setIsAddReviewOpen(false)}
-        products={PRODUCTS}
-        onSubmitReview={handleAddReview}
-      />
-
       <CartDrawer 
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
@@ -337,4 +333,3 @@ export default function App() {
     </div>
   );
 }
-
