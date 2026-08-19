@@ -24,18 +24,18 @@ export default function CookieLogoIcon({ size = 28, color = '#FFF', cookieBg = '
       <circle cx="22" cy="7" r="2" fill={chipColor} opacity="0.8" />
       <circle cx="22" cy="37" r="2" fill={chipColor} opacity="0.8" />
 
-      {/* S-M Monogram Text in Center */}
+      {/* SM Monogram Text in Center */}
       <text 
         x="22" 
-        y="26.5" 
+        y="27" 
         textAnchor="middle" 
         fill={color} 
-        fontSize="14" 
+        fontSize="15" 
         fontWeight="900" 
         fontFamily="'Plus Jakarta Sans', system-ui, sans-serif"
-        letterSpacing="-0.5px"
+        letterSpacing="-0.3px"
       >
-        S-M
+        SM
       </text>
     </svg>
   );
