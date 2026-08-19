@@ -67,7 +67,7 @@ export default function Footer({ onOpenAbout, onOpenBakerLogin }) {
                 <span>(916) 555-BAKE</span>
               </div>
               <div style={{ marginTop: '6px', fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>
-                ⏰ Kitchen Hours: Tuesday – Sunday: 8:00 AM – 7:00 PM
+                ⏰ Kitchen Hours: Saturday & Sunday: 8:00 AM – 8:00 PM
               </div>
             </div>
           </div>
