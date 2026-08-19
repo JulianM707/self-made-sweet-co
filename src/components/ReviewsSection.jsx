@@ -15,6 +15,18 @@ export default function ReviewsSection({ reviews, onAddReview }) {
   const [comment, setComment] = useState('');
   const [customImage, setCustomImage] = useState(null);
 
+  // DYNAMIC STATS CALCULATIONS
+  const totalReviews = reviews.length;
+  const avgRatingNumber = totalReviews > 0
+    ? reviews.reduce((sum, r) => sum + (r.rating || 5), 0) / totalReviews
+    : 5.0;
+  const avgRatingDisplay = avgRatingNumber.toFixed(1);
+
+  const fiveStarCount = reviews.filter(r => (r.rating || 5) === 5).length;
+  const satisfactionPct = totalReviews > 0
+    ? Math.round((fiveStarCount / totalReviews) * 100)
+    : 100;
+
   const filteredReviews = reviews.filter(r => {
     if (selectedProductFilter === 'all') return true;
     const name = r.dishName || r.productName || '';
@@ -44,7 +56,7 @@ export default function ReviewsSection({ reviews, onAddReview }) {
       location: location.trim() || 'Sacramento, CA',
       dishName: dishName,
       productName: dishName,
-      rating: rating,
+      rating: Number(rating),
       date: 'Just now',
       title: title.trim() || `${rating} Stars for ${dishName}!`,
       comment: comment.trim(),
@@ -79,7 +91,7 @@ export default function ReviewsSection({ reviews, onAddReview }) {
           </p>
         </div>
 
-        {/* Rating Overview Summary Banner */}
+        {/* Dynamic Rating Overview Summary Banner */}
         <div style={{
           backgroundColor: '#FFFFFF',
           borderRadius: 'var(--radius-lg)',
@@ -95,10 +107,12 @@ export default function ReviewsSection({ reviews, onAddReview }) {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             <div style={{ textAlign: 'center', borderRight: '1px solid var(--color-border)', paddingRight: '24px' }}>
-              <div style={{ fontSize: '3rem', fontWeight: 800, color: 'var(--color-espresso)', lineHeight: 1 }}>5.0</div>
+              <div style={{ fontSize: '3rem', fontWeight: 800, color: 'var(--color-espresso)', lineHeight: 1 }}>
+                {avgRatingDisplay}
+              </div>
               <div style={{ display: 'flex', gap: '2px', color: 'var(--color-gold)', marginTop: '4px', justifyContent: 'center' }}>
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={18} fill="currentColor" />
+                  <Star key={i} size={18} fill={i < Math.round(avgRatingNumber) ? 'currentColor' : 'none'} color="var(--color-gold)" />
                 ))}
               </div>
               <span style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', fontWeight: 600, display: 'block', marginTop: '4px' }}>
@@ -108,10 +122,12 @@ export default function ReviewsSection({ reviews, onAddReview }) {
 
             <div>
               <h3 style={{ fontSize: '1.25rem', marginBottom: '4px', color: 'var(--color-espresso)' }}>
-                100% 5-Star Satisfaction
+                {satisfactionPct}% 5-Star Satisfaction
               </h3>
               <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', margin: 0 }}>
-                Based on {reviews.length} verified customer reviews & photo uploads.
+                {totalReviews === 0 
+                  ? 'Be the first customer to leave an authentic review for Julian!' 
+                  : `Calculated live from ${totalReviews} verified customer review${totalReviews === 1 ? '' : 's'}.`}
               </p>
             </div>
           </div>
@@ -145,7 +161,7 @@ export default function ReviewsSection({ reviews, onAddReview }) {
               cursor: 'pointer'
             }}
           >
-            All Bakes ({reviews.length})
+            All Bakes ({totalReviews})
           </button>
 
           {PRODUCTS.map(p => (
@@ -171,8 +187,18 @@ export default function ReviewsSection({ reviews, onAddReview }) {
         {/* Reviews Cards Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '24px' }}>
           {filteredReviews.length === 0 ? (
-            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px 0', color: 'var(--color-text-muted)' }}>
-              No reviews found for this bake yet. Be the first to leave one and upload a photo!
+            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '60px 20px', backgroundColor: '#FFF', borderRadius: 'var(--radius-lg)', border: '1px dashed var(--color-border)' }}>
+              <Sparkles size={36} color="var(--color-caramel)" style={{ marginBottom: '12px' }} />
+              <h3 style={{ fontSize: '1.25rem', color: 'var(--color-espresso)', marginBottom: '6px' }}>No Customer Reviews Yet</h3>
+              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.92rem', marginBottom: '20px' }}>
+                Be the very first customer to submit a review and photo for Julian’s signature bakes!
+              </p>
+              <button 
+                onClick={() => setIsFormOpen(true)}
+                className="btn-primary"
+              >
+                + Submit First Review
+              </button>
             </div>
           ) : (
             filteredReviews.map(review => {
