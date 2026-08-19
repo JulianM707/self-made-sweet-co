@@ -103,21 +103,20 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
         </button>
 
         {/* Left Side: Product Image */}
-        <div style={{ position: 'relative', height: '100%', minHeight: '360px' }}>
+        <div className="modal-product-image">
           <img 
             src={activeImage} 
             alt={product.name} 
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
           {product.badge && (
-            <div style={{ position: 'absolute', top: '20px', left: '20px' }}>
+            <div style={{ position: 'absolute', top: '16px', left: '16px', zIndex: 2 }}>
               <span className="badge badge-gold">{product.badge}</span>
             </div>
           )}
         </div>
 
         {/* Right Side: Product Details & Options */}
-        <div style={{ padding: '36px 32px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div className="modal-content-body" style={{ padding: '36px 32px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div>
             {/* Prep Time */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '12px' }}>
