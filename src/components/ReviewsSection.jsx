@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Star, MessageSquare, Plus, CheckCircle2, Heart, ThumbsUp, Filter, Sparkles, MapPin, X } from 'lucide-react';
+import { Star, MessageSquare, Plus, CheckCircle2, Heart, ThumbsUp, Filter, Sparkles, MapPin, X, Camera, Upload } from 'lucide-react';
 import { PRODUCTS } from '../data/bakeryData';
 
 export default function ReviewsSection({ reviews, onAddReview }) {
@@ -13,12 +13,24 @@ export default function ReviewsSection({ reviews, onAddReview }) {
   const [rating, setRating] = useState(5);
   const [title, setTitle] = useState('');
   const [comment, setComment] = useState('');
+  const [customImage, setCustomImage] = useState(null);
 
   const filteredReviews = reviews.filter(r => {
     if (selectedProductFilter === 'all') return true;
     const name = r.dishName || r.productName || '';
     return name.toLowerCase().includes(selectedProductFilter.toLowerCase());
   });
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCustomImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmitReview = (e) => {
     e.preventDefault();
@@ -36,7 +48,7 @@ export default function ReviewsSection({ reviews, onAddReview }) {
       date: 'Just now',
       title: title.trim() || `${rating} Stars for ${dishName}!`,
       comment: comment.trim(),
-      image: matchedProduct.image,
+      image: customImage || matchedProduct.image,
       verified: true
     };
 
@@ -45,6 +57,7 @@ export default function ReviewsSection({ reviews, onAddReview }) {
     setLocation('');
     setTitle('');
     setComment('');
+    setCustomImage(null);
     setIsFormOpen(false);
   };
 
@@ -59,10 +72,10 @@ export default function ReviewsSection({ reviews, onAddReview }) {
             <span>Verified Customer Reviews</span>
           </span>
           <h2 style={{ fontSize: '2.5rem', marginBottom: '12px', color: 'var(--color-espresso)' }}>
-            Customer Praise for My Bakes
+            Customer Praise & Dish Photos
           </h2>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '1.05rem', lineHeight: 1.6 }}>
-            Real reviews from dessert lovers across Vallejo, Sacramento, Vacaville, and Northern California!
+            Real reviews & photos from dessert lovers across Vallejo, Sacramento, Vacaville, and Northern California!
           </p>
         </div>
 
@@ -98,7 +111,7 @@ export default function ReviewsSection({ reviews, onAddReview }) {
                 100% 5-Star Satisfaction
               </h3>
               <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', margin: 0 }}>
-                Based on {reviews.length} verified customer reviews & completed kitchen orders.
+                Based on {reviews.length} verified customer reviews & photo uploads.
               </p>
             </div>
           </div>
@@ -108,8 +121,8 @@ export default function ReviewsSection({ reviews, onAddReview }) {
             className="btn-primary"
             style={{ padding: '12px 24px', display: 'flex', alignItems: 'center', gap: '8px' }}
           >
-            <Plus size={18} />
-            <span>Leave a Review</span>
+            <Camera size={18} />
+            <span>Leave Review & Upload Photo</span>
           </button>
         </div>
 
@@ -159,7 +172,7 @@ export default function ReviewsSection({ reviews, onAddReview }) {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '24px' }}>
           {filteredReviews.length === 0 ? (
             <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px 0', color: 'var(--color-text-muted)' }}>
-              No reviews found for this bake yet. Be the first to leave one!
+              No reviews found for this bake yet. Be the first to leave one and upload a photo!
             </div>
           ) : (
             filteredReviews.map(review => {
@@ -180,7 +193,7 @@ export default function ReviewsSection({ reviews, onAddReview }) {
                 }}>
                   {/* Photo if available */}
                   {review.image && (
-                    <div style={{ height: '180px', overflow: 'hidden', position: 'relative' }}>
+                    <div style={{ height: '210px', overflow: 'hidden', position: 'relative' }}>
                       <img 
                         src={review.image} 
                         alt={dish} 
@@ -253,7 +266,7 @@ export default function ReviewsSection({ reviews, onAddReview }) {
           )}
         </div>
 
-        {/* Leave Review Modal */}
+        {/* Leave Review & Upload Photo Modal */}
         {isFormOpen && (
           <div style={{
             position: 'fixed',
@@ -273,8 +286,10 @@ export default function ReviewsSection({ reviews, onAddReview }) {
             <div className="animate-fade-in" style={{
               backgroundColor: '#FFFFFF',
               borderRadius: 'var(--radius-lg)',
-              maxWidth: '480px',
+              maxWidth: '500px',
               width: '100%',
+              maxHeight: '90vh',
+              overflowY: 'auto',
               padding: '32px',
               position: 'relative',
               boxShadow: 'var(--shadow-lg)'
@@ -300,11 +315,14 @@ export default function ReviewsSection({ reviews, onAddReview }) {
                 <X size={18} />
               </button>
 
-              <h3 style={{ fontSize: '1.5rem', marginBottom: '6px', color: 'var(--color-espresso)' }}>
-                Leave a Review for Julian
-              </h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                <Camera size={24} color="var(--color-caramel)" />
+                <h3 style={{ fontSize: '1.5rem', color: 'var(--color-espresso)', margin: 0 }}>
+                  Leave Review & Upload Photo
+                </h3>
+              </div>
               <p style={{ color: 'var(--color-text-muted)', fontSize: '0.88rem', marginBottom: '20px' }}>
-                Share your experience with Self-Made Sweet Co.!
+                Showcase the delicious bake you received from Julian!
               </p>
 
               <form onSubmit={handleSubmitReview} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -350,6 +368,39 @@ export default function ReviewsSection({ reviews, onAddReview }) {
                   </select>
                 </div>
 
+                {/* 📸 CUSTOM DISH PHOTO UPLOAD INPUT */}
+                <div style={{
+                  backgroundColor: 'var(--color-cream-light)',
+                  padding: '16px',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px dashed var(--color-caramel)'
+                }}>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-espresso)', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                    <Upload size={16} color="var(--color-caramel)" />
+                    <span>Upload Photo of Your Bake (Optional)</span>
+                  </label>
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    style={{ width: '100%', fontSize: '0.85rem', cursor: 'pointer' }}
+                  />
+
+                  {customImage && (
+                    <div style={{ marginTop: '12px', position: 'relative' }}>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#2D7A42', display: 'block', marginBottom: '4px' }}>
+                        ✓ Photo Ready to Upload:
+                      </span>
+                      <img 
+                        src={customImage} 
+                        alt="Uploaded preview" 
+                        style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }} 
+                      />
+                    </div>
+                  )}
+                </div>
+
                 <div>
                   <label style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--color-espresso)', display: 'block', marginBottom: '6px' }}>
                     Rating *
@@ -379,7 +430,7 @@ export default function ReviewsSection({ reviews, onAddReview }) {
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. Best cheesecake in town!"
+                    placeholder="e.g. Look at this gorgeous slice!"
                     value={title}
                     onChange={e => setTitle(e.target.value)}
                     style={{ width: '100%', padding: '10px 14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', fontSize: '0.9rem', outline: 'none' }}
@@ -392,7 +443,7 @@ export default function ReviewsSection({ reviews, onAddReview }) {
                   </label>
                   <textarea
                     required
-                    rows={4}
+                    rows={3}
                     placeholder="Tell us what you loved about your bake..."
                     value={comment}
                     onChange={e => setComment(e.target.value)}
@@ -414,7 +465,7 @@ export default function ReviewsSection({ reviews, onAddReview }) {
                     className="btn-primary"
                     style={{ flex: 1 }}
                   >
-                    Submit Review
+                    Post Review & Photo
                   </button>
                 </div>
               </form>
