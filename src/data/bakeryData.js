@@ -224,3 +224,97 @@ export const INITIAL_ORDERS = [
     note: 'Delivery to front lobby receptionist'
   }
 ];
+
+export const INITIAL_REVIEWS = [
+  {
+    id: 'REV-101',
+    customerName: 'Samantha R.',
+    verified: true,
+    dishId: 'classic-cheesecake',
+    dishName: 'Classic Artisan Cheesecake',
+    rating: 5,
+    date: '2 days ago',
+    timestamp: Date.now() - 86400000 * 2,
+    title: 'Literally the best cheesecake in Sacramento!! 🍓',
+    comment: 'Julian does not mess around with his cheesecakes. The texture is impossibly smooth and creamy with that perfect hint of lemon zest! The house strawberry compote on top tasted like it was picked fresh this morning.',
+    image: '/images/strawberry_cheesecake_1786065683977.jpg',
+    helpfulCount: 34,
+    featured: true
+  },
+  {
+    id: 'REV-102',
+    customerName: 'David K.',
+    verified: true,
+    dishId: 'regular-tiramisu',
+    dishName: 'Classic Venetian Tiramisu',
+    rating: 5,
+    date: '4 days ago',
+    timestamp: Date.now() - 86400000 * 4,
+    title: 'Took this to a dinner party & everybody went crazy',
+    comment: 'The mascarpone is so light and velvety, not overly sweet at all. You can taste the quality of the cold brew espresso. Will definitely be ordering the whole tray for holidays.',
+    image: '/images/espresso_tiramisu_1786065261884.jpg',
+    helpfulCount: 19,
+    featured: true
+  },
+  {
+    id: 'REV-103',
+    customerName: 'Maria & Carlos',
+    verified: true,
+    dishId: 'blueberry-muffin',
+    dishName: 'Wild Blueberry Streusel Muffin',
+    rating: 5,
+    date: '1 week ago',
+    timestamp: Date.now() - 86400000 * 7,
+    title: 'Cinnamon streusel top is to die for!',
+    comment: 'Got these warm for morning coffee. Packed with real wild blueberries in every single bite. That cold-butter cinnamon brown sugar crunch on top is pure perfection.',
+    image: '/images/berry_muffins_1786065279996.jpg',
+    helpfulCount: 27,
+    featured: true
+  },
+  {
+    id: 'REV-104',
+    customerName: 'Brandon T.',
+    verified: true,
+    dishId: 'cinnamon-coffee-cake',
+    dishName: 'Cinnamon Streusel Coffee Cake',
+    rating: 5,
+    date: '1 week ago',
+    timestamp: Date.now() - 86400000 * 8,
+    title: 'Warm & buttery excellence',
+    comment: 'The cinnamon swirl layer in the center was super gooey and rich. Paired with a fresh espresso from our kitchen. Julian’s Vallejo roots & UCSC pride show in every bake!',
+    image: '/images/coffee_cake_1786065744321.jpg',
+    helpfulCount: 14,
+    featured: false
+  },
+  {
+    id: 'REV-105',
+    customerName: 'Chloe M.',
+    verified: true,
+    dishId: 'chocolate-chip-cookie',
+    dishName: 'Gourmet Chocolate Chip Cookie',
+    rating: 5,
+    date: '2 weeks ago',
+    timestamp: Date.now() - 86400000 * 14,
+    title: 'Crispy edges with soft gooey melted centers 🍫',
+    comment: 'Ordered a half dozen for a weekend study group. They arrived warm with huge chocolate chunks. 10/10 recommend!',
+    image: '/images/chocolate_chip_cookies.jpg',
+    helpfulCount: 22,
+    featured: true
+  },
+  {
+    id: 'REV-106',
+    customerName: 'Jessica H.',
+    verified: true,
+    dishId: 'classic-cheesecake',
+    dishName: 'Basque Caramelized Cheesecake',
+    rating: 5,
+    date: '3 weeks ago',
+    timestamp: Date.now() - 86400000 * 21,
+    title: 'Silky smooth golden bake',
+    comment: 'Look at this gorgeous golden bake! Unbelievably rich and balanced. Everyone at work wanted a slice.',
+    image: '/images/basque_cheesecake_1786065253639.jpg',
+    helpfulCount: 16,
+    featured: false
+  }
+];
+

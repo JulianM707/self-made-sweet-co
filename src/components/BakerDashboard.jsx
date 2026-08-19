@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChefHat, Flame, Clock, CheckCircle2, DollarSign, Package, AlertCircle, Sparkles, Filter, Trash2, CheckCheck } from 'lucide-react';
+import { ChefHat, Flame, Clock, CheckCircle2, DollarSign, Package, AlertCircle, Sparkles, Filter, Trash2, CheckCheck, Camera, Star, Eye } from 'lucide-react';
 
 export default function BakerDashboard({ 
   orders, 
@@ -7,9 +7,14 @@ export default function BakerDashboard({
   onDeleteOrder, 
   onClearCompletedOrders,
   products, 
-  onToggleProductAvailability 
+  onToggleProductAvailability,
+  reviews = [],
+  onDeleteReview,
+  onToggleFeatureReview
 }) {
+  const [activeTab, setActiveTab] = useState('orders'); // 'orders' or 'reviews'
   const [activeFilter, setActiveFilter] = useState('all');
+
 
   const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
   const activeOrdersCount = orders.filter(o => o.status !== 'Completed').length;
@@ -75,8 +80,8 @@ export default function BakerDashboard({
               <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#F9F1D8' }}>{activeOrdersCount}</div>
             </div>
             <div style={{ borderLeft: '1px solid rgba(255,255,255,0.2)', paddingLeft: '24px' }}>
-              <span style={{ fontSize: '0.78rem', opacity: 0.8, textTransform: 'uppercase' }}>Completed Orders</span>
-              <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--color-gold)' }}>{completedOrdersCount}</div>
+              <span style={{ fontSize: '0.78rem', opacity: 0.8, textTransform: 'uppercase' }}>Customer Reviews</span>
+              <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--color-gold)' }}>{reviews.length}</div>
             </div>
             <div style={{ borderLeft: '1px solid rgba(255,255,255,0.2)', paddingLeft: '24px' }}>
               <span style={{ fontSize: '0.78rem', opacity: 0.8, textTransform: 'uppercase' }}>Total Revenue</span>
@@ -84,6 +89,159 @@ export default function BakerDashboard({
             </div>
           </div>
         </div>
+
+        {/* Dashboard Sub-Tab Navigation (Orders vs Customer Reviews) */}
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '28px' }}>
+          <button
+            onClick={() => setActiveTab('orders')}
+            style={{
+              padding: '10px 20px',
+              borderRadius: 'var(--radius-full)',
+              fontWeight: 700,
+              fontSize: '0.92rem',
+              backgroundColor: activeTab === 'orders' ? 'var(--color-espresso)' : '#FFFFFF',
+              color: activeTab === 'orders' ? '#FFFFFF' : 'var(--color-espresso)',
+              border: '1px solid var(--color-border)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              boxShadow: activeTab === 'orders' ? 'var(--shadow-sm)' : 'none'
+            }}
+          >
+            <Package size={17} />
+            <span>Orders Queue ({orders.length})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('reviews')}
+            style={{
+              padding: '10px 20px',
+              borderRadius: 'var(--radius-full)',
+              fontWeight: 700,
+              fontSize: '0.92rem',
+              backgroundColor: activeTab === 'reviews' ? 'var(--color-espresso)' : '#FFFFFF',
+              color: activeTab === 'reviews' ? '#FFFFFF' : 'var(--color-espresso)',
+              border: '1px solid var(--color-border)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              boxShadow: activeTab === 'reviews' ? 'var(--shadow-sm)' : 'none'
+            }}
+          >
+            <Camera size={17} color="#D4AF37" />
+            <span>Customer Photo Reviews ({reviews.length})</span>
+          </button>
+        </div>
+
+        {activeTab === 'reviews' ? (
+          /* Customer Photo Reviews Management Section */
+          <div style={{ backgroundColor: '#FFFFFF', borderRadius: 'var(--radius-lg)', padding: '28px', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--color-border)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <div>
+                <h3 style={{ fontSize: '1.4rem', fontFamily: 'var(--font-heading)', color: 'var(--color-espresso)', margin: 0 }}>
+                  Customer Reviews & Dish Photos Moderation
+                </h3>
+                <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>
+                  Inspect incoming dish photos, feature top reviews on the main gallery, or delete entries.
+                </p>
+              </div>
+            </div>
+
+            {reviews.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--color-text-muted)' }}>
+                No customer reviews posted yet.
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
+                {reviews.map(review => (
+                  <div key={review.id} style={{
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '20px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    backgroundColor: review.featured ? '#FFFDF5' : '#FFFFFF'
+                  }}>
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                        <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--color-espresso)' }}>{review.customerName}</span>
+                        <div style={{ display: 'flex', gap: '2px' }}>
+                          {'★'.repeat(review.rating)}
+                        </div>
+                      </div>
+
+                      <div style={{ fontSize: '0.8rem', color: 'var(--color-caramel)', fontWeight: 700, marginBottom: '8px' }}>
+                        🍰 {review.dishName}
+                      </div>
+
+                      <h5 style={{ fontSize: '1rem', fontWeight: 700, margin: '0 0 6px 0', color: 'var(--color-espresso)' }}>{review.title}</h5>
+                      <p style={{ fontSize: '0.88rem', color: 'var(--color-text-main)', lineHeight: 1.5, marginBottom: '14px' }}>{review.comment}</p>
+
+                      {review.image && (
+                        <img 
+                          src={review.image} 
+                          alt={review.dishName}
+                          style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: 'var(--radius-sm)', marginBottom: '14px' }}
+                        />
+                      )}
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--color-border)', paddingTop: '12px' }}>
+                      <button
+                        onClick={() => onToggleFeatureReview && onToggleFeatureReview(review.id)}
+                        style={{
+                          backgroundColor: review.featured ? '#D4AF37' : 'transparent',
+                          color: review.featured ? '#FFF' : 'var(--color-espresso)',
+                          border: '1px solid #D4AF37',
+                          padding: '4px 10px',
+                          borderRadius: 'var(--radius-full)',
+                          fontSize: '0.78rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        <Star size={12} fill={review.featured ? '#FFF' : 'none'} />
+                        <span>{review.featured ? 'Featured' : 'Feature'}</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          if (window.confirm('Delete this customer review?')) {
+                            onDeleteReview && onDeleteReview(review.id);
+                          }
+                        }}
+                        style={{
+                          backgroundColor: 'rgba(217, 107, 67, 0.1)',
+                          color: 'var(--color-terracotta)',
+                          border: 'none',
+                          padding: '6px 12px',
+                          borderRadius: 'var(--radius-full)',
+                          fontSize: '0.78rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        <Trash2 size={13} />
+                        <span>Delete</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+
 
         {/* Status Filters & Bulk Clear Action */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
@@ -299,8 +457,11 @@ export default function BakerDashboard({
             })
           )}
         </div>
+        </>
+        )}
 
       </div>
     </section>
   );
 }
+

@@ -9,14 +9,17 @@ import BakerLoginModal from './components/BakerLoginModal';
 import CartDrawer from './components/CartDrawer';
 import OrderStatusModal from './components/OrderStatusModal';
 import BakerDashboard from './components/BakerDashboard';
+import ReviewsSection from './components/ReviewsSection';
+import AddReviewModal from './components/AddReviewModal';
 import Footer from './components/Footer';
-import { INITIAL_ORDERS, PRODUCTS } from './data/bakeryData';
+import { INITIAL_ORDERS, INITIAL_REVIEWS, PRODUCTS } from './data/bakeryData';
 import { ChefHat, LogOut, Lock } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('menu');
   const [isAdminMode, setIsAdminMode] = useState(false);
   const [isBakerLoginOpen, setIsBakerLoginOpen] = useState(false);
+  const [isAddReviewOpen, setIsAddReviewOpen] = useState(false);
   
   // Detect ?admin=true or #admin in URL on load to prompt secret Baker Login
   useEffect(() => {
@@ -47,6 +50,16 @@ export default function App() {
     }
   });
 
+  // Persist reviews in localStorage
+  const [reviews, setReviews] = useState(() => {
+    try {
+      const saved = localStorage.getItem('julians_bakery_reviews');
+      return saved ? JSON.parse(saved) : INITIAL_REVIEWS;
+    } catch (e) {
+      return INITIAL_REVIEWS;
+    }
+  });
+
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
@@ -70,6 +83,42 @@ export default function App() {
       console.error('Failed to save orders to localStorage', e);
     }
   }, [orders]);
+
+  // Sync reviews state to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('julians_bakery_reviews', JSON.stringify(reviews));
+    } catch (e) {
+      console.error('Failed to save reviews to localStorage', e);
+    }
+  }, [reviews]);
+
+  // Review Operations
+  const handleAddReview = (newReview) => {
+    setReviews(prev => [newReview, ...prev]);
+  };
+
+  const handleLikeReview = (reviewId) => {
+    setReviews(prev => prev.map(r => {
+      if (r.id === reviewId) {
+        return { ...r, helpfulCount: (r.helpfulCount || 0) + 1 };
+      }
+      return r;
+    }));
+  };
+
+  const handleDeleteReview = (reviewId) => {
+    setReviews(prev => prev.filter(r => r.id !== reviewId));
+  };
+
+  const handleToggleFeatureReview = (reviewId) => {
+    setReviews(prev => prev.map(r => {
+      if (r.id === reviewId) {
+        return { ...r, featured: !r.featured };
+      }
+      return r;
+    }));
+  };
 
   // Cart operations
   const handleAddToCart = (productOrCustomItem, portionType = 'slice') => {
@@ -188,6 +237,7 @@ export default function App() {
         onOpenAbout={() => setIsAboutOpen(true)}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        reviewsCount={reviews.length}
       />
 
       {/* Main View Switching */}
@@ -200,9 +250,20 @@ export default function App() {
             onDeleteOrder={handleDeleteOrder}
             onClearCompletedOrders={handleClearCompletedOrders}
             products={PRODUCTS}
+            reviews={reviews}
+            onDeleteReview={handleDeleteReview}
+            onToggleFeatureReview={handleToggleFeatureReview}
+          />
+        ) : activeTab === 'reviews' ? (
+          /* Customer Reviews & Dish Photos Tab */
+          <ReviewsSection 
+            reviews={reviews}
+            products={PRODUCTS}
+            onOpenAddReview={() => setIsAddReviewOpen(true)}
+            onLikeReview={handleLikeReview}
           />
         ) : (
-          /* Customer Bakery Experience */
+          /* Customer Bakery Menu Experience */
           <>
             <Hero 
               onExploreMenu={() => {
@@ -252,6 +313,13 @@ export default function App() {
         }}
       />
 
+      <AddReviewModal
+        isOpen={isAddReviewOpen}
+        onClose={() => setIsAddReviewOpen(false)}
+        products={PRODUCTS}
+        onSubmitReview={handleAddReview}
+      />
+
       <CartDrawer 
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
@@ -269,3 +337,4 @@ export default function App() {
     </div>
   );
 }
+

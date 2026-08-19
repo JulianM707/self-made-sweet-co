@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingBag, Sparkles, Cake, Heart } from 'lucide-react';
+import { ShoppingBag, Sparkles, Cake, Heart, Star } from 'lucide-react';
 
 export default function Navbar({ 
   cartCount, 
@@ -7,7 +7,8 @@ export default function Navbar({
   onOpenQuiz, 
   onOpenAbout,
   activeTab, 
-  setActiveTab
+  setActiveTab,
+  reviewsCount = 5
 }) {
   return (
     <header className="glass-panel" style={{ position: 'sticky', top: 0, zIndex: 100, borderBottom: '1px solid var(--color-border)' }}>
@@ -56,6 +57,37 @@ export default function Navbar({
             }}
           >
             Signature Menu
+          </button>
+
+          <button 
+            onClick={() => setActiveTab('reviews')}
+            style={{
+              padding: '8px 16px',
+              borderRadius: 'var(--radius-full)',
+              fontWeight: 600,
+              fontSize: '0.9rem',
+              backgroundColor: activeTab === 'reviews' ? 'var(--color-cream)' : 'transparent',
+              color: activeTab === 'reviews' ? 'var(--color-espresso)' : 'var(--color-text-muted)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            <Star size={16} color="var(--color-gold)" fill="var(--color-gold)" />
+            <span>Customer Reviews</span>
+            {reviewsCount > 0 && (
+              <span style={{
+                backgroundColor: 'var(--color-caramel)',
+                color: '#FFF',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                padding: '2px 7px',
+                borderRadius: '10px'
+              }}>
+                {reviewsCount}
+              </span>
+            )}
           </button>
 
           <button 
