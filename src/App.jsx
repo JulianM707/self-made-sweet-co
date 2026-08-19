@@ -50,20 +50,8 @@ export default function App() {
     }
   });
 
-  // Persist reviews in localStorage (filter out any old demo reviews)
-  const [reviews, setReviews] = useState(() => {
-    try {
-      const saved = localStorage.getItem('julians_bakery_reviews');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        const realOnly = parsed.filter(r => !['REV-101', 'REV-102', 'REV-103', 'REV-104', 'REV-105', 'REV-106', 'rev-1', 'rev-2', 'rev-3', 'rev-4', 'rev-5'].includes(r.id));
-        return realOnly;
-      }
-      return INITIAL_REVIEWS;
-    } catch (e) {
-      return INITIAL_REVIEWS;
-    }
-  });
+  // Pure clean state for reviews (clears all previous test/demo reviews)
+  const [reviews, setReviews] = useState([]);
 
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
