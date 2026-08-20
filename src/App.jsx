@@ -8,6 +8,7 @@ import AboutJulianModal from './components/AboutJulianModal';
 import BakerLoginModal from './components/BakerLoginModal';
 import CartDrawer from './components/CartDrawer';
 import OrderStatusModal from './components/OrderStatusModal';
+import OrderNotificationToast from './components/OrderNotificationToast';
 import BakerDashboard from './components/BakerDashboard';
 import ReviewsSection from './components/ReviewsSection';
 import AddReviewModal from './components/AddReviewModal';
@@ -20,6 +21,7 @@ export default function App() {
   const [isAdminMode, setIsAdminMode] = useState(false);
   const [isBakerLoginOpen, setIsBakerLoginOpen] = useState(false);
   const [isAddReviewOpen, setIsAddReviewOpen] = useState(false);
+  const [notificationOrder, setNotificationOrder] = useState(null);
   
   // Detect ?admin=true or #admin in URL on load to prompt secret Baker Login
   useEffect(() => {
@@ -157,6 +159,7 @@ export default function App() {
     setOrders(prev => [newOrder, ...prev]);
     setCartItems([]);
     setActiveOrderTrack(newOrder);
+    setNotificationOrder(newOrder);
   };
 
   const handleUpdateOrderStatus = (orderId, newStatus) => {
@@ -316,6 +319,13 @@ export default function App() {
       <OrderStatusModal 
         order={activeOrderTrack}
         onClose={() => setActiveOrderTrack(null)}
+      />
+
+      {/* Instant Purchase Order Notification Toast */}
+      <OrderNotificationToast 
+        order={notificationOrder}
+        onClose={() => setNotificationOrder(null)}
+        onTrackOrder={(ord) => setActiveOrderTrack(ord)}
       />
 
     </div>
