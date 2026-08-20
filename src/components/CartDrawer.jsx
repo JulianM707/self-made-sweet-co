@@ -2,6 +2,52 @@ import React, { useState } from 'react';
 import { X, Trash2, Plus, Minus, Calendar, MapPin, Clock, ShoppingBag, ArrowRight, CheckCircle2, DollarSign, Smartphone, Send, Check } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
+// Generate arranged weekend kitchen time slots (Saturday & Sunday 8:00 AM - 8:00 PM)
+function getArrangedTimeSlots() {
+  const slots = [];
+  const now = new Date();
+
+  const getNextDayOfWeek = (date, dayOfWeek) => {
+    const resultDate = new Date(date.getTime());
+    let diff = dayOfWeek - date.getDay();
+    if (diff < 0) diff += 7;
+    resultDate.setDate(date.getDate() + diff);
+    return resultDate;
+  };
+
+  const isSatToday = now.getDay() === 6;
+  const isSunToday = now.getDay() === 0;
+
+  const targetSat = isSatToday ? now : getNextDayOfWeek(now, 6);
+  const targetSun = isSunToday ? now : getNextDayOfWeek(now, 0);
+
+  const formatDate = (d) => {
+    return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  };
+
+  const hours = [
+    '8:00 AM (Opening Batch)',
+    '10:00 AM',
+    '12:00 PM (Noon)',
+    '2:00 PM',
+    '4:00 PM',
+    '6:00 PM',
+    '7:30 PM (Final Evening Batch)'
+  ];
+
+  // Saturday Slots (8 AM - 8 PM)
+  hours.forEach(h => {
+    slots.push(`Sat, ${formatDate(targetSat)} @ ${h}`);
+  });
+
+  // Sunday Slots (8 AM - 8 PM)
+  hours.forEach(h => {
+    slots.push(`Sun, ${formatDate(targetSun)} @ ${h}`);
+  });
+
+  return slots;
+}
+
 export default function CartDrawer({ 
   isOpen, 
   onClose, 
@@ -12,8 +58,10 @@ export default function CartDrawer({
 }) {
   if (!isOpen) return null;
 
+  const availableTimeSlots = getArrangedTimeSlots();
+
   const [fulfillment, setFulfillment] = useState('pickup'); // 'pickup' | 'delivery'
-  const [pickupTime, setPickupTime] = useState('Tomorrow at 10:00 AM');
+  const [pickupTime, setPickupTime] = useState(availableTimeSlots[0]);
   const [customerName, setCustomerName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -45,37 +93,34 @@ export default function CartDrawer({
       });
 
       const paymentLabelMap = {
-        cash: 'Cash (Pay on Pickup/Delivery)',
+        cash: 'Cash (On Pickup/Delivery)',
         venmo: 'Venmo (@SelfMadeSweetCo)',
         cashapp: 'Cash App ($SelfMadeSweetCo)',
-        paypal: 'PayPal (julian@selfmadesweetco.com)'
+        paypal: 'PayPal (@SelfMadeSweetCo)'
       };
 
       const newOrder = {
         id: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
-        customerName,
-        email,
-        phone,
-        address: fulfillment === 'delivery' ? address : 'Sacramento Kitchen Store Pickup',
-        fulfillment: fulfillment === 'delivery' ? 'Sacramento Delivery' : 'Store Pickup',
+        customerName: customerName.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        fulfillment: fulfillment === 'delivery' ? `Sacramento Delivery (${address})` : 'Store Pickup',
         dateSlot: pickupTime,
         paymentMethod: paymentLabelMap[paymentMethod] || 'Cash',
         items: cartItems.map(item => ({
           name: item.name,
           qty: item.quantity,
-          price: item.totalPrice || (item.unitPrice * item.quantity),
-          customDetails: item.customDetails
+          price: item.unitPrice || item.priceWhole
         })),
         total: grandTotal,
-        status: 'Order Confirmed',
-        createdAt: 'Just now',
-        note: notes
+        status: 'Pending Prep',
+        note: notes.trim()
       };
 
       onOrderPlaced(newOrder);
       setIsSubmitting(false);
       onClose();
-    }, 900);
+    }, 1000);
   };
 
   return (
@@ -85,65 +130,73 @@ export default function CartDrawer({
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundColor: 'rgba(42, 27, 23, 0.6)',
-      backdropFilter: 'blur(6px)',
+      backgroundColor: 'rgba(42, 27, 23, 0.65)',
+      backdropFilter: 'blur(8px)',
       display: 'flex',
       justifyContent: 'flex-end',
-      zIndex: 220
+      zIndex: 250
     }} onClick={onClose}>
-
+      
       <div className="animate-fade-in" style={{
-        backgroundColor: '#FFFFFF',
         width: '100%',
         maxWidth: '480px',
         height: '100%',
+        backgroundColor: '#FFFFFF',
+        boxShadow: 'var(--shadow-lg)',
         display: 'flex',
         flexDirection: 'column',
-        boxShadow: 'var(--shadow-lg)'
-      }} onClick={(e) => e.stopPropagation()}>
+        position: 'relative'
+      }} onClick={e => e.stopPropagation()}>
         
         {/* Drawer Header */}
         <div style={{
-          padding: '20px 24px',
+          padding: '24px',
           borderBottom: '1px solid var(--color-border)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          backgroundColor: 'var(--color-cream-light)'
+          backgroundColor: 'var(--color-bg)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <ShoppingBag size={20} color="var(--color-caramel)" />
-            <h3 style={{ fontSize: '1.25rem' }}>Your Artisan Basket</h3>
+            <ShoppingBag size={22} color="var(--color-caramel)" />
+            <h3 style={{ fontSize: '1.4rem', color: 'var(--color-espresso)', margin: 0 }}>
+              Your Bakery Order
+            </h3>
           </div>
-          <button onClick={onClose} style={{ background: 'none', color: 'var(--color-espresso)', cursor: 'pointer' }}>
-            <X size={20} />
+
+          <button 
+            onClick={onClose}
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              backgroundColor: 'var(--color-cream)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--color-espresso)',
+              cursor: 'pointer'
+            }}
+          >
+            <X size={18} />
           </button>
         </div>
 
-        {/* Cart Content / Item List */}
+        {/* Drawer Content */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
           {cartItems.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--color-text-muted)' }}>
-              <div style={{
-                width: '64px',
-                height: '64px',
-                borderRadius: '50%',
-                backgroundColor: 'var(--color-cream)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '16px',
-                color: 'var(--color-caramel)'
-              }}>
-                <ShoppingBag size={28} />
-              </div>
-              <p style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--color-espresso)', marginBottom: '4px' }}>Your cart is empty</p>
-              <p style={{ fontSize: '0.88rem' }}>Add signature cheesecakes, tiramisu, muffins, or cookies to get started.</p>
+              <ShoppingBag size={48} color="var(--color-caramel)" style={{ marginBottom: '16px', opacity: 0.6 }} />
+              <h4 style={{ fontSize: '1.2rem', marginBottom: '8px' }}>Your cart is empty</h4>
+              <p style={{ fontSize: '0.9rem', marginBottom: '24px' }}>Add some handcrafted cheesecakes, tiramisu, or cookies to get started!</p>
+              <button onClick={onClose} className="btn-primary">
+                Browse Menu
+              </button>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               
-              {/* Item Cards */}
+              {/* Itemized Cart List */}
               {cartItems.map((item, idx) => (
                 <div key={idx} style={{
                   display: 'flex',
@@ -261,10 +314,10 @@ export default function CartDrawer({
                   </button>
                 </div>
 
-                {/* Time Slot Picker */}
+                {/* Chronologically Arranged Time Slot Picker */}
                 <div style={{ marginBottom: '16px' }}>
                   <label style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--color-text-muted)', display: 'block', marginBottom: '4px' }}>
-                    Select Preferred Time Slot:
+                    Select Weekend Kitchen Time Slot (Sat & Sun 8 AM - 8 PM):
                   </label>
                   <select
                     value={pickupTime}
@@ -279,10 +332,9 @@ export default function CartDrawer({
                       backgroundColor: '#FFF'
                     }}
                   >
-                    <option value="Today at 4:30 PM">Today at 4:30 PM (Express Pickup)</option>
-                    <option value="Tomorrow at 10:00 AM">Tomorrow at 10:00 AM</option>
-                    <option value="Tomorrow at 2:00 PM">Tomorrow at 2:00 PM</option>
-                    <option value="This Saturday at 11:00 AM">This Saturday at 11:00 AM</option>
+                    {availableTimeSlots.map((slot, index) => (
+                      <option key={index} value={slot}>{slot}</option>
+                    ))}
                   </select>
                 </div>
 
@@ -461,53 +513,54 @@ export default function CartDrawer({
                         </div>
                       </button>
                     </div>
-
-                    {/* Payment Instruction Banner */}
-                    <div className="animate-fade-in" style={{ marginTop: '10px', padding: '10px 12px', backgroundColor: 'var(--color-cream-light)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', fontSize: '0.8rem', color: 'var(--color-espresso)' }}>
-                      {paymentMethod === 'cash' && (
-                        <div>💵 <strong>Cash Option:</strong> Pay in person when picking up at the kitchen or upon Sacramento delivery.</div>
-                      )}
-                      {paymentMethod === 'venmo' && (
-                        <div>💜 <strong>Venmo Option:</strong> Send <strong>${grandTotal.toFixed(2)}</strong> to <strong>@SelfMadeSweetCo</strong> with your name in notes.</div>
-                      )}
-                      {paymentMethod === 'cashapp' && (
-                        <div>💚 <strong>Cash App Option:</strong> Send <strong>${grandTotal.toFixed(2)}</strong> to <strong>$SelfMadeSweetCo</strong> with your name in notes.</div>
-                      )}
-                      {paymentMethod === 'paypal' && (
-                        <div>💙 <strong>PayPal Option:</strong> Send <strong>${grandTotal.toFixed(2)}</strong> to <strong>julian@selfmadesweetco.com</strong> or <strong>@SelfMadeSweetCo</strong>.</div>
-                      )}
-                    </div>
                   </div>
 
                   {/* Summary Totals */}
-                  <div style={{ backgroundColor: 'var(--color-cream-light)', padding: '16px', borderRadius: 'var(--radius-md)', marginTop: '4px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem', marginBottom: '4px' }}>
-                      <span style={{ color: 'var(--color-text-muted)' }}>Subtotal:</span>
+                  <div style={{
+                    backgroundColor: 'var(--color-cream)',
+                    padding: '14px',
+                    borderRadius: 'var(--radius-md)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '6px',
+                    fontSize: '0.88rem'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--color-text-muted)' }}>
+                      <span>Subtotal</span>
                       <span>${subtotal.toFixed(2)}</span>
                     </div>
                     {fulfillment === 'delivery' && (
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem', marginBottom: '4px' }}>
-                        <span style={{ color: 'var(--color-text-muted)' }}>Sacramento Delivery Fee:</span>
-                        <span>${deliveryFee.toFixed(2)}</span>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--color-text-muted)' }}>
+                        <span>Sacramento Delivery Fee</span>
+                        <span>$8.50</span>
                       </div>
                     )}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem', marginBottom: '8px' }}>
-                      <span style={{ color: 'var(--color-text-muted)' }}>Estimated Tax (8%):</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--color-text-muted)' }}>
+                      <span>Estimated Tax (8%)</span>
                       <span>${tax.toFixed(2)}</span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-espresso)', borderTop: '1px solid var(--color-border)', paddingTop: '8px' }}>
-                      <span>Total Due:</span>
-                      <span style={{ color: 'var(--color-caramel)' }}>${grandTotal.toFixed(2)}</span>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      fontWeight: 800,
+                      fontSize: '1.1rem',
+                      color: 'var(--color-espresso)',
+                      borderTop: '1px solid var(--color-border)',
+                      paddingTop: '6px',
+                      marginTop: '4px'
+                    }}>
+                      <span>Grand Total</span>
+                      <span>${grandTotal.toFixed(2)}</span>
                     </div>
                   </div>
 
-                  <button 
-                    type="submit" 
-                    className="btn-primary" 
+                  <button
+                    type="submit"
                     disabled={isSubmitting}
-                    style={{ width: '100%', marginTop: '12px', padding: '14px', fontSize: '1rem' }}
+                    className="btn-primary"
+                    style={{ padding: '14px', width: '100%', marginTop: '6px', fontSize: '1rem' }}
                   >
-                    {isSubmitting ? 'Confirming Order...' : `Place Order ($${grandTotal.toFixed(2)})`}
+                    {isSubmitting ? 'Processing Order...' : `Place Bakery Order ($${grandTotal.toFixed(2)})`}
                   </button>
                 </form>
               </div>
