@@ -14,6 +14,7 @@ import ReviewsSection from './components/ReviewsSection';
 import AddReviewModal from './components/AddReviewModal';
 import Footer from './components/Footer';
 import { INITIAL_ORDERS, INITIAL_REVIEWS, PRODUCTS } from './data/bakeryData';
+import { sendOrderConfirmationEmail } from './services/emailService';
 import { ChefHat, LogOut, Lock } from 'lucide-react';
 
 export default function App() {
@@ -160,6 +161,7 @@ export default function App() {
     setCartItems([]);
     setActiveOrderTrack(newOrder);
     setNotificationOrder(newOrder);
+    sendOrderConfirmationEmail(newOrder);
   };
 
   const handleUpdateOrderStatus = (orderId, newStatus) => {
