@@ -60,7 +60,7 @@ export default function Footer({ onOpenAbout, onOpenBakerLogin }) {
               </div>
               <div style={{ display: 'flex', gap: '10px' }}>
                 <Mail size={18} color="var(--color-caramel)" style={{ flexShrink: 0 }} />
-                <span>julian@selfmadesweetco.com</span>
+                <span>jmedrano707@yahoo.com</span>
               </div>
               <div style={{ display: 'flex', gap: '10px' }}>
                 <Phone size={18} color="var(--color-caramel)" style={{ flexShrink: 0 }} />

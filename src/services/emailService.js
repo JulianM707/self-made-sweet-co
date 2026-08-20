@@ -25,7 +25,7 @@ export async function sendOrderConfirmationEmail(order) {
       items_summary: `• ${itemsList}`,
       total_price: `$${order.total.toFixed(2)}`,
       order_notes: order.note || 'No special instructions',
-      baker_email: 'julian@selfmadesweetco.com'
+      baker_email: 'jmedrano707@yahoo.com'
     };
 
     console.log('Sending EmailJS Order Notification:', templateParams);

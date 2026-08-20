@@ -202,7 +202,7 @@ export default function App() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <ChefHat size={16} color="#D4AF37" />
             <span style={{ fontWeight: 700, color: '#D4AF37' }}>Baker Kitchen Portal Active</span>
-            <span style={{ color: 'rgba(255,255,255,0.6)' }}>• Signed in as julian@selfmadesweetco.com</span>
+            <span style={{ color: 'rgba(255,255,255,0.6)' }}>• Signed in as jmedrano707@yahoo.com</span>
           </div>
 
           <button

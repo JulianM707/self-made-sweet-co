@@ -8,7 +8,7 @@ export default function BakerLoginModal({ isOpen, onClose, onLoginSuccess }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const SECRET_EMAILS = ['julian@selfmadesweetco.com', 'julian@juliansbakery.com'];
+  const SECRET_EMAILS = ['jmedrano707@yahoo.com', 'julian@selfmadesweetco.com', 'julian@juliansbakery.com'];
   const SECRET_PASSWORD = 'bakery123';
 
   // Email & Password Submit
