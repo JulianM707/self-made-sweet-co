@@ -243,17 +243,9 @@ a {
     font-size: 1.4rem !important;
   }
 
-  /* Modal Image Mobile Adjustment */
+  /* Hide photo in Details modal on mobile screens */
   .modal-product-image {
-    min-height: 250px !important;
-    height: 250px !important;
-    max-height: 280px !important;
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
-  }
-
-  .modal-product-image img {
-    object-fit: cover !important;
-    object-position: center 30% !important;
+    display: none !important;
   }
 
   .modal-content-body {

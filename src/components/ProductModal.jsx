@@ -118,8 +118,11 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
         {/* Right Side: Product Details & Options */}
         <div className="modal-content-body" style={{ padding: '36px 32px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div>
-            {/* Prep Time */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '12px' }}>
+            {/* Badge & Prep Time Header Row */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+              {product.badge ? (
+                <span className="badge badge-gold">{product.badge}</span>
+              ) : <div />}
               <span style={{ fontSize: '0.82rem', color: 'var(--color-caramel)', fontWeight: 600 }}>
                 <Clock size={14} style={{ display: 'inline', marginRight: '4px' }} />
                 {product.prepTime}
