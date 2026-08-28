@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Search, TrendingDown, Award, DollarSign, ExternalLink, CheckCircle2, Sparkles, Filter, RefreshCw, X, Store, Loader2, Calendar } from 'lucide-react';
+import { ShoppingCart, Search, TrendingDown, Award, DollarSign, ExternalLink, CheckCircle2, Sparkles, Filter, RefreshCw, X, Store, Loader2, Calendar, Edit3, Save, RotateCcw } from 'lucide-react';
 import { fetchLiveSacramentoPrices } from '../services/livePriceScraper';
 
 // Initial Baseline Database for Sacramento Bakery Ingredients
@@ -11,9 +11,9 @@ const INITIAL_SUPPLIERS_DATA = [
     usedFor: 'Classic Artisan Cheesecake',
     lastScraped: 'Baseline Daily Market Price',
     suppliers: [
-      { name: "Costco Business Center (Sacramento)", price: "$14.49", unit: "3 lb block (48 oz)", unitPrice: "$4.83 / lb", badge: "Daily Best Deal 🏆", qualityScore: "4.8/5", inStock: true, notes: "Real block cream cheese, ideal for dense baking." },
-      { name: "US Foods Chef's'Store (Sacramento)", price: "$15.99", unit: "3 lb block", unitPrice: "$5.33 / lb", badge: "Commercial Grade", qualityScore: "4.7/5", inStock: true, notes: "Low moisture content for slow bakes." },
-      { name: "Trader Joe's (Sacramento)", price: "$2.89", unit: "8 oz block", unitPrice: "$5.78 / lb", badge: "Organic Choice", qualityScore: "4.9/5", inStock: true, notes: "Ultra creamy texture, great for small batches." }
+      { name: "Costco Business Center (Sacramento)", productBrand: "Kirkland Signature", scannedProductName: "Kirkland Signature Real Block Cream Cheese (3 lb / 48 oz)", skuNumber: "Item #948210", price: "$14.49", unit: "3 lb block (48 oz)", unitPrice: "$4.83 / lb", badge: "Daily Best Deal 🏆", qualityScore: "4.8/5", inStock: true, notes: "Real block cream cheese, ideal for dense baking." },
+      { name: "US Foods Chef's'Store (Sacramento)", productBrand: "Glenview Farms", scannedProductName: "Glenview Farms Commercial Cream Cheese Loaf", skuNumber: "SKU #742019", price: "$15.99", unit: "3 lb loaf", unitPrice: "$5.33 / lb", badge: "Commercial Grade", qualityScore: "4.7/5", inStock: true, notes: "Low moisture content for cheesecakes." },
+      { name: "Trader Joe's (Sacramento)", productBrand: "Trader Joe's Organic", scannedProductName: "Trader Joe's Organic Pasteurized Cream Cheese", skuNumber: "TJ #004921", price: "$2.89", unit: "8 oz block", unitPrice: "$5.78 / lb", badge: "Organic Choice", qualityScore: "4.9/5", inStock: true, notes: "Ultra creamy texture, great for small batches." }
     ]
   },
   {
@@ -23,9 +23,9 @@ const INITIAL_SUPPLIERS_DATA = [
     usedFor: 'Wild Blueberry Streusel Muffins',
     lastScraped: 'Baseline Daily Market Price',
     suppliers: [
-      { name: "Costco Wholesale (Sacramento)", price: "$6.49", unit: "18 oz container", unitPrice: "$5.76 / lb", badge: "Daily Best Deal 🏆", qualityScore: "4.9/5", inStock: true, notes: "Plump & sweet, perfect fruit distribution in batter." },
-      { name: "Trader Joe's", price: "$4.79", unit: "12 oz package", unitPrice: "$6.38 / lb", badge: "Organic Choice", qualityScore: "4.8/5", inStock: true, notes: "Smaller berries, excellent cinnamon pairing." },
-      { name: "Restaurant Depot", price: "$22.50", unit: "4 lb flat", unitPrice: "$5.62 / lb", badge: "Bulk Flat", qualityScore: "4.6/5", inStock: true, notes: "Best for heavy weekend production runs." }
+      { name: "Costco Wholesale (Sacramento)", productBrand: "Driscoll's / Ocean Spray", scannedProductName: "Fresh Organic Wild Blueberries 18 oz Clamshell", skuNumber: "Item #401129", price: "$6.49", unit: "18 oz container", unitPrice: "$5.76 / lb", badge: "Daily Best Deal 🏆", qualityScore: "4.9/5", inStock: true, notes: "Plump & sweet, perfect fruit distribution in batter." },
+      { name: "Trader Joe's", productBrand: "Trader Joe's Produce", scannedProductName: "Trader Joe's Organic Jumbo Blueberries", skuNumber: "TJ #008812", price: "$4.79", unit: "12 oz package", unitPrice: "$6.38 / lb", badge: "Organic Choice", qualityScore: "4.8/5", inStock: true, notes: "Smaller berries, excellent cinnamon pairing." },
+      { name: "Restaurant Depot", productBrand: "Fresh Farms Wholesale", scannedProductName: "Fresh Wild Blueberry Bakery Flat (4 lb)", skuNumber: "RD #339102", price: "$22.50", unit: "4 lb flat", unitPrice: "$5.62 / lb", badge: "Bulk Flat", qualityScore: "4.6/5", inStock: true, notes: "Best for heavy weekend production runs." }
     ]
   },
   {
@@ -35,20 +35,21 @@ const INITIAL_SUPPLIERS_DATA = [
     usedFor: 'Classic Venetian Tiramisu',
     lastScraped: 'Baseline Daily Market Price',
     suppliers: [
-      { name: "US Foods Chef's'Store", price: "$12.49", unit: "16 oz tub", unitPrice: "$12.49 / lb", badge: "Authentic Import 🇮🇹", qualityScore: "5.0/5", inStock: true, notes: "100% Italian cream, velvet smooth whip." },
-      { name: "Trader Joe's", price: "$4.29", unit: "8 oz tub", unitPrice: "$8.58 / lb", badge: "Daily Best Deal 🏆", qualityScore: "4.7/5", inStock: true, notes: "Great consistency for whipped mascarpone cream." },
-      { name: "Whole Foods Market", price: "$7.49", unit: "8 oz tub", unitPrice: "$14.98 / lb", badge: "Premium Organic", qualityScore: "4.9/5", inStock: true, notes: "Ultra rich fat content." }
+      { name: "US Foods Chef's'Store", productBrand: "Galbani Santa Lucia", scannedProductName: "Galbani Italian Imported Mascarpone Cheese 16 oz", skuNumber: "SKU #589100", price: "$12.49", unit: "16 oz tub", unitPrice: "$12.49 / lb", badge: "Authentic Import 🇮🇹", qualityScore: "5.0/5", inStock: true, notes: "100% Italian cream, velvet smooth whip." },
+      { name: "Trader Joe's", productBrand: "Trader Joe's", scannedProductName: "Trader Joe's Italian Mascarpone Cheese", skuNumber: "TJ #003194", price: "$4.29", unit: "8 oz tub", unitPrice: "$8.58 / lb", badge: "Daily Best Deal 🏆", qualityScore: "4.7/5", inStock: true, notes: "Great consistency for whipped mascarpone cream." },
+      { name: "Whole Foods Market", productBrand: "BelGioioso", scannedProductName: "BelGioioso Artisanal Fresh Mascarpone 8 oz", skuNumber: "WF #991023", price: "$7.49", unit: "8 oz tub", unitPrice: "$14.98 / lb", badge: "Premium Organic", qualityScore: "4.9/5", inStock: true, notes: "Ultra rich fat content." }
     ]
   },
   {
     id: 'chocolate-chunks',
-    ingredient: 'Gourmet Dark Chocolate Chunks (60%+)',
+    ingredient: 'Gourmet Dark Chocolate Chips / Chunks',
     category: 'Pantry',
     usedFor: 'Gourmet Chocolate Chip Cookies',
     lastScraped: 'Baseline Daily Market Price',
     suppliers: [
-      { name: "Costco Business Center", price: "$17.99", unit: "5 lb bag", unitPrice: "$3.60 / lb", badge: "Daily Best Deal 🏆", qualityScore: "4.9/5", inStock: true, notes: "Gourmet melt, holds shape with gooey center." },
-      { name: "WebstaurantStore Bulk", price: "$39.99", unit: "10 lb box (Valrhona/Guittard)", unitPrice: "$4.00 / lb", badge: "Pastry Chef Choice", qualityScore: "5.0/5", inStock: true, notes: "Premium French chocolate callets." }
+      { name: "Costco Business Center (Sacramento)", productBrand: "Kirkland Signature", scannedProductName: "Kirkland Signature Semi-Sweet Chocolate Chips (4.5 lb / 72 oz)", skuNumber: "Item #1324792", price: "$12.99", unit: "4.5 lb bag (72 oz)", unitPrice: "$2.89 / lb", badge: "Daily Best Deal 🏆", qualityScore: "4.8/5", inStock: true, notes: "Real 51% cacao semi-sweet baking chips." },
+      { name: "Costco Business Center (Sacramento)", productBrand: "Nestlé Toll House", scannedProductName: "Nestlé Toll House Semi-Sweet Morsels (72 oz)", skuNumber: "Item #274889", price: "$14.99", unit: "4.5 lb bag", unitPrice: "$3.33 / lb", badge: "Name Brand Classic", qualityScore: "4.7/5", inStock: true, notes: "Classic bakery morsels." },
+      { name: "US Foods Chef's'Store (Sacramento)", productBrand: "Hershey's Special Dark", scannedProductName: "Hershey's Special Dark Mildly Sweet Chocolate Chips 5 lb", skuNumber: "SKU #88201", price: "$18.50", unit: "5 lb bag", unitPrice: "$3.70 / lb", badge: "Commercial Grade", qualityScore: "4.8/5", inStock: true, notes: "Rich dark chocolate flavor." }
     ]
   },
   {
@@ -58,8 +59,8 @@ const INITIAL_SUPPLIERS_DATA = [
     usedFor: 'Streusel Crumbles & Crusts',
     lastScraped: 'Baseline Daily Market Price',
     suppliers: [
-      { name: "Costco Wholesale", price: "$11.99", unit: "4 lb (4 pack)", unitPrice: "$3.00 / lb", badge: "Daily Best Deal 🏆", qualityScore: "4.8/5", inStock: true, notes: "Real Grade AA creamery butter." },
-      { name: "US Foods Chef's'Store", price: "$13.80", unit: "4 lb case", unitPrice: "$3.45 / lb", badge: "Restaurant Grade", qualityScore: "4.7/5", inStock: true, notes: "High butterfat ratio for flaky streusel." }
+      { name: "Costco Wholesale (Sacramento)", productBrand: "Kirkland Signature", scannedProductName: "Kirkland Signature Grade AA Unsalted Butter 4/1 lb", skuNumber: "Item #218391", price: "$11.99", unit: "4 lb (4 pack)", unitPrice: "$3.00 / lb", badge: "Daily Best Deal 🏆", qualityScore: "4.8/5", inStock: true, notes: "Real Grade AA creamery butter." },
+      { name: "US Foods Chef's'Store (Sacramento)", productBrand: "Darigold", scannedProductName: "Darigold Commercial Unsalted Butter 4 lb Case", skuNumber: "SKU #109244", price: "$13.80", unit: "4 lb case", unitPrice: "$3.45 / lb", badge: "Restaurant Grade", qualityScore: "4.7/5", inStock: true, notes: "High butterfat ratio for flaky streusel." }
     ]
   }
 ];
@@ -69,8 +70,27 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [sourcingData, setSourcingData] = useState(INITIAL_SUPPLIERS_DATA);
+  const [isEditing, setIsEditing] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
+
+  // Load custom saved prices from localStorage or initial
+  const [sourcingData, setSourcingData] = useState(() => {
+    try {
+      const saved = localStorage.getItem('julians_custom_sourcing_prices');
+      return saved ? JSON.parse(saved) : INITIAL_SUPPLIERS_DATA;
+    } catch (e) {
+      return INITIAL_SUPPLIERS_DATA;
+    }
+  });
+
+  // Save to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('julians_custom_sourcing_prices', JSON.stringify(sourcingData));
+    } catch (e) {
+      console.error('Failed to save custom sourcing prices', e);
+    }
+  }, [sourcingData]);
 
   const handleRunLiveScraper = async () => {
     setIsScanning(true);
@@ -79,11 +99,26 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
     setIsScanning(false);
   };
 
-  useEffect(() => {
-    if (isOpen) {
-      handleRunLiveScraper();
+  // Handle live price editing for specific supplier
+  const handleUpdateSupplierPrice = (ingredientId, supplierIdx, field, val) => {
+    setSourcingData(prev => prev.map(item => {
+      if (item.id === ingredientId) {
+        const updatedSuppliers = [...item.suppliers];
+        updatedSuppliers[supplierIdx] = {
+          ...updatedSuppliers[supplierIdx],
+          [field]: val
+        };
+        return { ...item, suppliers: updatedSuppliers };
+      }
+      return item;
+    }));
+  };
+
+  const handleResetDefaults = () => {
+    if (window.confirm('Reset all supplier ingredient prices back to initial baseline?')) {
+      setSourcingData(INITIAL_SUPPLIERS_DATA);
     }
-  }, [isOpen]);
+  };
 
   const filteredData = sourcingData.filter(item => {
     const matchesSearch = item.ingredient.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -111,7 +146,7 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
       <div className="animate-fade-in" style={{
         backgroundColor: '#FFFFFF',
         borderRadius: 'var(--radius-lg)',
-        maxWidth: '780px',
+        maxWidth: '820px',
         width: '100%',
         maxHeight: '90vh',
         overflowY: 'auto',
@@ -150,42 +185,64 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
               </p>
             </div>
 
-            <button
-              onClick={handleRunLiveScraper}
-              disabled={isScanning}
-              style={{
-                backgroundColor: 'var(--color-caramel)',
-                color: '#FFFFFF',
-                border: 'none',
-                padding: '10px 18px',
-                borderRadius: 'var(--radius-full)',
-                fontWeight: 700,
-                fontSize: '0.85rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-            >
-              {isScanning ? (
-                <>
-                  <Loader2 size={16} className="animate-spin" />
-                  <span>Running Daily Scan...</span>
-                </>
-              ) : (
-                <>
-                  <RefreshCw size={16} />
-                  <span>🔄 Refresh Daily Scan</span>
-                </>
-              )}
-            </button>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={() => setIsEditing(!isEditing)}
+                style={{
+                  backgroundColor: isEditing ? '#D4AF37' : 'rgba(255,255,255,0.15)',
+                  color: '#FFFFFF',
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  padding: '8px 14px',
+                  borderRadius: 'var(--radius-full)',
+                  fontWeight: 700,
+                  fontSize: '0.82rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <Edit3 size={15} />
+                <span>{isEditing ? 'Done Editing' : '✏️ Edit Store Prices'}</span>
+              </button>
+
+              <button
+                onClick={handleRunLiveScraper}
+                disabled={isScanning}
+                style={{
+                  backgroundColor: 'var(--color-caramel)',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  padding: '8px 16px',
+                  borderRadius: 'var(--radius-full)',
+                  fontWeight: 700,
+                  fontSize: '0.82rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                {isScanning ? (
+                  <>
+                    <Loader2 size={15} className="animate-spin" />
+                    <span>Scanning...</span>
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw size={15} />
+                    <span>🔄 Refresh Daily Scan</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
 
         <div style={{ padding: '28px 32px' }}>
 
           {/* Search & Category Bar */}
-          <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: '220px', padding: '10px 14px', borderRadius: 'var(--radius-full)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-cream-light)' }}>
               <Search size={18} color="var(--color-text-muted)" />
               <input 
@@ -218,6 +275,13 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
                 </button>
               ))}
             </div>
+
+            <button
+              onClick={handleResetDefaults}
+              style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', fontSize: '0.78rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+            >
+              <RotateCcw size={13} /> Reset
+            </button>
           </div>
 
           {/* Supplier Cards List */}
@@ -256,7 +320,7 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
                   {item.suppliers.map((sup, idx) => (
                     <div key={idx} style={{
                       display: 'grid',
-                      gridTemplateColumns: '1.4fr 1fr 1fr 1.2fr',
+                      gridTemplateColumns: isEditing ? '1.4fr 1fr 1fr 0.8fr' : '1.4fr 1fr 1fr 1.2fr',
                       gap: '12px',
                       alignItems: 'center',
                       padding: '12px 14px',
@@ -272,14 +336,34 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
                         <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{sup.notes}</div>
                       </div>
 
+                      {/* Package Price Field */}
                       <div>
-                        <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Package</div>
-                        <div style={{ fontWeight: 700, fontSize: '0.88rem' }}>{sup.unit} ({sup.price})</div>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: '2px' }}>Package Price</div>
+                        {isEditing ? (
+                          <input 
+                            type="text"
+                            value={sup.price}
+                            onChange={e => handleUpdateSupplierPrice(item.id, idx, 'price', e.target.value)}
+                            style={{ width: '100%', padding: '4px 8px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', fontWeight: 800 }}
+                          />
+                        ) : (
+                          <div style={{ fontWeight: 700, fontSize: '0.88rem' }}>{sup.unit} ({sup.price})</div>
+                        )}
                       </div>
 
+                      {/* Unit Price Field */}
                       <div>
-                        <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Unit Price</div>
-                        <div style={{ fontWeight: 800, fontSize: '1.05rem', color: 'var(--color-espresso)' }}>{sup.unitPrice}</div>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: '2px' }}>Unit Price ($/lb)</div>
+                        {isEditing ? (
+                          <input 
+                            type="text"
+                            value={sup.unitPrice}
+                            onChange={e => handleUpdateSupplierPrice(item.id, idx, 'unitPrice', e.target.value)}
+                            style={{ width: '100%', padding: '4px 8px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', fontWeight: 800 }}
+                          />
+                        ) : (
+                          <div style={{ fontWeight: 800, fontSize: '1.05rem', color: 'var(--color-espresso)' }}>{sup.unitPrice}</div>
+                        )}
                       </div>
 
                       <div style={{ textAlign: 'right' }}>
