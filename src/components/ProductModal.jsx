@@ -297,12 +297,17 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
 
             {/* Submit Button */}
             <button 
-              onClick={handleAdd}
-              className="btn-primary"
-              style={{ flex: 1 }}
+              onClick={() => !product.isOutOfStock && handleAdd()}
+              disabled={product.isOutOfStock}
+              className={product.isOutOfStock ? "btn-secondary" : "btn-primary"}
+              style={{ 
+                flex: 1,
+                opacity: product.isOutOfStock ? 0.6 : 1,
+                cursor: product.isOutOfStock ? 'not-allowed' : 'pointer'
+              }}
             >
               <ShoppingBag size={18} />
-              <span>Add to Cart (${totalPrice.toFixed(2)})</span>
+              <span>{product.isOutOfStock ? 'Temporarily Sold Out' : `Add to Cart ($${totalPrice.toFixed(2)})`}</span>
             </button>
           </div>
 

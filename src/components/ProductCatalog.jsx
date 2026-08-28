@@ -179,7 +179,11 @@ export default function ProductCatalog({ onSelectProduct, onAddToCart }) {
                       padding: product.id === 'chocolate-chip-cookie' ? '8px' : 0
                     }}
                   />
-                  {product.badge && (
+                  {product.isOutOfStock ? (
+                    <span style={{ position: 'absolute', top: '16px', left: '16px', backgroundColor: '#E53E3E', color: '#FFF', fontWeight: 800, padding: '4px 10px', borderRadius: 'var(--radius-full)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      🔴 Temporarily Sold Out
+                    </span>
+                  ) : product.badge && (
                     <span className="badge badge-gold" style={{ position: 'absolute', top: '16px', left: '16px' }}>
                       {product.badge}
                     </span>
@@ -244,12 +248,18 @@ export default function ProductCatalog({ onSelectProduct, onAddToCart }) {
                       </button>
 
                       <button 
-                        onClick={() => onAddToCart(product, 'slice')}
-                        className="btn-primary"
-                        style={{ padding: '10px', fontSize: '0.85rem' }}
+                        onClick={() => !product.isOutOfStock && onAddToCart(product, 'slice')}
+                        disabled={product.isOutOfStock}
+                        className={product.isOutOfStock ? "btn-secondary" : "btn-primary"}
+                        style={{ 
+                          padding: '10px', 
+                          fontSize: '0.85rem',
+                          opacity: product.isOutOfStock ? 0.6 : 1,
+                          cursor: product.isOutOfStock ? 'not-allowed' : 'pointer'
+                        }}
                       >
                         <Plus size={15} />
-                        <span>Add Slice</span>
+                        <span>{product.isOutOfStock ? 'Sold Out' : 'Add Slice'}</span>
                       </button>
                     </div>
                   </div>

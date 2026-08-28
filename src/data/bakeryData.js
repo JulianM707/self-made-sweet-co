@@ -17,6 +17,7 @@ export const PRODUCTS = [
     rating: 5.0,
     reviewsCount: 0,
     image: '/images/basque_cheesecake_1786065253639.jpg',
+    isOutOfStock: true,
     description: 'My signature velvety cream cheese, sour cream & fresh lemon zest filling baked low and slow in a buttery Graham cracker crust. Top with house-made jammy strawberry sauce or wild blueberry compote!',
     dietary: ['Gluten-Free Available', 'Custom Crust Option'],
     prepTime: 'Same Day Pickup',
