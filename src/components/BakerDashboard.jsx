@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ChefHat, Flame, Clock, CheckCircle2, DollarSign, Package, AlertCircle, Sparkles, Filter, Trash2, CheckCheck, Camera, Star, Eye, Bot, ShoppingBag, X, Check } from 'lucide-react';
+import { ChefHat, Flame, Clock, CheckCircle2, DollarSign, Package, AlertCircle, Sparkles, Filter, Trash2, CheckCheck, Camera, Star, Eye, Bot, ShoppingBag, X, Check, Store } from 'lucide-react';
+import IngredientSourcingAgent from './IngredientSourcingAgent';
 
 export default function BakerDashboard({ 
   orders, 
@@ -15,6 +16,7 @@ export default function BakerDashboard({
   const [activeTab, setActiveTab] = useState('orders'); // 'orders' or 'reviews'
   const [activeFilter, setActiveFilter] = useState('all');
   const [showAIIngredientsModal, setShowAIIngredientsModal] = useState(false);
+  const [showAISourcingModal, setShowAISourcingModal] = useState(false);
 
   const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
   const activeOrdersCount = orders.filter(o => o.status !== 'Completed').length;
@@ -139,7 +141,7 @@ export default function BakerDashboard({
           </div>
         </div>
 
-        {/* Dashboard Sub-Tab Navigation & AI Calculator Button */}
+        {/* Dashboard Sub-Tab Navigation & AI Calculator Buttons */}
         <div style={{ display: 'flex', gap: '12px', marginBottom: '28px', flexWrap: 'wrap', alignItems: 'center' }}>
           <button
             onClick={() => setActiveTab('orders')}
@@ -183,26 +185,47 @@ export default function BakerDashboard({
             <span>Customer Photo Reviews ({reviews.length})</span>
           </button>
 
-          <button
-            onClick={() => setShowAIIngredientsModal(true)}
-            style={{
-              padding: '10px 20px',
-              borderRadius: 'var(--radius-full)',
-              fontWeight: 700,
-              fontSize: '0.92rem',
-              backgroundColor: 'var(--color-gold-light)',
-              color: '#8A6D0B',
-              border: '1px solid rgba(212, 175, 55, 0.4)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              marginLeft: 'auto'
-            }}
-          >
-            <Sparkles size={17} />
-            <span>🤖 AI Grocery Prep Calculator</span>
-          </button>
+          <div style={{ display: 'flex', gap: '10px', marginLeft: 'auto', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => setShowAISourcingModal(true)}
+              style={{
+                padding: '10px 20px',
+                borderRadius: 'var(--radius-full)',
+                fontWeight: 700,
+                fontSize: '0.92rem',
+                backgroundColor: '#EBF7EE',
+                color: '#2D7A42',
+                border: '1px solid #C4EACC',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              <Store size={17} />
+              <span>🛒 AI Best Price Sourcing Agent</span>
+            </button>
+
+            <button
+              onClick={() => setShowAIIngredientsModal(true)}
+              style={{
+                padding: '10px 20px',
+                borderRadius: 'var(--radius-full)',
+                fontWeight: 700,
+                fontSize: '0.92rem',
+                backgroundColor: 'var(--color-gold-light)',
+                color: '#8A6D0B',
+                border: '1px solid rgba(212, 175, 55, 0.4)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              <Sparkles size={17} />
+              <span>🤖 AI Grocery Prep Calculator</span>
+            </button>
+          </div>
         </div>
 
         {activeTab === 'reviews' ? (
@@ -476,6 +499,12 @@ export default function BakerDashboard({
             </div>
           </div>
         )}
+
+        {/* 🛒 AI BEST PRICE SOURCING AGENT MODAL */}
+        <IngredientSourcingAgent 
+          isOpen={showAISourcingModal}
+          onClose={() => setShowAISourcingModal(false)}
+        />
 
       </div>
     </section>
