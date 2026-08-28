@@ -266,6 +266,9 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
                     }}>
                       <div>
                         <div style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--color-espresso)' }}>{sup.name}</div>
+                        <div style={{ fontSize: '0.78rem', color: 'var(--color-caramel)', fontWeight: 700, margin: '2px 0' }}>
+                          🔍 {sup.scannedProductName || sup.productBrand || sup.name} {sup.skuNumber ? `(${sup.skuNumber})` : ''}
+                        </div>
                         <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{sup.notes}</div>
                       </div>
 
