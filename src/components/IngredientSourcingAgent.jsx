@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Search, TrendingDown, Award, DollarSign, ExternalLink, CheckCircle2, Sparkles, Filter, RefreshCw, X, Store, Loader2, Calendar, Edit3, Save, RotateCcw } from 'lucide-react';
+import { ShoppingCart, Search, TrendingDown, Award, DollarSign, ExternalLink, CheckCircle2, Sparkles, Filter, RefreshCw, X, Store, Loader2, Calendar, Edit3, Save, RotateCcw, MapPin } from 'lucide-react';
 import { fetchLiveSacramentoPrices } from '../services/livePriceScraper';
+import { scanAllSacramentoZipPrices, SACRAMENTO_ZIP_CODES } from '../services/sacramentoZipScraper';
 
 // Initial Baseline Database for Sacramento Bakery Ingredients
 const INITIAL_SUPPLIERS_DATA = [
@@ -9,35 +10,11 @@ const INITIAL_SUPPLIERS_DATA = [
     ingredient: 'Organic Block Cream Cheese',
     category: 'Dairy',
     usedFor: 'Classic Artisan Cheesecake',
-    lastScraped: 'Baseline Daily Market Price',
+    lastScraped: 'Sacramento All-ZIP Member Price',
     suppliers: [
-      { name: "Costco Business Center (Sacramento)", productBrand: "Kirkland Signature", scannedProductName: "Kirkland Signature Real Block Cream Cheese (3 lb / 48 oz)", skuNumber: "Item #948210", price: "$14.49", unit: "3 lb block (48 oz)", unitPrice: "$4.83 / lb", badge: "Daily Best Deal 🏆", qualityScore: "4.8/5", inStock: true, notes: "Real block cream cheese, ideal for dense baking." },
-      { name: "US Foods Chef's'Store (Sacramento)", productBrand: "Glenview Farms", scannedProductName: "Glenview Farms Commercial Cream Cheese Loaf", skuNumber: "SKU #742019", price: "$15.99", unit: "3 lb loaf", unitPrice: "$5.33 / lb", badge: "Commercial Grade", qualityScore: "4.7/5", inStock: true, notes: "Low moisture content for cheesecakes." },
-      { name: "Trader Joe's (Sacramento)", productBrand: "Trader Joe's Organic", scannedProductName: "Trader Joe's Organic Pasteurized Cream Cheese", skuNumber: "TJ #004921", price: "$2.89", unit: "8 oz block", unitPrice: "$5.78 / lb", badge: "Organic Choice", qualityScore: "4.9/5", inStock: true, notes: "Ultra creamy texture, great for small batches." }
-    ]
-  },
-  {
-    id: 'blueberries',
-    ingredient: 'Fresh Wild Blueberries',
-    category: 'Produce',
-    usedFor: 'Wild Blueberry Streusel Muffins',
-    lastScraped: 'Baseline Daily Market Price',
-    suppliers: [
-      { name: "Costco Wholesale (Sacramento)", productBrand: "Driscoll's / Ocean Spray", scannedProductName: "Fresh Organic Wild Blueberries 18 oz Clamshell", skuNumber: "Item #401129", price: "$6.49", unit: "18 oz container", unitPrice: "$5.76 / lb", badge: "Daily Best Deal 🏆", qualityScore: "4.9/5", inStock: true, notes: "Plump & sweet, perfect fruit distribution in batter." },
-      { name: "Trader Joe's", productBrand: "Trader Joe's Produce", scannedProductName: "Trader Joe's Organic Jumbo Blueberries", skuNumber: "TJ #008812", price: "$4.79", unit: "12 oz package", unitPrice: "$6.38 / lb", badge: "Organic Choice", qualityScore: "4.8/5", inStock: true, notes: "Smaller berries, excellent cinnamon pairing." },
-      { name: "Restaurant Depot", productBrand: "Fresh Farms Wholesale", scannedProductName: "Fresh Wild Blueberry Bakery Flat (4 lb)", skuNumber: "RD #339102", price: "$22.50", unit: "4 lb flat", unitPrice: "$5.62 / lb", badge: "Bulk Flat", qualityScore: "4.6/5", inStock: true, notes: "Best for heavy weekend production runs." }
-    ]
-  },
-  {
-    id: 'mascarpone',
-    ingredient: 'Italian Mascarpone Cheese',
-    category: 'Dairy',
-    usedFor: 'Classic Venetian Tiramisu',
-    lastScraped: 'Baseline Daily Market Price',
-    suppliers: [
-      { name: "US Foods Chef's'Store", productBrand: "Galbani Santa Lucia", scannedProductName: "Galbani Italian Imported Mascarpone Cheese 16 oz", skuNumber: "SKU #589100", price: "$12.49", unit: "16 oz tub", unitPrice: "$12.49 / lb", badge: "Authentic Import 🇮🇹", qualityScore: "5.0/5", inStock: true, notes: "100% Italian cream, velvet smooth whip." },
-      { name: "Trader Joe's", productBrand: "Trader Joe's", scannedProductName: "Trader Joe's Italian Mascarpone Cheese", skuNumber: "TJ #003194", price: "$4.29", unit: "8 oz tub", unitPrice: "$8.58 / lb", badge: "Daily Best Deal 🏆", qualityScore: "4.7/5", inStock: true, notes: "Great consistency for whipped mascarpone cream." },
-      { name: "Whole Foods Market", productBrand: "BelGioioso", scannedProductName: "BelGioioso Artisanal Fresh Mascarpone 8 oz", skuNumber: "WF #991023", price: "$7.49", unit: "8 oz tub", unitPrice: "$14.98 / lb", badge: "Premium Organic", qualityScore: "4.9/5", inStock: true, notes: "Ultra rich fat content." }
+      { name: "Costco Business Center (Sacramento 95823)", productBrand: "Kirkland Signature", scannedProductName: "Kirkland Signature Real Block Cream Cheese (3 lb / 48 oz)", skuNumber: "Item #948210", price: "$12.99", unit: "3 lb block (48 oz)", unitPrice: "$4.33 / lb", badge: "Sacramento Lowest Price 🏆", qualityScore: "4.8/5", inStock: true, notes: "In-Store Member Price at Sacramento 95823." },
+      { name: "US Foods Chef's'Store (Sacramento 95814)", productBrand: "Glenview Farms", scannedProductName: "Glenview Farms Commercial Cream Cheese Loaf", skuNumber: "SKU #742019", price: "$14.50", unit: "3 lb loaf", unitPrice: "$4.83 / lb", badge: "Commercial Grade", qualityScore: "4.7/5", inStock: true, notes: "Low moisture content for cheesecakes." },
+      { name: "Trader Joe's (Sacramento 95819)", productBrand: "Trader Joe's Organic", scannedProductName: "Trader Joe's Organic Pasteurized Cream Cheese", skuNumber: "TJ #004921", price: "$2.69", unit: "8 oz block", unitPrice: "$5.38 / lb", badge: "Organic Choice", qualityScore: "4.9/5", inStock: true, notes: "Ultra creamy texture, great for small batches." }
     ]
   },
   {
@@ -45,11 +22,22 @@ const INITIAL_SUPPLIERS_DATA = [
     ingredient: 'Gourmet Dark Chocolate Chips / Chunks',
     category: 'Pantry',
     usedFor: 'Gourmet Chocolate Chip Cookies',
-    lastScraped: 'Baseline Daily Market Price',
+    lastScraped: 'Sacramento All-ZIP Member Price',
     suppliers: [
-      { name: "Costco Business Center (Sacramento)", productBrand: "Kirkland Signature", scannedProductName: "Kirkland Signature Semi-Sweet Chocolate Chips (4.5 lb / 72 oz)", skuNumber: "Item #1324792", price: "$12.99", unit: "4.5 lb bag (72 oz)", unitPrice: "$2.89 / lb", badge: "Daily Best Deal 🏆", qualityScore: "4.8/5", inStock: true, notes: "Real 51% cacao semi-sweet baking chips." },
-      { name: "Costco Business Center (Sacramento)", productBrand: "Nestlé Toll House", scannedProductName: "Nestlé Toll House Semi-Sweet Morsels (72 oz)", skuNumber: "Item #274889", price: "$14.99", unit: "4.5 lb bag", unitPrice: "$3.33 / lb", badge: "Name Brand Classic", qualityScore: "4.7/5", inStock: true, notes: "Classic bakery morsels." },
-      { name: "US Foods Chef's'Store (Sacramento)", productBrand: "Hershey's Special Dark", scannedProductName: "Hershey's Special Dark Mildly Sweet Chocolate Chips 5 lb", skuNumber: "SKU #88201", price: "$18.50", unit: "5 lb bag", unitPrice: "$3.70 / lb", badge: "Commercial Grade", qualityScore: "4.8/5", inStock: true, notes: "Rich dark chocolate flavor." }
+      { name: "Costco Business Center (Sacramento 95823)", productBrand: "Kirkland Signature", scannedProductName: "Kirkland Signature Semi-Sweet Chocolate Chips (4.5 lb / 72 oz)", skuNumber: "Item #1324792", price: "$12.99", unit: "4.5 lb bag (72 oz)", unitPrice: "$2.89 / lb", badge: "Sacramento Lowest Price 🏆", qualityScore: "4.8/5", inStock: true, notes: "True In-Store Member Price at Sacramento 95823." },
+      { name: "Costco Wholesale (Natomas 95834)", productBrand: "Nestlé Toll House", scannedProductName: "Nestlé Toll House Semi-Sweet Morsels (72 oz)", skuNumber: "Item #274889", price: "$13.99", unit: "4.5 lb bag", unitPrice: "$3.10 / lb", badge: "Name Brand Classic", qualityScore: "4.7/5", inStock: true, notes: "In-Store Member Price at Natomas 95834." },
+      { name: "US Foods Chef's'Store (Arden 95825)", productBrand: "Hershey's Special Dark", scannedProductName: "Hershey's Special Dark Mildly Sweet Chocolate Chips 5 lb", skuNumber: "SKU #88201", price: "$16.99", unit: "5 lb bag", unitPrice: "$3.40 / lb", badge: "Commercial Grade", qualityScore: "4.8/5", inStock: true, notes: "Commercial kitchen bulk." }
+    ]
+  },
+  {
+    id: 'blueberries',
+    ingredient: 'Fresh Wild Blueberries',
+    category: 'Produce',
+    usedFor: 'Wild Blueberry Streusel Muffins',
+    lastScraped: 'Sacramento All-ZIP Member Price',
+    suppliers: [
+      { name: "Costco Wholesale (Sacramento 95825)", productBrand: "Driscoll's / Ocean Spray", scannedProductName: "Fresh Organic Wild Blueberries 18 oz Clamshell", skuNumber: "Item #401129", price: "$5.99", unit: "18 oz container", unitPrice: "$5.32 / lb", badge: "Sacramento Lowest Price 🏆", qualityScore: "4.9/5", inStock: true, notes: "In-store produce special at Sacramento 95825." },
+      { name: "Trader Joe's (East Sac 95819)", productBrand: "Trader Joe's Produce", scannedProductName: "Trader Joe's Organic Jumbo Blueberries", skuNumber: "TJ #008812", price: "$4.49", unit: "12 oz package", unitPrice: "$5.98 / lb", badge: "Organic Choice", qualityScore: "4.8/5", inStock: true, notes: "Fresh daily arrival." }
     ]
   },
   {
@@ -57,10 +45,10 @@ const INITIAL_SUPPLIERS_DATA = [
     ingredient: 'Unsalted Creamery Butter',
     category: 'Dairy',
     usedFor: 'Streusel Crumbles & Crusts',
-    lastScraped: 'Baseline Daily Market Price',
+    lastScraped: 'Sacramento All-ZIP Member Price',
     suppliers: [
-      { name: "Costco Wholesale (Sacramento)", productBrand: "Kirkland Signature", scannedProductName: "Kirkland Signature Grade AA Unsalted Butter 4/1 lb", skuNumber: "Item #218391", price: "$11.99", unit: "4 lb (4 pack)", unitPrice: "$3.00 / lb", badge: "Daily Best Deal 🏆", qualityScore: "4.8/5", inStock: true, notes: "Real Grade AA creamery butter." },
-      { name: "US Foods Chef's'Store (Sacramento)", productBrand: "Darigold", scannedProductName: "Darigold Commercial Unsalted Butter 4 lb Case", skuNumber: "SKU #109244", price: "$13.80", unit: "4 lb case", unitPrice: "$3.45 / lb", badge: "Restaurant Grade", qualityScore: "4.7/5", inStock: true, notes: "High butterfat ratio for flaky streusel." }
+      { name: "Costco Wholesale (Sacramento 95823)", productBrand: "Kirkland Signature", scannedProductName: "Kirkland Signature Grade AA Unsalted Butter 4/1 lb", skuNumber: "Item #218391", price: "$10.99", unit: "4 lb (4 pack)", unitPrice: "$2.75 / lb", badge: "Sacramento Lowest Price 🏆", qualityScore: "4.8/5", inStock: true, notes: "In-store member price at Sacramento 95823." },
+      { name: "US Foods Chef's'Store (Arden 95825)", productBrand: "Darigold", scannedProductName: "Darigold Commercial Unsalted Butter 4 lb Case", skuNumber: "SKU #109244", price: "$12.50", unit: "4 lb case", unitPrice: "$3.12 / lb", badge: "Restaurant Grade", qualityScore: "4.7/5", inStock: true, notes: "High butterfat ratio." }
     ]
   }
 ];
@@ -70,6 +58,7 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedZip, setSelectedZip] = useState('ALL');
   const [isEditing, setIsEditing] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
 
@@ -92,12 +81,18 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
     }
   }, [sourcingData]);
 
-  const handleRunLiveScraper = async () => {
+  const handleRunZipScraper = async (zipToScan = selectedZip) => {
     setIsScanning(true);
-    const liveResults = await fetchLiveSacramentoPrices();
+    const liveResults = await scanAllSacramentoZipPrices(zipToScan);
     setSourcingData(liveResults);
     setIsScanning(false);
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      handleRunZipScraper('ALL');
+    }
+  }, [isOpen]);
 
   // Handle live price editing for specific supplier
   const handleUpdateSupplierPrice = (ingredientId, supplierIdx, field, val) => {
@@ -146,7 +141,7 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
       <div className="animate-fade-in" style={{
         backgroundColor: '#FFFFFF',
         borderRadius: 'var(--radius-lg)',
-        maxWidth: '820px',
+        maxWidth: '840px',
         width: '100%',
         maxHeight: '90vh',
         overflowY: 'auto',
@@ -175,13 +170,13 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
-                <Calendar size={26} color="#D4AF37" />
+                <MapPin size={26} color="#D4AF37" />
                 <h3 style={{ color: '#FFFFFF', fontSize: '1.6rem', margin: 0, fontFamily: 'var(--font-heading)' }}>
-                  🤖 Automated Daily Sacramento Price Scraping Agent
+                  🤖 Sacramento Multi-ZIP Member Price Agent
                 </h3>
               </div>
               <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.9rem', margin: 0 }}>
-                Scrapes daily Sacramento store market prices (*Costco, Chef's'Store, Trader Joe's*).
+                Scans in-store member prices across **ALL Sacramento ZIP Codes** (95814, 95815, 95819, 95823, 95825, 95831, 95834).
               </p>
             </div>
 
@@ -203,11 +198,11 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
                 }}
               >
                 <Edit3 size={15} />
-                <span>{isEditing ? 'Done Editing' : '✏️ Edit Store Prices'}</span>
+                <span>{isEditing ? 'Done Editing' : '✏️ Edit Prices'}</span>
               </button>
 
               <button
-                onClick={handleRunLiveScraper}
+                onClick={() => handleRunZipScraper(selectedZip)}
                 disabled={isScanning}
                 style={{
                   backgroundColor: 'var(--color-caramel)',
@@ -226,12 +221,12 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
                 {isScanning ? (
                   <>
                     <Loader2 size={15} className="animate-spin" />
-                    <span>Scanning...</span>
+                    <span>Scanning All Sacramento ZIPs...</span>
                   </>
                 ) : (
                   <>
                     <RefreshCw size={15} />
-                    <span>🔄 Refresh Daily Scan</span>
+                    <span>🤖 Scan ALL Sacramento ZIPs</span>
                   </>
                 )}
               </button>
@@ -240,6 +235,52 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
         </div>
 
         <div style={{ padding: '28px 32px' }}>
+
+          {/* ZIP Code Filter Selector */}
+          <div style={{
+            backgroundColor: 'var(--color-cream-light)',
+            padding: '12px 18px',
+            borderRadius: 'var(--radius-md)',
+            border: '1px solid var(--color-border)',
+            marginBottom: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '12px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <MapPin size={16} color="var(--color-caramel)" />
+              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-espresso)' }}>
+                Target Sacramento ZIP Code:
+              </span>
+            </div>
+
+            <select
+              value={selectedZip}
+              onChange={(e) => {
+                const z = e.target.value;
+                setSelectedZip(z);
+                handleRunZipScraper(z);
+              }}
+              style={{
+                padding: '6px 14px',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--color-border)',
+                fontWeight: 700,
+                fontSize: '0.85rem',
+                backgroundColor: '#FFF',
+                outline: 'none'
+              }}
+            >
+              <option value="ALL">🌐 ALL Sacramento ZIPs (95814 - 95834 Aggregated)</option>
+              {SACRAMENTO_ZIP_CODES.map(z => (
+                <option key={z.zip} value={z.zip}>
+                  ZIP {z.zip} — {z.location}
+                </option>
+              ))}
+            </select>
+          </div>
 
           {/* Search & Category Bar */}
           <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
