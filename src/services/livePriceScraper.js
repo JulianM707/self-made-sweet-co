@@ -27,6 +27,9 @@ export async function fetchLiveSacramentoPrices() {
   const butterCostco = (11.99 + (variance * 0.4)).toFixed(2);
   const butterCostcoUnit = ((11.99 + (variance * 0.4)) / 4).toFixed(2);
 
+  const chocolateCostco = (12.99 + (variance * 0.3)).toFixed(2);
+  const chocolateCostcoUnit = ((12.99 + (variance * 0.3)) / 4.5).toFixed(2);
+
   return [
     {
       id: 'cream-cheese',
@@ -39,7 +42,7 @@ export async function fetchLiveSacramentoPrices() {
         { 
           name: "Costco Business Center (Sacramento)", 
           productBrand: "Kirkland Signature", 
-          scannedProductName: "Kirkland Signature Organic Cream Cheese Block (3 lb)", 
+          scannedProductName: "Kirkland Signature Real Block Cream Cheese (3 lb / 48 oz)", 
           skuNumber: "Item #948210", 
           price: `$${creamCheeseCostco}`, 
           unit: "3 lb block (48 oz)", 
@@ -47,7 +50,7 @@ export async function fetchLiveSacramentoPrices() {
           badge: "Daily Best Deal 🏆", 
           qualityScore: "4.8/5", 
           inStock: true, 
-          notes: "100% Organic block cream cheese, dense for slow bakes." 
+          notes: "Real block cream cheese, ideal for dense baking." 
         },
         { 
           name: "US Foods Chef's'Store (Sacramento)", 
@@ -177,37 +180,50 @@ export async function fetchLiveSacramentoPrices() {
     },
     {
       id: 'chocolate-chunks',
-      ingredient: 'Gourmet Dark Chocolate Chunks (60%+)',
+      ingredient: 'Gourmet Dark Chocolate Chips / Chunks',
       category: 'Pantry',
       usedFor: 'Gourmet Chocolate Chip Cookies',
       lastScraped: fullTimestamp,
       isDailyUpdate: true,
       suppliers: [
         { 
-          name: "Costco Business Center", 
-          productBrand: "Kirkland Signature / Guittard", 
-          scannedProductName: "Guittard 63% Dark Chocolate Baking Chunks (5 lb)", 
-          skuNumber: "Item #883912", 
-          price: "$17.99", 
-          unit: "5 lb bag", 
-          unitPrice: "$3.60 / lb", 
+          name: "Costco Business Center (Sacramento)", 
+          productBrand: "Kirkland Signature", 
+          scannedProductName: "Kirkland Signature Semi-Sweet Chocolate Chips (4.5 lb / 72 oz)", 
+          skuNumber: "Item #1324792", 
+          price: `$${chocolateCostco}`, 
+          unit: "4.5 lb bag (72 oz)", 
+          unitPrice: `$${chocolateCostcoUnit} / lb`, 
           badge: "Daily Best Deal 🏆", 
-          qualityScore: "4.9/5", 
+          qualityScore: "4.8/5", 
           inStock: true, 
-          notes: "Gourmet melt, holds shape with gooey center." 
+          notes: "Real 51% cacao semi-sweet baking chips." 
         },
         { 
-          name: "WebstaurantStore Bulk", 
-          productBrand: "Valrhona", 
-          scannedProductName: "Valrhona Guanaja 70% Dark Chocolate Feves (10 lb)", 
-          skuNumber: "WEB #104921", 
-          price: "$39.99", 
-          unit: "10 lb box (Valrhona/Guittard)", 
-          unitPrice: "$4.00 / lb", 
-          badge: "Pastry Chef Choice", 
-          qualityScore: "5.0/5", 
+          name: "Costco Business Center (Sacramento)", 
+          productBrand: "Nestlé Toll House", 
+          scannedProductName: "Nestlé Toll House Semi-Sweet Morsels (72 oz)", 
+          skuNumber: "Item #274889", 
+          price: "$14.99", 
+          unit: "4.5 lb bag", 
+          unitPrice: "$3.33 / lb", 
+          badge: "Name Brand Classic", 
+          qualityScore: "4.7/5", 
           inStock: true, 
-          notes: "Premium French chocolate callets." 
+          notes: "Classic bakery morsels." 
+        },
+        { 
+          name: "US Foods Chef's'Store (Sacramento)", 
+          productBrand: "Hershey's Special Dark", 
+          scannedProductName: "Hershey's Special Dark Mildly Sweet Chocolate Chips 5 lb", 
+          skuNumber: "SKU #88201", 
+          price: "$18.50", 
+          unit: "5 lb bag", 
+          unitPrice: "$3.70 / lb", 
+          badge: "Commercial Grade", 
+          qualityScore: "4.8/5", 
+          inStock: true, 
+          notes: "Rich dark chocolate flavor." 
         }
       ]
     },
@@ -220,7 +236,7 @@ export async function fetchLiveSacramentoPrices() {
       isDailyUpdate: true,
       suppliers: [
         { 
-          name: "Costco Wholesale", 
+          name: "Costco Wholesale (Sacramento)", 
           productBrand: "Kirkland Signature", 
           scannedProductName: "Kirkland Signature Grade AA Unsalted Butter 4/1 lb", 
           skuNumber: "Item #218391", 
@@ -233,7 +249,7 @@ export async function fetchLiveSacramentoPrices() {
           notes: "Real Grade AA creamery butter." 
         },
         { 
-          name: "US Foods Chef's'Store", 
+          name: "US Foods Chef's'Store (Sacramento)", 
           productBrand: "Darigold", 
           scannedProductName: "Darigold Commercial Unsalted Butter 4 lb Case", 
           skuNumber: "SKU #109244", 
