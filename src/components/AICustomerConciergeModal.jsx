@@ -16,16 +16,16 @@ const BAKERY_KNOWLEDGE = [
       "🚚 **Pickup & Delivery**: Saturday & Sunday 8:00 AM – 8:00 PM in Natomas, Sacramento!"
   },
   {
-    keywords: ['hours', 'time', 'open', 'schedule', 'pickup', 'when', 'weekend'],
-    answer: "Julian's kitchen is open for Store Pickup and Sacramento Local Delivery on **Saturday & Sunday from 8:00 AM to 8:00 PM**! You can select your exact weekend time slot at checkout."
+    keywords: ['hours', 'time', 'open', 'schedule', 'pickup', 'when', 'weekend', 'slots'],
+    answer: "Julian's kitchen is open for Store Pickup and Sacramento Local Delivery on **Saturday & Sunday from 8:00 AM to 8:00 PM**! You can select your exact weekend time slot (8:00 AM, 10:00 AM, 12:00 PM, 2:00 PM, 4:00 PM, 6:00 PM, 7:30 PM) at checkout."
   },
   {
     keywords: ['location', 'where', 'sacramento', 'vallejo', 'address', 'natomas', '95834'],
-    answer: "Self-Made Sweet Co. operates out of **Natomas, Sacramento, CA (ZIP 95834)** for local delivery & weekend pickup. Julian originally comes from **Vallejo, CA**!"
+    answer: "Self-Made Sweet Co. operates out of **Natomas, Sacramento, CA (ZIP 95834)** for local delivery & weekend store pickup. Julian originally comes from **Vallejo, CA**!"
   },
   {
-    keywords: ['masterpiece', 'recommend', 'popular', 'best', 'signature', 'top'],
-    answer: "Julian's Signature Masterpiece 🏆 is the **Wild Blueberry Streusel Muffin** ($4.50 single / $24 6-pack)! Packed with a full pint of fresh blueberries per batch and topped with a cold-butter cinnamon brown sugar streusel."
+    keywords: ['masterpiece', 'recommend', 'popular', 'best', 'signature', 'top', 'flagship'],
+    answer: "Julian's Signature Masterpiece 🏆 is the **Wild Blueberry Streusel Muffin** ($4.50 single / $24 6-pack)! Packed with a full pint of fresh blueberries per batch and topped with a cold-butter cinnamon brown sugar streusel crumble."
   },
   {
     keywords: ['cheesecake', 'basque', 'crust', 'topping', 'strawberry', 'stock', 'sold out', 'available'],
@@ -48,11 +48,15 @@ const BAKERY_KNOWLEDGE = [
     answer: "We offer dietary-conscious bakes! Our **Wild Blueberry Streusel Muffins**, **Cinnamon Coffee Cake**, and **Gourmet Chocolate Chip Cookies** are 100% Nut-Free!"
   },
   {
+    keywords: ['custom', 'builder', 'customizer', 'bespoke', 'dream cake'],
+    answer: "You can build your custom cake right on our website! Choose your base (Artisan Cheesecake or Vanilla Sponge), size (8\" or 10\"), fillings, and toppings!"
+  },
+  {
     keywords: ['julian', 'founder', 'story', 'mba', 'santa cruz', 'sdsu', 'education'],
     answer: "Julian Medrano is the sole baker and founder of Self-Made Sweet Co.! He is a 1st generation Mexican-American from Vallejo, CA with a **Bachelor's from UC Santa Cruz** 🍌 and an **MBA from San Diego State University (SDSU)** 🔴⚫!"
   },
   {
-    keywords: ['payment', 'venmo', 'cashapp', 'paypal', 'cash', 'pay'],
+    keywords: ['payment', 'venmo', 'cashapp', 'paypal', 'cash', 'pay', 'card'],
     answer: "We accept **Cash on pickup/delivery**, **Venmo** (`@SelfMadeSweetCo`), **Cash App** (`$SelfMadeSweetCo`), and **PayPal** (`@SelfMadeSweetCo`)!"
   }
 ];
@@ -63,7 +67,7 @@ export default function AICustomerConciergeModal({ isOpen, onClose }) {
   const [messages, setMessages] = useState([
     {
       sender: 'bot',
-      text: "👋 Hi! I'm Julian's 24/7 AI Bakery Concierge. Ask me **what I offer**, about Julian's Masterpiece 🏆, weekend pickup hours (Sat/Sun 8AM-8PM), or custom bakes!"
+      text: "👋 Hi! I'm Julian's 24/7 AI Bakery Concierge. Tap any chip below or ask me a question!"
     }
   ]);
   const [inputText, setInputText] = useState('');
@@ -171,7 +175,7 @@ export default function AICustomerConciergeModal({ isOpen, onClose }) {
         </button>
       </div>
 
-      {/* Quick Suggestion Chips */}
+      {/* Comprehensive Quick Suggestion Chips */}
       <div style={{
         padding: '10px 14px',
         backgroundColor: 'var(--color-cream-light)',
@@ -184,23 +188,27 @@ export default function AICustomerConciergeModal({ isOpen, onClose }) {
         {[
           '🍰 What Do You Offer?',
           '🏆 Julian\'s Masterpiece',
-          '⏰ Weekend Hours',
-          '🫐 Nut-Free Bakes',
-          '👨‍🍳 Julian\'s Story'
+          '⏰ Weekend Hours & Slots',
+          '📍 Natomas Location',
+          '🫐 Nut-Free & Dietary',
+          '🎨 Custom Cake Builder',
+          '💳 Payment Methods',
+          '👨‍🍳 Julian\'s Story (MBA)'
         ].map((chip, idx) => (
           <button
             key={idx}
             onClick={() => handleSend(chip)}
             style={{
-              padding: '4px 10px',
+              padding: '5px 12px',
               borderRadius: 'var(--radius-full)',
               backgroundColor: '#FFFFFF',
               border: '1px solid var(--color-border)',
               fontSize: '0.75rem',
-              fontWeight: 600,
+              fontWeight: 700,
               color: 'var(--color-espresso)',
               cursor: 'pointer',
-              flexShrink: 0
+              flexShrink: 0,
+              boxShadow: 'var(--shadow-sm)'
             }}
           >
             {chip}
@@ -215,7 +223,7 @@ export default function AICustomerConciergeModal({ isOpen, onClose }) {
             key={idx} 
             style={{
               display: 'flex',
-              justifyContent: msg.sender === 'user' ? 'flex-end' : 'flex-start',
+              justify: msg.sender === 'user' ? 'flex-end' : 'flex-start',
               gap: '8px'
             }}
           >
