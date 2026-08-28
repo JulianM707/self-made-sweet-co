@@ -1,44 +1,44 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Bot, Send, X, Sparkles, User, Cake, Clock, MapPin, Heart } from 'lucide-react';
+import { Bot, Send, X, Sparkles, User, Cake, Clock, MapPin, Heart, Loader2 } from 'lucide-react';
 import { PRODUCTS } from '../data/bakeryData';
 
 // Knowledge Base Rules for Julian's AI Concierge
 const BAKERY_KNOWLEDGE = [
   {
-    keywords: ['hours', 'time', 'open', 'schedule', 'pickup', 'when'],
-    answer: "Julian's kitchen is open for Store Pickup and Sacramento Local Delivery on **Saturday & Sunday from 8:00 AM to 8:00 PM**. You can select your exact time slot at checkout!"
+    keywords: ['hours', 'time', 'open', 'schedule', 'pickup', 'when', 'weekend'],
+    answer: "Julian's kitchen is open for Store Pickup and Sacramento Local Delivery on **Saturday & Sunday from 8:00 AM to 8:00 PM**! You can select your exact weekend time slot at checkout."
   },
   {
-    keywords: ['location', 'where', 'sacramento', 'vallejo', 'address'],
-    answer: "Self-Made Sweet Co. operates out of **Sacramento, California** for local delivery & store pickup. Julian originally comes from **Vallejo, CA**!"
+    keywords: ['location', 'where', 'sacramento', 'vallejo', 'address', 'natomas', '95834'],
+    answer: "Self-Made Sweet Co. operates out of **Natomas, Sacramento, CA (ZIP 95834)** for local delivery & weekend pickup. Julian originally comes from **Vallejo, CA**!"
   },
   {
-    keywords: ['nut', 'allergy', 'gluten', 'dietary', 'vegan'],
-    answer: "We offer dietary-conscious bakes! Our **Wild Blueberry Streusel Muffins**, **Cinnamon Coffee Cake**, and **Gourmet Chocolate Chip Cookies** are 100% Nut-Free. Gluten-Free options are available for our **Classic Artisan Cheesecake**!"
+    keywords: ['masterpiece', 'recommend', 'popular', 'best', 'signature', 'top'],
+    answer: "Julian's Signature Masterpiece 🏆 is the **Wild Blueberry Streusel Muffin** ($4.50 single / $24 6-pack)! Packed with a full pint of fresh blueberries per batch and topped with a cold-butter cinnamon brown sugar streusel."
   },
   {
-    keywords: ['cheesecake', 'basque', 'crust', 'topping', 'strawberry'],
-    answer: "Julian's **Classic Artisan Cheesecake** ($7.50 slice / $42 whole) features velvety cream cheese, sour cream, and lemon zest in a buttery Graham crust. You can customize it with house jammy strawberry sauce or macadamia nut crust!"
+    keywords: ['cheesecake', 'basque', 'crust', 'topping', 'strawberry', 'stock', 'sold out', 'available'],
+    answer: "Please note: Our **Classic Artisan Cheesecake** is currently **🔴 TEMPORARILY OUT OF STOCK**. We highly recommend trying **Julian's Masterpiece 🏆 (Wild Blueberry Streusel Muffins)** or **Classic Venetian Tiramisu** for this weekend's pickup!"
   },
   {
-    keywords: ['tiramisu', 'espresso', 'mascarpone'],
+    keywords: ['tiramisu', 'espresso', 'mascarpone', 'coffee'],
     answer: "Our **Classic Venetian Tiramisu** ($8.50 slice / $48 tray) features light whipped mascarpone cream, espresso-soaked Savoiardi Italian ladyfingers, and Valrhona cocoa powder!"
   },
   {
     keywords: ['muffin', 'blueberry', 'streusel'],
-    answer: "The **Wild Blueberry Streusel Muffin** ($4.50 single / $24 6-pack) is packed with a full pint of fresh blueberries per batch and topped with a cold-butter cinnamon brown sugar crunch!"
+    answer: "Julian's Masterpiece 🏆 **Wild Blueberry Streusel Muffin** ($4.50 single / $24 6-pack) is overflowing with fresh wild blueberries and topped with a cold-butter cinnamon brown sugar crunch!"
   },
   {
     keywords: ['cookie', 'chocolate'],
-    answer: "Our **Gourmet Chocolate Chip Cookie** ($3.50 single / $18 6-pack) has crisp golden edges and a warm, soft, gooey dark chocolate chunk center!"
+    answer: "Our **Gourmet Chocolate Chip Cookie** ($3.50 single / $18 6-pack) features crisp golden edges with a warm, soft, gooey dark chocolate chunk center!"
+  },
+  {
+    keywords: ['nut', 'allergy', 'gluten', 'dietary', 'vegan'],
+    answer: "We offer dietary-conscious bakes! Our **Wild Blueberry Streusel Muffins**, **Cinnamon Coffee Cake**, and **Gourmet Chocolate Chip Cookies** are 100% Nut-Free!"
   },
   {
     keywords: ['julian', 'founder', 'story', 'mba', 'santa cruz', 'sdsu', 'education'],
     answer: "Julian Medrano is the sole baker and founder of Self-Made Sweet Co.! He is a 1st generation Mexican-American from Vallejo, CA with a **Bachelor's from UC Santa Cruz** 🍌 and an **MBA from San Diego State University (SDSU)** 🔴⚫!"
-  },
-  {
-    keywords: ['custom', 'customizer', 'bespoke', 'dream cake'],
-    answer: "You can build your custom cake right on our website! Choose your base (Artisan Cheesecake or Vanilla Sponge), size (8\" or 10\"), fillings, and toppings!"
   },
   {
     keywords: ['payment', 'venmo', 'cashapp', 'paypal', 'cash', 'pay'],
@@ -46,16 +46,17 @@ const BAKERY_KNOWLEDGE = [
   }
 ];
 
-export default function AICustomerConciergeModal({ isOpen, onClose, onSelectProduct }) {
+export default function AICustomerConciergeModal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   const [messages, setMessages] = useState([
     {
       sender: 'bot',
-      text: "👋 Hi! I'm Julian's AI Bakery Concierge. How can I help you today? Ask me about my signature bakes, weekend pickup hours, dietary options, or Julian's founder story!"
+      text: "👋 Hi! I'm Julian's 24/7 AI Bakery Concierge. How can I help you today? Ask me about Julian's Masterpiece 🏆, weekend pickup hours (Sat/Sun 8AM-8PM), or dietary bakes!"
     }
   ]);
   const [inputText, setInputText] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -64,18 +65,19 @@ export default function AICustomerConciergeModal({ isOpen, onClose, onSelectProd
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isTyping]);
 
   const handleSend = (textToSend) => {
     const query = (textToSend || inputText).trim();
-    if (!query) return;
+    if (!query || isTyping) return;
 
     // Add User Message
     const userMsg = { sender: 'user', text: query };
     setMessages(prev => [...prev, userMsg]);
     setInputText('');
+    setIsTyping(true);
 
-    // Generate AI Response
+    // Generate AI Response with typing indicator
     setTimeout(() => {
       const lower = query.toLowerCase();
       let botAnswer = null;
@@ -89,11 +91,12 @@ export default function AICustomerConciergeModal({ isOpen, onClose, onSelectProd
       }
 
       if (!botAnswer) {
-        botAnswer = "I'm happy to help! Julian bakes fresh every weekend (**Saturday & Sunday 8:00 AM – 8:00 PM**) in Sacramento. Feel free to explore our Signature Menu or custom cake builder! Is there a specific bake you'd like to learn about?";
+        botAnswer = "I'm happy to help! Julian bakes fresh every weekend (**Saturday & Sunday 8:00 AM – 8:00 PM**) in Natomas, Sacramento. Try **Julian's Masterpiece 🏆 (Wild Blueberry Streusel Muffin)**! Is there a specific bake you'd like to learn about?";
       }
 
+      setIsTyping(false);
       setMessages(prev => [...prev, { sender: 'bot', text: botAnswer }]);
-    }, 600);
+    }, 550);
   };
 
   return (
@@ -168,9 +171,9 @@ export default function AICustomerConciergeModal({ isOpen, onClose, onSelectProd
         whiteSpace: 'nowrap'
       }}>
         {[
+          '🏆 Julian\'s Masterpiece',
           '⏰ Weekend Hours',
           '🫐 Nut-Free Bakes',
-          '🍰 Cheesecake Details',
           '👨‍🍳 Julian\'s Story'
         ].map((chip, idx) => (
           <button
@@ -238,6 +241,39 @@ export default function AICustomerConciergeModal({ isOpen, onClose, onSelectProd
             </div>
           </div>
         ))}
+
+        {/* Typing Indicator */}
+        {isTyping && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{
+              width: '28px',
+              height: '28px',
+              borderRadius: '50%',
+              backgroundColor: 'var(--color-caramel)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#FFF',
+              flexShrink: 0
+            }}>
+              <Bot size={15} />
+            </div>
+            <div style={{
+              padding: '10px 14px',
+              borderRadius: '18px 18px 18px 4px',
+              backgroundColor: 'var(--color-cream-light)',
+              color: 'var(--color-text-muted)',
+              fontSize: '0.82rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}>
+              <Loader2 size={14} className="animate-spin" color="var(--color-caramel)" />
+              <span>Julian's AI Assistant is typing...</span>
+            </div>
+          </div>
+        )}
+
         <div ref={messagesEndRef} />
       </div>
 
@@ -268,6 +304,7 @@ export default function AICustomerConciergeModal({ isOpen, onClose, onSelectProd
         />
         <button
           type="submit"
+          disabled={isTyping}
           className="btn-primary"
           style={{ padding: '10px 16px', borderRadius: 'var(--radius-full)' }}
         >
