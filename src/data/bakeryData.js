@@ -82,7 +82,7 @@ export const PRODUCTS = [
       'Vanilla Extract', 
       'Organic Flour'
     ],
-    badge: 'Fresh Morning Bake'
+    badge: "Julian's Masterpiece 🏆"
   },
   {
     id: 'cinnamon-coffee-cake',

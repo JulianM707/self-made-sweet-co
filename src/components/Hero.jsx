@@ -83,8 +83,8 @@ export default function Hero({ onExploreMenu, onOpenAbout }) {
             border: '4px solid #FFF'
           }}>
             <img 
-              src="/images/basque_cheesecake_1786065253639.jpg" 
-              alt="Julian Medrano's Classic Artisan Cheesecake" 
+              src="/images/berry_muffins_1786065279996.jpg" 
+              alt="Julian Medrano's Wild Blueberry Streusel Muffin" 
               style={{ width: '100%', height: '420px', objectFit: 'cover', display: 'block' }}
             />
             <div style={{
@@ -96,9 +96,9 @@ export default function Hero({ onExploreMenu, onOpenAbout }) {
               background: 'linear-gradient(to top, rgba(42,27,23,0.88) 0%, rgba(42,27,23,0) 100%)',
               color: '#FFF'
             }}>
-              <span className="badge badge-gold" style={{ marginBottom: '8px' }}>Julian's Masterpiece</span>
-              <h3 style={{ color: '#FFF', fontSize: '1.4rem', fontFamily: 'var(--font-heading)' }}>Classic Artisan Cheesecake</h3>
-              <p style={{ fontSize: '0.88rem', opacity: 0.9 }}>Velvety cream cheese & lemon zest in Graham cracker crust</p>
+              <span className="badge badge-gold" style={{ marginBottom: '8px' }}>Julian's Masterpiece 🏆</span>
+              <h3 style={{ color: '#FFF', fontSize: '1.4rem', fontFamily: 'var(--font-heading)' }}>Wild Blueberry Streusel Muffin</h3>
+              <p style={{ fontSize: '0.88rem', opacity: 0.9 }}>Overflowing with fresh wild blueberries & cold-butter cinnamon streusel crumble</p>
             </div>
           </div>
 
