@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { ChefHat, Flame, Clock, CheckCircle2, DollarSign, Package, AlertCircle, Sparkles, Filter, Trash2, CheckCheck, Camera, Star, Eye, Bot, ShoppingBag, X, Check, Store } from 'lucide-react';
+import { ChefHat, Flame, Clock, CheckCircle2, DollarSign, Package, AlertCircle, Sparkles, Filter, Trash2, CheckCheck, Camera, Star, Eye, Bot, ShoppingBag, X, Check, Store, TrendingUp } from 'lucide-react';
 import IngredientSourcingAgent from './IngredientSourcingAgent';
+import FoodCostingAgent from './FoodCostingAgent';
 
 export default function BakerDashboard({ 
   orders, 
@@ -17,6 +18,7 @@ export default function BakerDashboard({
   const [activeFilter, setActiveFilter] = useState('all');
   const [showAIIngredientsModal, setShowAIIngredientsModal] = useState(false);
   const [showAISourcingModal, setShowAISourcingModal] = useState(false);
+  const [showAICostingModal, setShowAICostingModal] = useState(false);
 
   const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
   const activeOrdersCount = orders.filter(o => o.status !== 'Completed').length;
@@ -187,6 +189,26 @@ export default function BakerDashboard({
 
           <div style={{ display: 'flex', gap: '10px', marginLeft: 'auto', flexWrap: 'wrap' }}>
             <button
+              onClick={() => setShowAICostingModal(true)}
+              style={{
+                padding: '10px 20px',
+                borderRadius: 'var(--radius-full)',
+                fontWeight: 700,
+                fontSize: '0.92rem',
+                backgroundColor: '#F3E8FF',
+                color: '#6B21A8',
+                border: '1px solid #E9D5FF',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              <TrendingUp size={17} />
+              <span>🏷️ AI Profit Optimizer</span>
+            </button>
+
+            <button
               onClick={() => setShowAISourcingModal(true)}
               style={{
                 padding: '10px 20px',
@@ -203,7 +225,7 @@ export default function BakerDashboard({
               }}
             >
               <Store size={17} />
-              <span>🛒 AI Best Price Sourcing Agent</span>
+              <span>🛒 AI Sourcing Agent</span>
             </button>
 
             <button
@@ -223,7 +245,7 @@ export default function BakerDashboard({
               }}
             >
               <Sparkles size={17} />
-              <span>🤖 AI Grocery Prep Calculator</span>
+              <span>🤖 AI Grocery Prep</span>
             </button>
           </div>
         </div>
@@ -504,6 +526,12 @@ export default function BakerDashboard({
         <IngredientSourcingAgent 
           isOpen={showAISourcingModal}
           onClose={() => setShowAISourcingModal(false)}
+        />
+
+        {/* 🏷️ AI FOOD COSTING & PROFIT OPTIMIZER MODAL */}
+        <FoodCostingAgent 
+          isOpen={showAICostingModal}
+          onClose={() => setShowAICostingModal(false)}
         />
 
       </div>
