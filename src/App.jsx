@@ -12,16 +12,18 @@ import OrderNotificationToast from './components/OrderNotificationToast';
 import BakerDashboard from './components/BakerDashboard';
 import ReviewsSection from './components/ReviewsSection';
 import AddReviewModal from './components/AddReviewModal';
+import AICustomerConciergeModal from './components/AICustomerConciergeModal';
 import Footer from './components/Footer';
 import { INITIAL_ORDERS, INITIAL_REVIEWS, PRODUCTS } from './data/bakeryData';
 import { sendOrderConfirmationEmail } from './services/emailService';
-import { ChefHat, LogOut, Lock } from 'lucide-react';
+import { ChefHat, LogOut, Lock, Bot, Sparkles } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('menu');
   const [isAdminMode, setIsAdminMode] = useState(false);
   const [isBakerLoginOpen, setIsBakerLoginOpen] = useState(false);
   const [isAddReviewOpen, setIsAddReviewOpen] = useState(false);
+  const [isAIChatOpen, setIsAIChatOpen] = useState(false);
   const [notificationOrder, setNotificationOrder] = useState(null);
   
   // Detect ?admin=true or #admin in URL on load to prompt secret Baker Login
@@ -276,6 +278,36 @@ export default function App() {
         )}
       </main>
 
+      {/* Floating AI Customer Concierge Trigger Button (Bottom Right) */}
+      {!isAdminMode && !isAIChatOpen && (
+        <button
+          onClick={() => setIsAIChatOpen(true)}
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            right: '24px',
+            zIndex: 200,
+            backgroundColor: 'var(--color-espresso)',
+            color: '#FFFFFF',
+            padding: '12px 20px',
+            borderRadius: 'var(--radius-full)',
+            boxShadow: '0 8px 24px rgba(42, 27, 23, 0.3)',
+            border: '1.5px solid var(--color-gold)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            cursor: 'pointer',
+            fontWeight: 700,
+            fontSize: '0.88rem',
+            animation: 'pulseGlow 3s infinite'
+          }}
+        >
+          <Bot size={20} color="var(--color-gold)" />
+          <span>Ask AI Concierge</span>
+          <span className="badge badge-gold" style={{ fontSize: '0.7rem', padding: '2px 8px' }}>24/7</span>
+        </button>
+      )}
+
       {/* Footer */}
       <Footer 
         onOpenAbout={() => setIsAboutOpen(true)} 
@@ -321,6 +353,12 @@ export default function App() {
       <OrderStatusModal 
         order={activeOrderTrack}
         onClose={() => setActiveOrderTrack(null)}
+      />
+
+      <AICustomerConciergeModal 
+        isOpen={isAIChatOpen}
+        onClose={() => setIsAIChatOpen(false)}
+        onSelectProduct={(product) => setSelectedProduct(product)}
       />
 
       {/* Instant Purchase Order Notification Toast */}
