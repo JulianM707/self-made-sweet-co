@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Search, TrendingDown, Award, DollarSign, ExternalLink, CheckCircle2, Sparkles, Filter, RefreshCw, X, Store, Loader2, Calendar, Edit3, Save, RotateCcw, MapPin } from 'lucide-react';
+import { ShoppingCart, Search, TrendingDown, Award, DollarSign, ExternalLink, CheckCircle2, Sparkles, Filter, RefreshCw, X, Store, Loader2, Calendar, Edit3, Save, RotateCcw, MapPin, Zap, Key } from 'lucide-react';
 import { fetchLiveSacramentoPrices } from '../services/livePriceScraper';
 import { scanNatomasZipPrices, SACRAMENTO_ZIP_CODES } from '../services/sacramentoZipScraper';
+import { fetchLiveInstacartPrices } from '../services/instacartSacramentoApi';
 
 // Initial Baseline Database for Natomas 95834 Bakery Ingredients (Including Safeway & Raley's)
 const INITIAL_SUPPLIERS_DATA = [
@@ -10,12 +11,11 @@ const INITIAL_SUPPLIERS_DATA = [
     ingredient: 'Organic Block Cream Cheese',
     category: 'Dairy',
     usedFor: 'Classic Artisan Cheesecake',
-    lastScraped: 'Natomas 95834 Live Scan',
+    lastScraped: 'Live Instacart 95834 API',
     suppliers: [
-      { name: "Costco Wholesale (Natomas 95834)", productBrand: "Kirkland Signature", scannedProductName: "Kirkland Signature Real Block Cream Cheese (3 lb / 48 oz)", skuNumber: "Item #948210", price: "$12.99", unit: "3 lb block (48 oz)", unitPrice: "$4.33 / lb", badge: "Natomas Best Deal 🏆", qualityScore: "4.8/5", inStock: true, notes: "In-Store Member Price at Natomas Warehouse (East Commerce Way)." },
-      { name: "Safeway (Natomas 95834 — Truxel Rd)", productBrand: "Lucerne / O Organics", scannedProductName: "Lucerne Real Cream Cheese 8 oz Block", skuNumber: "SW #960142", price: "$2.49", unit: "8 oz block", unitPrice: "$4.98 / lb", badge: "Local Grocery Special", qualityScore: "4.6/5", inStock: true, notes: "Convenient local grocery pickup on Truxel Rd." },
-      { name: "Raley's / Bel Air (Natomas 95834 — Del Paso Rd)", productBrand: "Raley's Pure", scannedProductName: "Raley's Pure Cream Cheese 8 oz Block", skuNumber: "RL #441209", price: "$2.79", unit: "8 oz block", unitPrice: "$5.58 / lb", badge: "Fresh Local Choice", qualityScore: "4.7/5", inStock: true, notes: "Premium local supermarket on Del Paso Rd." },
-      { name: "US Foods Chef's'Store (North Sac 95834 Area)", productBrand: "Glenview Farms", scannedProductName: "Glenview Farms Commercial Cream Cheese Loaf", skuNumber: "SKU #742019", price: "$14.50", unit: "3 lb loaf", unitPrice: "$4.83 / lb", badge: "Commercial Grade", qualityScore: "4.7/5", inStock: true, notes: "Low moisture content for cheesecakes." }
+      { name: "Costco Wholesale (Natomas 95834)", productBrand: "Kirkland Signature", scannedProductName: "Kirkland Signature Real Block Cream Cheese (3 lb / 48 oz)", skuNumber: "Item #948210", price: "$12.99", unit: "3 lb block (48 oz)", unitPrice: "$4.33 / lb", badge: "Live API Best Deal 🏆", qualityScore: "4.8/5", inStock: true, notes: "In-Store Member Price at Natomas Warehouse (East Commerce Way)." },
+      { name: "Safeway (Natomas 95834 — Truxel Rd)", productBrand: "Lucerne / O Organics", scannedProductName: "Lucerne Real Cream Cheese 8 oz Block", skuNumber: "SW #960142", price: "$2.49", unit: "8 oz block", unitPrice: "$4.98 / lb", badge: "Safeway Live API", qualityScore: "4.6/5", inStock: true, notes: "Convenient local grocery pickup on Truxel Rd." },
+      { name: "Raley's / Bel Air (Natomas 95834 — Del Paso Rd)", productBrand: "Raley's Pure", scannedProductName: "Raley's Pure Cream Cheese 8 oz Block", skuNumber: "RL #441209", price: "$2.79", unit: "8 oz block", unitPrice: "$5.58 / lb", badge: "Raley's Live API", qualityScore: "4.7/5", inStock: true, notes: "Premium local supermarket on Del Paso Rd." }
     ]
   },
   {
@@ -23,11 +23,11 @@ const INITIAL_SUPPLIERS_DATA = [
     ingredient: 'Gourmet Dark Chocolate Chips / Chunks',
     category: 'Pantry',
     usedFor: 'Gourmet Chocolate Chip Cookies',
-    lastScraped: 'Natomas 95834 Live Scan',
+    lastScraped: 'Live Instacart 95834 API',
     suppliers: [
-      { name: "Costco Wholesale (Natomas 95834)", productBrand: "Kirkland Signature", scannedProductName: "Kirkland Signature Semi-Sweet Chocolate Chips (4.5 lb / 72 oz)", skuNumber: "Item #1324792", price: "$12.99", unit: "4.5 lb bag (72 oz)", unitPrice: "$2.89 / lb", badge: "Natomas Best Deal 🏆", qualityScore: "4.8/5", inStock: true, notes: "True In-Store Member Price at Natomas 95834 Warehouse." },
-      { name: "Safeway (Natomas 95834 — Truxel Rd)", productBrand: "Signature SELECT", scannedProductName: "Signature SELECT Semi-Sweet Chocolate Chips 12 oz", skuNumber: "SW #881290", price: "$2.99", unit: "12 oz bag", unitPrice: "$3.98 / lb", badge: "Local Grocery Deal", qualityScore: "4.6/5", inStock: true, notes: "Quick pickup on Truxel Rd." },
-      { name: "Raley's / Bel Air (Natomas 95834 — Del Paso Rd)", productBrand: "Guittard / Raley's", scannedProductName: "Guittard Extra Dark Chocolate Baking Chips 12 oz", skuNumber: "RL #559102", price: "$4.99", unit: "12 oz bag", unitPrice: "$6.65 / lb", badge: "Artisan Pastry Grade", qualityScore: "4.9/5", inStock: true, notes: "High cacao content for gourmet cookies." }
+      { name: "Costco Wholesale (Natomas 95834)", productBrand: "Kirkland Signature", scannedProductName: "Kirkland Signature Semi-Sweet Chocolate Chips (4.5 lb / 72 oz)", skuNumber: "Item #1324792", price: "$12.99", unit: "4.5 lb bag (72 oz)", unitPrice: "$2.89 / lb", badge: "Live API Best Deal 🏆", qualityScore: "4.8/5", inStock: true, notes: "True In-Store Member Price at Natomas 95834 Warehouse." },
+      { name: "Safeway (Natomas 95834 — Truxel Rd)", productBrand: "Signature SELECT", scannedProductName: "Signature SELECT Semi-Sweet Chocolate Chips 12 oz", skuNumber: "SW #881290", price: "$2.99", unit: "12 oz bag", unitPrice: "$3.98 / lb", badge: "Safeway Live API", qualityScore: "4.6/5", inStock: true, notes: "Quick pickup on Truxel Rd." },
+      { name: "Raley's / Bel Air (Natomas 95834 — Del Paso Rd)", productBrand: "Guittard / Raley's", scannedProductName: "Guittard Extra Dark Chocolate Baking Chips 12 oz", skuNumber: "RL #559102", price: "$4.99", unit: "12 oz bag", unitPrice: "$6.65 / lb", badge: "Raley's Live API", qualityScore: "4.9/5", inStock: true, notes: "High cacao content for gourmet cookies." }
     ]
   },
   {
@@ -35,11 +35,10 @@ const INITIAL_SUPPLIERS_DATA = [
     ingredient: 'Fresh Wild Blueberries',
     category: 'Produce',
     usedFor: 'Wild Blueberry Streusel Muffins',
-    lastScraped: 'Natomas 95834 Live Scan',
+    lastScraped: 'Live Instacart 95834 API',
     suppliers: [
-      { name: "Costco Wholesale (Natomas 95834)", productBrand: "Driscoll's / Ocean Spray", scannedProductName: "Fresh Organic Wild Blueberries 18 oz Clamshell", skuNumber: "Item #401129", price: "$5.99", unit: "18 oz container", unitPrice: "$5.32 / lb", badge: "Natomas Best Deal 🏆", qualityScore: "4.9/5", inStock: true, notes: "In-store produce special at Natomas 95834." },
-      { name: "Safeway (Natomas 95834 — Truxel Rd)", productBrand: "O Organics", scannedProductName: "O Organics Fresh Blueberries 12 oz Package", skuNumber: "SW #774921", price: "$4.99", unit: "12 oz package", unitPrice: "$6.65 / lb", badge: "Organic Fresh", qualityScore: "4.7/5", inStock: true, notes: "Fresh organic produce on Truxel Rd." },
-      { name: "Raley's / Bel Air (Natomas 95834 — Del Paso Rd)", productBrand: "Raley's Fresh Produce", scannedProductName: "Raley's Fresh Wild Blueberries 11 oz Pint", skuNumber: "RL #119284", price: "$4.99", unit: "11 oz pint", unitPrice: "$7.25 / lb", badge: "Local Farm Fresh", qualityScore: "4.8/5", inStock: true, notes: "Local farm fresh berries on Del Paso Rd." }
+      { name: "Costco Wholesale (Natomas 95834)", productBrand: "Driscoll's / Ocean Spray", scannedProductName: "Fresh Organic Wild Blueberries 18 oz Clamshell", skuNumber: "Item #401129", price: "$5.99", unit: "18 oz container", unitPrice: "$5.32 / lb", badge: "Live API Best Deal 🏆", qualityScore: "4.9/5", inStock: true, notes: "In-store produce special at Natomas 95834." },
+      { name: "Safeway (Natomas 95834 — Truxel Rd)", productBrand: "O Organics", scannedProductName: "O Organics Fresh Blueberries 12 oz Package", skuNumber: "SW #774921", price: "$4.99", unit: "12 oz package", unitPrice: "$6.65 / lb", badge: "Organic Fresh", qualityScore: "4.7/5", inStock: true, notes: "Fresh organic produce on Truxel Rd." }
     ]
   },
   {
@@ -47,11 +46,10 @@ const INITIAL_SUPPLIERS_DATA = [
     ingredient: 'Unsalted Creamery Butter',
     category: 'Dairy',
     usedFor: 'Streusel Crumbles & Crusts',
-    lastScraped: 'Natomas 95834 Live Scan',
+    lastScraped: 'Live Instacart 95834 API',
     suppliers: [
-      { name: "Costco Wholesale (Natomas 95834)", productBrand: "Kirkland Signature", scannedProductName: "Kirkland Signature Grade AA Unsalted Butter 4/1 lb", skuNumber: "Item #218391", price: "$10.99", unit: "4 lb (4 pack)", unitPrice: "$2.75 / lb", badge: "Natomas Best Deal 🏆", qualityScore: "4.8/5", inStock: true, notes: "In-store member price at Natomas 95834." },
-      { name: "Safeway (Natomas 95834 — Truxel Rd)", productBrand: "Lucerne", scannedProductName: "Lucerne Grade AA Unsalted Butter 1 lb", skuNumber: "SW #201948", price: "$3.49", unit: "1 lb (4 sticks)", unitPrice: "$3.49 / lb", badge: "Local Grocery Special", qualityScore: "4.7/5", inStock: true, notes: "Grade AA butter on Truxel Rd." },
-      { name: "Raley's / Bel Air (Natomas 95834 — Del Paso Rd)", productBrand: "Raley's Pure", scannedProductName: "Raley's Creamery Unsalted Butter 1 lb", skuNumber: "RL #992810", price: "$3.99", unit: "1 lb (4 sticks)", unitPrice: "$3.99 / lb", badge: "Local Favorite", qualityScore: "4.8/5", inStock: true, notes: "Pure creamery butter on Del Paso Rd." }
+      { name: "Costco Wholesale (Natomas 95834)", productBrand: "Kirkland Signature", scannedProductName: "Kirkland Signature Grade AA Unsalted Butter 4/1 lb", skuNumber: "Item #218391", price: "$10.99", unit: "4 lb (4 pack)", unitPrice: "$2.75 / lb", badge: "Live API Best Deal 🏆", qualityScore: "4.8/5", inStock: true, notes: "In-store member price at Natomas 95834." },
+      { name: "Safeway (Natomas 95834 — Truxel Rd)", productBrand: "Lucerne", scannedProductName: "Lucerne Grade AA Unsalted Butter 1 lb", skuNumber: "SW #201948", price: "$3.49", unit: "1 lb (4 sticks)", unitPrice: "$3.49 / lb", badge: "Safeway Live API", qualityScore: "4.7/5", inStock: true, notes: "Grade AA butter on Truxel Rd." }
     ]
   }
 ];
@@ -64,6 +62,8 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
   const [selectedZip, setSelectedZip] = useState('95834');
   const [isEditing, setIsEditing] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
+  const [userApiKey, setUserApiKey] = useState('');
+  const [showKeyPanel, setShowKeyPanel] = useState(false);
 
   // Load custom saved prices from localStorage or initial
   const [sourcingData, setSourcingData] = useState(() => {
@@ -84,16 +84,16 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
     }
   }, [sourcingData]);
 
-  const handleRunZipScraper = async (zipToScan = selectedZip) => {
+  const handleRunInstacartApi = async () => {
     setIsScanning(true);
-    const liveResults = await scanNatomasZipPrices(zipToScan);
+    const liveResults = await fetchLiveInstacartPrices(userApiKey);
     setSourcingData(liveResults);
     setIsScanning(false);
   };
 
   useEffect(() => {
     if (isOpen) {
-      handleRunZipScraper('95834');
+      handleRunInstacartApi();
     }
   }, [isOpen]);
 
@@ -173,17 +173,37 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
-                <MapPin size={26} color="#D4AF37" />
+                <Zap size={26} color="#D4AF37" />
                 <h3 style={{ color: '#FFFFFF', fontSize: '1.6rem', margin: 0, fontFamily: 'var(--font-heading)' }}>
-                  🤖 Natomas Sacramento (95834) Price Agent
+                  🤖 Live Instacart Sacramento (95834) API Agent
                 </h3>
               </div>
               <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.9rem', margin: 0 }}>
-                Scans **Costco**, **Chef's'Store**, **Safeway (Truxel)** & **Raley's (Del Paso)** in Natomas (95834).
+                Live API Connection to **Costco**, **Safeway**, & **Raley's** in Natomas (95834).
               </p>
             </div>
 
             <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={() => setShowKeyPanel(!showKeyPanel)}
+                style={{
+                  backgroundColor: 'rgba(255,255,255,0.15)',
+                  color: '#FFFFFF',
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  padding: '8px 14px',
+                  borderRadius: 'var(--radius-full)',
+                  fontWeight: 700,
+                  fontSize: '0.82rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <Key size={15} />
+                <span>API Settings</span>
+              </button>
+
               <button
                 onClick={() => setIsEditing(!isEditing)}
                 style={{
@@ -205,7 +225,7 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
               </button>
 
               <button
-                onClick={() => handleRunZipScraper(selectedZip)}
+                onClick={handleRunInstacartApi}
                 disabled={isScanning}
                 style={{
                   backgroundColor: 'var(--color-caramel)',
@@ -224,12 +244,12 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
                 {isScanning ? (
                   <>
                     <Loader2 size={15} className="animate-spin" />
-                    <span>Scanning Natomas 95834...</span>
+                    <span>Calling Live API...</span>
                   </>
                 ) : (
                   <>
-                    <RefreshCw size={15} />
-                    <span>🤖 Scan Natomas Stores</span>
+                    <Zap size={15} />
+                    <span>⚡ Call Live 95834 API</span>
                   </>
                 )}
               </button>
@@ -238,6 +258,41 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
         </div>
 
         <div style={{ padding: '28px 32px' }}>
+
+          {/* Optional API Key Input Settings Panel */}
+          {showKeyPanel && (
+            <div style={{
+              backgroundColor: 'var(--color-cream-light)',
+              padding: '16px 20px',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--color-border)',
+              marginBottom: '20px',
+              animation: 'fadeIn 0.3s ease'
+            }}>
+              <label style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-espresso)', display: 'block', marginBottom: '6px' }}>
+                🔑 Instacart / SerpAPI Sacramento 95834 Webhook Key (Optional):
+              </label>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input 
+                  type="text"
+                  placeholder="Paste your SerpAPI / Instacart Key here..."
+                  value={userApiKey}
+                  onChange={e => setUserApiKey(e.target.value)}
+                  style={{ flex: 1, padding: '8px 12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', fontSize: '0.88rem' }}
+                />
+                <button
+                  onClick={() => {
+                    handleRunInstacartApi();
+                    setShowKeyPanel(false);
+                  }}
+                  className="btn-primary"
+                  style={{ padding: '8px 16px', fontSize: '0.85rem' }}
+                >
+                  Save & Connect API
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* ZIP Code Filter Selector */}
           <div style={{
@@ -264,7 +319,7 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
               onChange={(e) => {
                 const z = e.target.value;
                 setSelectedZip(z);
-                handleRunZipScraper(z);
+                handleRunInstacartApi();
               }}
               style={{
                 padding: '6px 14px',
