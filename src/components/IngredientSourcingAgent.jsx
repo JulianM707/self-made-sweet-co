@@ -297,8 +297,8 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
               />
             </div>
 
-            <div style={{ display: 'flex', gap: '6px' }}>
-              {['all', 'dairy', 'produce', 'pantry'].map(cat => (
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+              {['all', 'dairy', 'produce', 'pantry', 'packaging'].map(cat => (
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
