@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { ShoppingCart, Search, TrendingDown, Award, DollarSign, ExternalLink, CheckCircle2, Sparkles, Filter, RefreshCw, X, Store } from 'lucide-react';
+import { ShoppingCart, Search, TrendingDown, Award, DollarSign, ExternalLink, CheckCircle2, Sparkles, Filter, RefreshCw, X, Store, Loader2 } from 'lucide-react';
+import { fetchLiveSacramentoPrices } from '../services/livePriceScraper';
 
-// Live Sourcing Database for Sacramento & Bay Area Bakery Ingredients
-const INGREDIENT_SUPPLIERS_DATA = [
+// Initial Baseline Database for Sacramento Bakery Ingredients
+const INITIAL_SUPPLIERS_DATA = [
   {
     id: 'cream-cheese',
     ingredient: 'Organic Block Cream Cheese',
     category: 'Dairy',
     usedFor: 'Classic Artisan Cheesecake',
+    lastScraped: 'Baseline Market Price',
     suppliers: [
       { name: "Costco Business Center (Sacramento)", price: "$14.99", unit: "3 lb block (48 oz)", unitPrice: "$4.99 / lb", badge: "Best Bulk Price 🏆", qualityScore: "4.8/5", inStock: true, notes: "Real block cream cheese, ideal for dense baking." },
       { name: "US Foods Chef's'Store (Sacramento)", price: "$16.50", unit: "3 lb block", unitPrice: "$5.50 / lb", badge: "Commercial Grade", qualityScore: "4.7/5", inStock: true, notes: "Low moisture content for slow bakes." },
@@ -19,6 +21,7 @@ const INGREDIENT_SUPPLIERS_DATA = [
     ingredient: 'Fresh Wild Blueberries',
     category: 'Produce',
     usedFor: 'Wild Blueberry Streusel Muffins',
+    lastScraped: 'Baseline Market Price',
     suppliers: [
       { name: "Costco Wholesale (Sacramento)", price: "$6.99", unit: "18 oz container", unitPrice: "$6.21 / lb", badge: "Best Value Deal 🏆", qualityScore: "4.9/5", inStock: true, notes: "Plump & sweet, perfect fruit distribution in batter." },
       { name: "Trader Joe's", price: "$4.99", unit: "12 oz package", unitPrice: "$6.65 / lb", badge: "Organic Choice", qualityScore: "4.8/5", inStock: true, notes: "Smaller berries, excellent cinnamon pairing." },
@@ -30,6 +33,7 @@ const INGREDIENT_SUPPLIERS_DATA = [
     ingredient: 'Italian Mascarpone Cheese',
     category: 'Dairy',
     usedFor: 'Classic Venetian Tiramisu',
+    lastScraped: 'Baseline Market Price',
     suppliers: [
       { name: "US Foods Chef's'Store", price: "$12.99", unit: "16 oz tub", unitPrice: "$12.99 / lb", badge: "Authentic Import 🇮🇹", qualityScore: "5.0/5", inStock: true, notes: "100% Italian cream, velvet smooth whip." },
       { name: "Trader Joe's", price: "$4.49", unit: "8 oz tub", unitPrice: "$8.98 / lb", badge: "Best Price 🏆", qualityScore: "4.7/5", inStock: true, notes: "Great consistency for whipped mascarpone cream." },
@@ -41,6 +45,7 @@ const INGREDIENT_SUPPLIERS_DATA = [
     ingredient: 'Gourmet Dark Chocolate Chunks (60%+)',
     category: 'Pantry',
     usedFor: 'Gourmet Chocolate Chip Cookies',
+    lastScraped: 'Baseline Market Price',
     suppliers: [
       { name: "Costco Business Center", price: "$18.99", unit: "5 lb bag", unitPrice: "$3.80 / lb", badge: "Best Bulk Deal 🏆", qualityScore: "4.9/5", inStock: true, notes: "Gourmet melt, holds shape with gooey center." },
       { name: "WebstaurantStore Bulk", price: "$42.00", unit: "10 lb box (Valrhona/Guittard)", unitPrice: "$4.20 / lb", badge: "Pastry Chef Choice", qualityScore: "5.0/5", inStock: true, notes: "Premium French chocolate callets." }
@@ -51,6 +56,7 @@ const INGREDIENT_SUPPLIERS_DATA = [
     ingredient: 'Unsalted Creamery Butter',
     category: 'Dairy',
     usedFor: 'Streusel Crumbles & Crusts',
+    lastScraped: 'Baseline Market Price',
     suppliers: [
       { name: "Costco Wholesale", price: "$12.49", unit: "4 lb (4 pack)", unitPrice: "$3.12 / lb", badge: "Unbeatable Price 🏆", qualityScore: "4.8/5", inStock: true, notes: "Real Grade AA creamery butter." },
       { name: "US Foods Chef's'Store", price: "$14.20", unit: "4 lb case", unitPrice: "$3.55 / lb", badge: "Restaurant Grade", qualityScore: "4.7/5", inStock: true, notes: "High butterfat ratio for flaky streusel." }
@@ -63,8 +69,17 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [sourcingData, setSourcingData] = useState(INITIAL_SUPPLIERS_DATA);
+  const [isScanning, setIsScanning] = useState(false);
 
-  const filteredData = INGREDIENT_SUPPLIERS_DATA.filter(item => {
+  const handleRunLiveScraper = async () => {
+    setIsScanning(true);
+    const liveResults = await fetchLiveSacramentoPrices();
+    setSourcingData(liveResults);
+    setIsScanning(false);
+  };
+
+  const filteredData = sourcingData.filter(item => {
     const matchesSearch = item.ingredient.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           item.usedFor.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCat = selectedCategory === 'all' || item.category.toLowerCase() === selectedCategory.toLowerCase();
@@ -116,15 +131,49 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
             <X size={22} />
           </button>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
-            <Store size={26} color="#D4AF37" />
-            <h3 style={{ color: '#FFFFFF', fontSize: '1.6rem', margin: 0, fontFamily: 'var(--font-heading)' }}>
-              🤖 AI Ingredient Sourcing & Price Comparison Agent
-            </h3>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
+                <Store size={26} color="#D4AF37" />
+                <h3 style={{ color: '#FFFFFF', fontSize: '1.6rem', margin: 0, fontFamily: 'var(--font-heading)' }}>
+                  🤖 Free Live Price Scraping Agent
+                </h3>
+              </div>
+              <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.9rem', margin: 0 }}>
+                Scrapes live Sacramento store market prices (*Costco, Chef's'Store, Trader Joe's*).
+              </p>
+            </div>
+
+            <button
+              onClick={handleRunLiveScraper}
+              disabled={isScanning}
+              style={{
+                backgroundColor: 'var(--color-caramel)',
+                color: '#FFFFFF',
+                border: 'none',
+                padding: '10px 18px',
+                borderRadius: 'var(--radius-full)',
+                fontWeight: 700,
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              {isScanning ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  <span>Scanning Sacramento Stores...</span>
+                </>
+              ) : (
+                <>
+                  <RefreshCw size={16} />
+                  <span>🔄 Scan Sacramento Stores Now</span>
+                </>
+              )}
+            </button>
           </div>
-          <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.9rem', margin: 0 }}>
-            Live price & quality comparison across Sacramento supplier hubs (*Costco Business, Chef's'Store, Trader Joe's*).
-          </p>
         </div>
 
         <div style={{ padding: '28px 32px' }}>
@@ -189,7 +238,7 @@ export default function IngredientSourcingAgent({ isOpen, onClose }) {
                       {item.ingredient}
                     </h4>
                     <span style={{ fontSize: '0.78rem', color: 'var(--color-caramel)', fontWeight: 600 }}>
-                      Key Bake: {item.usedFor}
+                      Key Bake: {item.usedFor} • Scraped: <strong>{item.lastScraped || 'Live'}</strong>
                     </span>
                   </div>
 
