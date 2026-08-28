@@ -168,11 +168,16 @@ export default function ProductCatalog({ onSelectProduct, onAddToCart }) {
                 }}
               >
                 {/* Product Image & Badges */}
-                <div style={{ position: 'relative', height: '230px', overflow: 'hidden' }}>
+                <div style={{ position: 'relative', height: '230px', overflow: 'hidden', backgroundColor: 'var(--color-cream-light)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <img 
                     src={product.image} 
                     alt={product.name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    style={{ 
+                      width: '100%', 
+                      height: '100%', 
+                      objectFit: product.id === 'chocolate-chip-cookie' ? 'contain' : 'cover',
+                      padding: product.id === 'chocolate-chip-cookie' ? '8px' : 0
+                    }}
                   />
                   {product.badge && (
                     <span className="badge badge-gold" style={{ position: 'absolute', top: '16px', left: '16px' }}>

@@ -221,8 +221,10 @@ a {
 .modal-product-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
+  padding: 12px;
+  background-color: var(--color-cream-light);
   display: block;
 }
 
