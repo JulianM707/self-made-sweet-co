@@ -5,6 +5,17 @@ import { PRODUCTS } from '../data/bakeryData';
 // Knowledge Base Rules for Julian's AI Concierge
 const BAKERY_KNOWLEDGE = [
   {
+    keywords: ['offer', 'sell', 'menu', 'items', 'bakes', 'baked goods', 'options', 'desserts', 'what do you have', 'what do you sell', 'what do you offer', 'catalogue', 'products'],
+    answer: "🍰 **Here is everything Julian offers at Self-Made Sweet Co.:**\n\n" +
+      "1. 🏆 **Julian's Masterpiece**: Wild Blueberry Streusel Muffins ($4.50 single / $24 6-pack) — *Overflowing with fresh blueberries & cinnamon crumble!*\n" +
+      "2. ☕ **Classic Venetian Tiramisu**: ($8.50 slice / $48 tray) — *Whipped mascarpone, espresso ladyfingers & Valrhona cocoa!*\n" +
+      "3. 🥮 **Cinnamon Streusel Coffee Cake**: ($6.50 slice / $36 whole) — *Tender vanilla cake with brown sugar cinnamon swirl!*\n" +
+      "4. 🍪 **Gourmet Chocolate Chip Cookies**: ($3.50 single / $18 6-pack) — *Crisp golden edges with soft gooey dark chocolate centers!*\n" +
+      "5. 🎨 **Custom Bespoke Cakes**: Build-your-own 8\" or 10\" cake with custom fillings & toppings!\n" +
+      "6. 🍰 **Classic Artisan Cheesecake**: *(Temporarily Sold Out)*\n\n" +
+      "🚚 **Pickup & Delivery**: Saturday & Sunday 8:00 AM – 8:00 PM in Natomas, Sacramento!"
+  },
+  {
     keywords: ['hours', 'time', 'open', 'schedule', 'pickup', 'when', 'weekend'],
     answer: "Julian's kitchen is open for Store Pickup and Sacramento Local Delivery on **Saturday & Sunday from 8:00 AM to 8:00 PM**! You can select your exact weekend time slot at checkout."
   },
@@ -52,7 +63,7 @@ export default function AICustomerConciergeModal({ isOpen, onClose }) {
   const [messages, setMessages] = useState([
     {
       sender: 'bot',
-      text: "👋 Hi! I'm Julian's 24/7 AI Bakery Concierge. How can I help you today? Ask me about Julian's Masterpiece 🏆, weekend pickup hours (Sat/Sun 8AM-8PM), or dietary bakes!"
+      text: "👋 Hi! I'm Julian's 24/7 AI Bakery Concierge. Ask me **what I offer**, about Julian's Masterpiece 🏆, weekend pickup hours (Sat/Sun 8AM-8PM), or custom bakes!"
     }
   ]);
   const [inputText, setInputText] = useState('');
@@ -91,7 +102,7 @@ export default function AICustomerConciergeModal({ isOpen, onClose }) {
       }
 
       if (!botAnswer) {
-        botAnswer = "I'm happy to help! Julian bakes fresh every weekend (**Saturday & Sunday 8:00 AM – 8:00 PM**) in Natomas, Sacramento. Try **Julian's Masterpiece 🏆 (Wild Blueberry Streusel Muffin)**! Is there a specific bake you'd like to learn about?";
+        botAnswer = "🍰 **Here is what Julian offers:** Wild Blueberry Streusel Muffins (Julian's Masterpiece 🏆), Classic Venetian Tiramisu, Cinnamon Coffee Cake, Gourmet Chocolate Chip Cookies & Custom Cakes! Baked fresh for weekend pickup (Sat/Sun 8AM-8PM) in Natomas, Sacramento!";
       }
 
       setIsTyping(false);
@@ -171,6 +182,7 @@ export default function AICustomerConciergeModal({ isOpen, onClose }) {
         whiteSpace: 'nowrap'
       }}>
         {[
+          '🍰 What Do You Offer?',
           '🏆 Julian\'s Masterpiece',
           '⏰ Weekend Hours',
           '🫐 Nut-Free Bakes',
@@ -225,7 +237,7 @@ export default function AICustomerConciergeModal({ isOpen, onClose }) {
             )}
 
             <div style={{
-              maxWidth: '80%',
+              maxWidth: '85%',
               padding: '12px 16px',
               borderRadius: msg.sender === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
               backgroundColor: msg.sender === 'user' ? 'var(--color-caramel)' : 'var(--color-cream-light)',
@@ -233,7 +245,8 @@ export default function AICustomerConciergeModal({ isOpen, onClose }) {
               fontSize: '0.88rem',
               lineHeight: 1.5,
               border: msg.sender === 'user' ? 'none' : '1px solid var(--color-border)',
-              boxShadow: 'var(--shadow-sm)'
+              boxShadow: 'var(--shadow-sm)',
+              whiteSpace: 'pre-line'
             }}>
               {msg.text.split('**').map((part, i) => (
                 i % 2 === 1 ? <strong key={i}>{part}</strong> : part
