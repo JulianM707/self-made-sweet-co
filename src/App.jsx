@@ -16,6 +16,7 @@ import AICustomerConciergeModal from './components/AICustomerConciergeModal';
 import Footer from './components/Footer';
 import { INITIAL_ORDERS, INITIAL_REVIEWS, PRODUCTS } from './data/bakeryData';
 import { sendOrderConfirmationEmail } from './services/emailService';
+import { sendAutomatedBackgroundReceipt } from './services/automatedEmailService';
 import { ChefHat, LogOut, Lock, Bot, Sparkles } from 'lucide-react';
 
 export default function App() {
@@ -206,6 +207,7 @@ export default function App() {
     setActiveOrderTrack(newOrder);
     setNotificationOrder(newOrder);
     sendOrderConfirmationEmail(newOrder);
+    sendAutomatedBackgroundReceipt(newOrder);
   };
 
   const handleUpdateOrderStatus = (orderId, newStatus) => {
