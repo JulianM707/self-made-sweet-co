@@ -34,7 +34,34 @@ export default async function handler(req, res) {
     const itemsList = (order.items || []).map(i => `• ${i.qty || 1}x ${i.name} ($${((i.unitPrice || i.price || 0) * (i.qty || 1)).toFixed(2)})`).join('<br/>');
     const trackUrl = `https://self-made-sweet-co.vercel.app/?track=${order.id || 'ORD'}`;
 
-    const resendResponse = await fetch('https://api.resend.com/emails', {
+    const emailHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #EFE4D6; border-radius: 12px; overflow: hidden;">
+        <div style="background-color: #2A1B17; color: #FFFFFF; padding: 24px; text-align: center;">
+          <h2 style="color: #D4AF37; margin: 0;">Self-Made Sweet Co.</h2>
+          <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: rgba(255,255,255,0.75);">Handcrafted Bakes • Sacramento, CA</p>
+        </div>
+        <div style="padding: 24px; color: #2A1B17;">
+          <h3>Thank you, ${order.customerName || 'Valued Customer'}!</h3>
+          <p>Julian has received your order <strong>#${order.id || 'ORD-NEW'}</strong> in the kitchen!</p>
+          <div style="background-color: #FAF7F2; padding: 16px; border-radius: 8px; margin: 16px 0;">
+            <p style="margin: 4px 0;"><strong>Fulfillment:</strong> ${order.fulfillment || 'Store Pickup'}</p>
+            <p style="margin: 4px 0;"><strong>Time Slot:</strong> ${order.dateSlot || 'Weekend Hours (Sat/Sun 8AM-8PM)'}</p>
+            <p style="margin: 4px 0;"><strong>Payment Method:</strong> ${order.paymentMethod || 'Venmo / Cash'}</p>
+          </div>
+          <div style="text-align: center; margin: 24px 0;">
+            <a href="${trackUrl}" style="background-color: #C88242; color: #FFFFFF; padding: 12px 24px; border-radius: 24px; text-decoration: none; font-weight: bold; display: inline-block;">
+              🔎 Track Live Baking Status
+            </a>
+          </div>
+          <h4>Items Ordered:</h4>
+          <p style="line-height: 1.6;">${itemsList}</p>
+          <h3 style="color: #C88242; border-top: 1px solid #EFE4D6; padding-top: 12px;">Total Paid: $${(order.total || 0).toFixed(2)}</h3>
+        </div>
+      </div>
+    `;
+
+    // Attempt 1: Send to customer email + baker email
+    let resendResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${resendKey.trim()}`,
@@ -44,33 +71,27 @@ export default async function handler(req, res) {
         from: 'Self-Made Sweet Co. <onboarding@resend.dev>',
         to: order.email ? [order.email, 'jmedrano707@yahoo.com'] : ['jmedrano707@yahoo.com'],
         subject: `Order Confirmed! Self-Made Sweet Co. #${order.id}`,
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #EFE4D6; border-radius: 12px; overflow: hidden;">
-            <div style="background-color: #2A1B17; color: #FFFFFF; padding: 24px; text-align: center;">
-              <h2 style="color: #D4AF37; margin: 0;">Self-Made Sweet Co.</h2>
-              <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: rgba(255,255,255,0.75);">Handcrafted Bakes • Sacramento, CA</p>
-            </div>
-            <div style="padding: 24px; color: #2A1B17;">
-              <h3>Thank you, ${order.customerName}!</h3>
-              <p>Julian has received your order <strong>#${order.id}</strong> in the kitchen!</p>
-              <div style="background-color: #FAF7F2; padding: 16px; border-radius: 8px; margin: 16px 0;">
-                <p style="margin: 4px 0;"><strong>Fulfillment:</strong> ${order.fulfillment}</p>
-                <p style="margin: 4px 0;"><strong>Time Slot:</strong> ${order.dateSlot}</p>
-                <p style="margin: 4px 0;"><strong>Payment Method:</strong> ${order.paymentMethod}</p>
-              </div>
-              <div style="text-align: center; margin: 24px 0;">
-                <a href="${trackUrl}" style="background-color: #C88242; color: #FFFFFF; padding: 12px 24px; border-radius: 24px; text-decoration: none; font-weight: bold; display: inline-block;">
-                  🔎 Track Live Baking Status
-                </a>
-              </div>
-              <h4>Items Ordered:</h4>
-              <p style="line-height: 1.6;">${itemsList}</p>
-              <h3 style="color: #C88242; border-top: 1px solid #EFE4D6; padding-top: 12px;">Total Paid: $${(order.total || 0).toFixed(2)}</h3>
-            </div>
-          </div>
-        `
+        html: emailHtml
       })
     });
+
+    // Attempt 2 Fallback: If free onboarding domain restricts external recipient emails, send strictly to account owner email!
+    if (!resendResponse.ok) {
+      console.warn('Resend Attempt 1 notice (free tier restriction). Retrying with account owner email...');
+      resendResponse = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${resendKey.trim()}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'Self-Made Sweet Co. <onboarding@resend.dev>',
+          to: ['jmedrano707@yahoo.com'],
+          subject: `Order Confirmed! Self-Made Sweet Co. #${order.id}`,
+          html: emailHtml
+        })
+      });
+    }
 
     const data = await resendResponse.json();
 
