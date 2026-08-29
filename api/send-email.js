@@ -42,7 +42,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         from: 'Self-Made Sweet Co. <onboarding@resend.dev>',
-        to: ['jmedrano707@yahoo.com'],
+        to: order.email ? [order.email, 'jmedrano707@yahoo.com'] : ['jmedrano707@yahoo.com'],
         subject: `Order Confirmed! Self-Made Sweet Co. #${order.id}`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #EFE4D6; border-radius: 12px; overflow: hidden;">
