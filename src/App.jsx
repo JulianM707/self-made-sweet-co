@@ -26,14 +26,36 @@ export default function App() {
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
   const [notificationOrder, setNotificationOrder] = useState(null);
   
-  // Detect ?admin=true or #admin in URL on load to prompt secret Baker Login
+  // Detect ?admin=true or ?track=ORD-XXXX in URL on load
   useEffect(() => {
     const search = window.location.search;
     const hash = window.location.hash;
+    
     if (search.includes('admin=true') || search.includes('baker=true') || hash === '#admin' || hash === '#baker') {
       setIsBakerLoginOpen(true);
     }
-  }, []);
+
+    if (search.includes('track=') || search.includes('order=')) {
+      const params = new URLSearchParams(search);
+      const trackId = params.get('track') || params.get('order');
+      if (trackId) {
+        const found = orders.find(o => o.id.toLowerCase() === trackId.toLowerCase() || o.id.toLowerCase().endsWith(trackId.toLowerCase()));
+        if (found) {
+          setActiveOrderTrack(found);
+        } else {
+          setActiveOrderTrack({
+            id: trackId.toUpperCase(),
+            customerName: 'Valued Customer',
+            fulfillment: 'Store Pickup / Sacramento Delivery',
+            dateSlot: 'Weekend Hours (Sat & Sun 8AM-8PM)',
+            status: 'In Kitchen Queue',
+            items: [],
+            total: 0
+          });
+        }
+      }
+    }
+  }, [orders]);
 
   // Persist cart items in localStorage
   const [cartItems, setCartItems] = useState(() => {

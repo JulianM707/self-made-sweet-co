@@ -31,6 +31,7 @@ export function saveEmailConfig(config) {
  */
 export function formatOrderSummaryText(order) {
   const itemsText = order.items.map(i => `• ${i.qty || 1}x ${i.name} — $${((i.unitPrice || i.price || 0) * (i.qty || 1)).toFixed(2)}`).join('\n');
+  const trackUrl = `https://self-made-sweet-co.vercel.app/?track=${order.id || 'ORD'}`;
   
   return `----------------------------------------
 SELF-MADE SWEET CO. — ORDER CONFIRMATION
@@ -44,6 +45,9 @@ Phone: ${order.phone || 'N/A'}
 Fulfillment: ${order.fulfillment || 'Store Pickup'}
 Time Slot: ${order.dateSlot || 'Weekend Hours (Sat/Sun 8AM-8PM)'}
 Payment Method: ${order.paymentMethod || 'Venmo / Cash'}
+
+🔎 1-CLICK LIVE BAKING TRACKER:
+${trackUrl}
 
 ITEMS ORDERED:
 ${itemsText}
