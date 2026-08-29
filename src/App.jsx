@@ -20,14 +20,48 @@ import { sendAutomatedBackgroundReceipt } from './services/automatedEmailService
 import { ChefHat, LogOut, Lock, Bot, Sparkles } from 'lucide-react';
 
 export default function App() {
+  // 1. All State Declarations First
   const [activeTab, setActiveTab] = useState('menu');
   const [isAdminMode, setIsAdminMode] = useState(false);
   const [isBakerLoginOpen, setIsBakerLoginOpen] = useState(false);
   const [isAddReviewOpen, setIsAddReviewOpen] = useState(false);
   const [isAIChatOpen, setIsAIChatOpen] = useState(false);
   const [notificationOrder, setNotificationOrder] = useState(null);
+
+  const [cartItems, setCartItems] = useState(() => {
+    try {
+      const saved = localStorage.getItem('julians_bakery_cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+
+  const [orders, setOrders] = useState(() => {
+    try {
+      const saved = localStorage.getItem('julians_bakery_orders');
+      return saved ? JSON.parse(saved) : INITIAL_ORDERS;
+    } catch (e) {
+      return INITIAL_ORDERS;
+    }
+  });
+
+  const [reviews, setReviews] = useState([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isQuizOpen, setIsQuizOpen] = useState(false);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   
-  // Detect ?admin=true or ?track=ORD-XXXX in URL on load
+  const [activeOrderTrack, setActiveOrderTrack] = useState(() => {
+    try {
+      const saved = localStorage.getItem('julians_active_customer_order');
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+
+  // 2. All Effects After State Initializations
   useEffect(() => {
     const search = window.location.search;
     const hash = window.location.hash;
@@ -40,7 +74,7 @@ export default function App() {
       const params = new URLSearchParams(search);
       const trackId = params.get('track') || params.get('order');
       if (trackId) {
-        const found = orders.find(o => o.id.toLowerCase() === trackId.toLowerCase() || o.id.toLowerCase().endsWith(trackId.toLowerCase()));
+        const found = (orders || []).find(o => o.id && (o.id.toLowerCase() === trackId.toLowerCase() || o.id.toLowerCase().endsWith(trackId.toLowerCase())));
         if (found) {
           setActiveOrderTrack(found);
         } else {
@@ -57,42 +91,6 @@ export default function App() {
       }
     }
   }, [orders]);
-
-  // Persist cart items in localStorage
-  const [cartItems, setCartItems] = useState(() => {
-    try {
-      const saved = localStorage.getItem('julians_bakery_cart');
-      return saved ? JSON.parse(saved) : [];
-    } catch (e) {
-      return [];
-    }
-  });
-
-  // Persist orders in localStorage
-  const [orders, setOrders] = useState(() => {
-    try {
-      const saved = localStorage.getItem('julians_bakery_orders');
-      return saved ? JSON.parse(saved) : INITIAL_ORDERS;
-    } catch (e) {
-      return INITIAL_ORDERS;
-    }
-  });
-
-  // Pure clean state for reviews (clears all previous test/demo reviews)
-  const [reviews, setReviews] = useState([]);
-
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isQuizOpen, setIsQuizOpen] = useState(false);
-  const [isAboutOpen, setIsAboutOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [activeOrderTrack, setActiveOrderTrack] = useState(() => {
-    try {
-      const saved = localStorage.getItem('julians_active_customer_order');
-      return saved ? JSON.parse(saved) : null;
-    } catch (e) {
-      return null;
-    }
-  });
 
   // Sync active order to localStorage
   useEffect(() => {
@@ -134,12 +132,12 @@ export default function App() {
     }
   }, [reviews]);
 
-  // Review Operations
+  // Review handlers
   const handleAddReview = (newReview) => {
     setReviews(prev => [newReview, ...prev]);
   };
 
-  const handleLikeReview = (reviewId) => {
+  const handleHelpfulReview = (reviewId) => {
     setReviews(prev => prev.map(r => {
       if (r.id === reviewId) {
         return { ...r, helpfulCount: (r.helpfulCount || 0) + 1 };
@@ -296,26 +294,23 @@ export default function App() {
             onDeleteOrder={handleDeleteOrder}
             onClearCompletedOrders={handleClearCompletedOrders}
             products={PRODUCTS}
+            onToggleProductAvailability={() => {}}
             reviews={reviews}
             onDeleteReview={handleDeleteReview}
             onToggleFeatureReview={handleToggleFeatureReview}
           />
         ) : activeTab === 'reviews' ? (
-          /* Customer Reviews & Dish Photos Tab */
+          /* Customer Photo Reviews View */
           <ReviewsSection 
             reviews={reviews}
-            onAddReview={handleAddReview}
+            onOpenAddReview={() => setIsAddReviewOpen(true)}
+            onHelpfulReview={handleHelpfulReview}
           />
         ) : (
-          /* Customer Bakery Menu Experience */
+          /* Standard Customer Storefront View */
           <>
-            <Hero 
-              onExploreMenu={() => {
-                const elem = document.getElementById('menu-section');
-                if (elem) elem.scrollIntoView({ behavior: 'smooth' });
-              }}
-              onOpenAbout={() => setIsAboutOpen(true)}
-            />
+            <Hero onOpenQuiz={() => setIsQuizOpen(true)} />
+            
             <ProductCatalog 
               onSelectProduct={(product) => setSelectedProduct(product)}
               onAddToCart={(product, type) => handleAddToCart(product, type)}
@@ -324,41 +319,57 @@ export default function App() {
         )}
       </main>
 
-      {/* Floating AI Customer Concierge Trigger Button (Bottom Right) */}
-      {!isAdminMode && !isAIChatOpen && (
+      {/* Footer */}
+      <Footer 
+        onOpenBakerLogin={() => setIsBakerLoginOpen(true)}
+        onOpenAbout={() => setIsAboutOpen(true)}
+      />
+
+      {/* 24/7 AI Concierge Trigger Floating Badge */}
+      {!isAIChatOpen && (
         <button
           onClick={() => setIsAIChatOpen(true)}
           style={{
             position: 'fixed',
             bottom: '24px',
             right: '24px',
-            zIndex: 200,
+            zIndex: 270,
             backgroundColor: 'var(--color-espresso)',
             color: '#FFFFFF',
+            border: '2px solid var(--color-caramel)',
             padding: '12px 20px',
             borderRadius: 'var(--radius-full)',
-            boxShadow: '0 8px 24px rgba(42, 27, 23, 0.3)',
-            border: '1.5px solid var(--color-gold)',
+            boxShadow: '0 12px 30px rgba(42, 27, 23, 0.35)',
             display: 'flex',
             alignItems: 'center',
             gap: '10px',
             cursor: 'pointer',
             fontWeight: 700,
-            fontSize: '0.88rem',
-            animation: 'pulseGlow 3s infinite'
+            fontSize: '0.9rem'
           }}
         >
-          <Bot size={20} color="var(--color-gold)" />
-          <span>Ask AI Concierge</span>
-          <span className="badge badge-gold" style={{ fontSize: '0.7rem', padding: '2px 8px' }}>24/7</span>
+          <div style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            backgroundColor: 'var(--color-caramel)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#FFF'
+          }}>
+            <Bot size={16} />
+          </div>
+          <span>Julian's 24/7 AI Concierge</span>
+          <span style={{
+            width: '8px',
+            height: '8px',
+            borderRadius: '50%',
+            backgroundColor: '#2D7A42',
+            boxShadow: '0 0 8px #2D7A42'
+          }} />
         </button>
       )}
-
-      {/* Footer */}
-      <Footer 
-        onOpenAbout={() => setIsAboutOpen(true)} 
-        onOpenBakerLogin={() => setIsBakerLoginOpen(true)}
-      />
 
       {/* Modals & Drawers */}
       <ProductModal 
@@ -405,6 +416,12 @@ export default function App() {
         isOpen={isAIChatOpen}
         onClose={() => setIsAIChatOpen(false)}
         onSelectProduct={(product) => setSelectedProduct(product)}
+      />
+
+      <AddReviewModal 
+        isOpen={isAddReviewOpen}
+        onClose={() => setIsAddReviewOpen(false)}
+        onAddReview={handleAddReview}
       />
 
       {/* Instant Purchase Order Notification Toast */}
