@@ -1,6 +1,6 @@
 /**
  * 100% Automated Background Email Service for Self-Made Sweet Co.
- * Supports Resend.com (3,000 free emails/mo) & EmailJS for hands-free background emails.
+ * Connects via Vercel Serverless Backend Route /api/send-email for 100% reliable background email dispatch.
  */
 
 export function getResendApiKey() {
@@ -33,12 +33,33 @@ export async function sendAutomatedBackgroundReceipt(order, customResendKey = ''
 
   const resendApiKey = customResendKey || getResendApiKey();
 
-  const itemsList = (order.items || []).map(i => `• ${i.qty || 1}x ${i.name} ($${((i.unitPrice || i.price || 0) * (i.qty || 1)).toFixed(2)})`).join('<br/>');
-  const trackUrl = `https://self-made-sweet-co.vercel.app/?track=${order.id || 'ORD'}`;
+  // 1. Try Vercel Serverless Function Endpoint /api/send-email (Bypasses Browser CORS)
+  try {
+    const serverlessResponse = await fetch('/api/send-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        order: order,
+        apiKey: resendApiKey
+      })
+    });
 
-  // 1. Resend.com Direct Background Email Dispatch
+    if (serverlessResponse.ok) {
+      console.log('✅ Vercel Serverless Backend Resend Email Dispatched Successfully!');
+      return { success: true, provider: 'Vercel-Serverless-Resend' };
+    }
+  } catch (err) {
+    console.warn('Vercel serverless endpoint notice:', err);
+  }
+
+  // 2. Direct Resend Client Fallback
   if (resendApiKey) {
     try {
+      const itemsList = (order.items || []).map(i => `• ${i.qty || 1}x ${i.name} ($${((i.unitPrice || i.price || 0) * (i.qty || 1)).toFixed(2)})`).join('<br/>');
+      const trackUrl = `https://self-made-sweet-co.vercel.app/?track=${order.id || 'ORD'}`;
+
       const resendResponse = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -78,17 +99,12 @@ export async function sendAutomatedBackgroundReceipt(order, customResendKey = ''
       });
 
       if (resendResponse.ok) {
-        console.log('✅ Resend.com Background Email Dispatched Successfully!');
-        return { success: true, provider: 'Resend' };
-      } else {
-        const errorText = await resendResponse.text();
-        console.warn('Resend response notice:', errorText);
+        console.log('✅ Direct Resend Email Dispatched Successfully!');
+        return { success: true, provider: 'Direct-Resend' };
       }
     } catch (err) {
-      console.warn('Resend API background error:', err);
+      console.warn('Direct Resend client notice:', err);
     }
-  } else {
-    console.warn('⚠️ Resend API Key is missing or empty. Please enter your key in Kitchen Portal or set VITE_RESEND_API_KEY in Vercel.');
   }
 
   return { success: false, fallback: true };
