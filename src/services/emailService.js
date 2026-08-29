@@ -12,9 +12,9 @@ export function getEmailConfig() {
     console.error('Failed to load email config', e);
   }
   return {
-    serviceId: typeof process !== 'undefined' && process.env && process.env.VITE_EMAILJS_SERVICE_ID ? process.env.VITE_EMAILJS_SERVICE_ID : 'service_selfmadesweetco',
-    templateId: typeof process !== 'undefined' && process.env && process.env.VITE_EMAILJS_TEMPLATE_ID ? process.env.VITE_EMAILJS_TEMPLATE_ID : 'template_order_confirm',
-    publicKey: typeof process !== 'undefined' && process.env && process.env.VITE_EMAILJS_PUBLIC_KEY ? process.env.VITE_EMAILJS_PUBLIC_KEY : 'user_selfmadesweetco_key'
+    serviceId: typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_EMAILJS_SERVICE_ID ? import.meta.env.VITE_EMAILJS_SERVICE_ID : 'service_selfmadesweetco',
+    templateId: typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_EMAILJS_TEMPLATE_ID ? import.meta.env.VITE_EMAILJS_TEMPLATE_ID : 'template_order_confirm',
+    publicKey: typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_EMAILJS_PUBLIC_KEY ? import.meta.env.VITE_EMAILJS_PUBLIC_KEY : 'user_selfmadesweetco_key'
   };
 }
 
