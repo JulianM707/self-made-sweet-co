@@ -9,7 +9,9 @@ export default function Navbar({
   onOpenAbout,
   activeTab, 
   setActiveTab,
-  reviewsCount = 0
+  reviewsCount = 0,
+  activeOrderTrack,
+  onTrackOrder
 }) {
   return (
     <header className="glass-panel" style={{ position: 'sticky', top: 0, zIndex: 100, borderBottom: '1px solid var(--color-border)' }}>
@@ -111,6 +113,18 @@ export default function Navbar({
 
         {/* Right Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {/* Persistent Order Tracking Button */}
+          {activeOrderTrack && (
+            <button 
+              onClick={onTrackOrder}
+              className="badge badge-gold animate-bounce-short"
+              style={{ padding: '8px 14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem', border: '1px solid #D4AF37' }}
+            >
+              <Sparkles size={14} color="#D4AF37" />
+              <span>🔎 Track Order #{activeOrderTrack.id}</span>
+            </button>
+          )}
+
           {/* Flavor Quiz Button */}
           <button 
             onClick={onOpenQuiz}

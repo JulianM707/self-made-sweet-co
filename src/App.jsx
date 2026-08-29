@@ -61,8 +61,27 @@ export default function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [activeOrderTrack, setActiveOrderTrack] = useState(null);
+  const [activeOrderTrack, setActiveOrderTrack] = useState(() => {
+    try {
+      const saved = localStorage.getItem('julians_active_customer_order');
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+
+  // Sync active order to localStorage
+  useEffect(() => {
+    try {
+      if (activeOrderTrack) {
+        localStorage.setItem('julians_active_customer_order', JSON.stringify(activeOrderTrack));
+      } else {
+        localStorage.removeItem('julians_active_customer_order');
+      }
+    } catch (e) {
+      console.error('Failed to save active order to localStorage', e);
+    }
+  }, [activeOrderTrack]);
 
   // Sync cartItems state to localStorage whenever it changes
   useEffect(() => {
@@ -238,6 +257,8 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         reviewsCount={reviews.length}
+        activeOrderTrack={activeOrderTrack}
+        onTrackOrder={() => setActiveOrderTrack(activeOrderTrack)}
       />
 
       {/* Main View Switching */}
@@ -367,6 +388,37 @@ export default function App() {
         onClose={() => setNotificationOrder(null)}
         onTrackOrder={(ord) => setActiveOrderTrack(ord)}
       />
+
+      {/* Persistent Bottom-Left Track Active Order Button */}
+      {activeOrderTrack && !notificationOrder && (
+        <div style={{
+          position: 'fixed',
+          bottom: '24px',
+          left: '24px',
+          zIndex: 250
+        }}>
+          <button
+            onClick={() => setActiveOrderTrack(activeOrderTrack)}
+            style={{
+              backgroundColor: '#2A1B17',
+              color: '#FFFFFF',
+              border: '1.5px solid #D4AF37',
+              padding: '10px 18px',
+              borderRadius: 'var(--radius-full)',
+              fontWeight: 800,
+              fontSize: '0.85rem',
+              boxShadow: '0 10px 30px rgba(42, 27, 23, 0.4)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            <Sparkles size={16} color="#D4AF37" />
+            <span>🔎 Track Active Order #{activeOrderTrack.id}</span>
+          </button>
+        </div>
+      )}
 
     </div>
   );
