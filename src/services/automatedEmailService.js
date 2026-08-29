@@ -6,7 +6,15 @@
 export async function sendAutomatedBackgroundReceipt(order, customResendKey = '') {
   console.log('⚡ Automated Background Email Agent: Dispatching receipt for Order:', order.id);
 
-  const resendApiKey = customResendKey || (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_RESEND_API_KEY ? import.meta.env.VITE_RESEND_API_KEY : '');
+  // Check for custom key, VITE_RESEND_API_KEY, or SelfMadeSweetCoBakery in Vercel env
+  const resendApiKey = customResendKey || (
+    typeof import.meta !== 'undefined' && import.meta.env ? (
+      import.meta.env.VITE_RESEND_API_KEY || 
+      import.meta.env.VITE_SelfMadeSweetCoBakery || 
+      import.meta.env.SelfMadeSweetCoBakery || 
+      ''
+    ) : ''
+  );
 
   const itemsList = (order.items || []).map(i => `• ${i.qty || 1}x ${i.name} ($${((i.unitPrice || i.price || 0) * (i.qty || 1)).toFixed(2)})`).join('<br/>');
   const trackUrl = `https://self-made-sweet-co.vercel.app/?track=${order.id || 'ORD'}`;
