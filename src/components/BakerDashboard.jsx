@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ChefHat, Flame, Clock, CheckCircle2, DollarSign, Package, AlertCircle, Sparkles, Filter, Trash2, CheckCheck, Camera, Star, Eye, Bot, ShoppingBag, X, Check, Store, TrendingUp } from 'lucide-react';
 import IngredientSourcingAgent from './IngredientSourcingAgent';
 import FoodCostingAgent from './FoodCostingAgent';
+import { getResendApiKey, saveResendApiKey } from '../services/automatedEmailService';
 
 export default function BakerDashboard({ 
   orders, 
@@ -19,6 +20,8 @@ export default function BakerDashboard({
   const [showAIIngredientsModal, setShowAIIngredientsModal] = useState(false);
   const [showAISourcingModal, setShowAISourcingModal] = useState(false);
   const [showAICostingModal, setShowAICostingModal] = useState(false);
+  const [showResendModal, setShowResendModal] = useState(false);
+  const [resendKeyInput, setResendKeyInput] = useState(() => getResendApiKey());
 
   const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
   const activeOrdersCount = orders.filter(o => o.status !== 'Completed').length;
@@ -206,6 +209,26 @@ export default function BakerDashboard({
             >
               <TrendingUp size={17} />
               <span>🏷️ AI Profit Optimizer</span>
+            </button>
+
+            <button
+              onClick={() => setShowResendModal(true)}
+              style={{
+                padding: '10px 20px',
+                borderRadius: 'var(--radius-full)',
+                fontWeight: 700,
+                fontSize: '0.92rem',
+                backgroundColor: '#EFF6FF',
+                color: '#1D4ED8',
+                border: '1px solid #BFDBFE',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              <Bot size={17} />
+              <span>🔑 24/7 Auto Email Key</span>
             </button>
 
             <button
@@ -543,6 +566,89 @@ export default function BakerDashboard({
           isOpen={showAICostingModal}
           onClose={() => setShowAICostingModal(false)}
         />
+
+        {/* 🔑 24/7 AUTO EMAIL API KEY MODAL */}
+        {showResendModal && (
+          <div style={{
+            position: 'fixed',
+            top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: 'rgba(42, 27, 23, 0.7)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 290,
+            padding: '24px'
+          }} onClick={() => setShowResendModal(false)}>
+            <div style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 'var(--radius-lg)',
+              maxWidth: '520px',
+              width: '100%',
+              padding: '32px',
+              position: 'relative',
+              boxShadow: 'var(--shadow-lg)'
+            }} onClick={(e) => e.stopPropagation()}>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <h3 style={{ fontSize: '1.3rem', color: 'var(--color-espresso)', margin: 0, fontWeight: 800 }}>
+                  🔑 24/7 Auto Email Key Settings
+                </h3>
+                <button onClick={() => setShowResendModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+                  <X size={20} />
+                </button>
+              </div>
+
+              <p style={{ fontSize: '0.88rem', color: 'var(--color-text-muted)', lineHeight: 1.5, marginBottom: '20px' }}>
+                Enter your free <strong>Resend.com API Key</strong> (`re_...`) below to enable instant, 100% automated background email receipts sent directly to <strong>jmedrano707@yahoo.com</strong>!
+              </p>
+
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-espresso)', display: 'block', marginBottom: '6px' }}>
+                  Resend API Key:
+                </label>
+                <input 
+                  type="password"
+                  placeholder="re_123456789_abcdefg..."
+                  value={resendKeyInput}
+                  onChange={(e) => setResendKeyInput(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1.5px solid var(--color-border)',
+                    fontSize: '0.9rem',
+                    outline: 'none',
+                    fontFamily: 'monospace'
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button 
+                  onClick={() => {
+                    saveResendApiKey(resendKeyInput);
+                    setShowResendModal(false);
+                    alert('✅ Resend API Key saved! Automated 24/7 background emails are now ACTIVE!');
+                  }}
+                  className="btn-primary"
+                  style={{ flex: 1, padding: '12px' }}
+                >
+                  Save API Key
+                </button>
+
+                <button 
+                  onClick={() => setShowResendModal(false)}
+                  className="btn-secondary"
+                  style={{ padding: '12px' }}
+                >
+                  Cancel
+                </button>
+              </div>
+
+            </div>
+          </div>
+        )}
 
       </div>
     </section>

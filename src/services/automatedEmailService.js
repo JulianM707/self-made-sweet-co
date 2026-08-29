@@ -3,18 +3,35 @@
  * Supports Resend.com (3,000 free emails/mo) & EmailJS for hands-free background emails.
  */
 
+export function getResendApiKey() {
+  try {
+    const saved = localStorage.getItem('julians_resend_api_key');
+    if (saved && saved.trim()) return saved.trim();
+  } catch (e) {
+    console.error('Failed to load resend key from localStorage', e);
+  }
+
+  if (typeof import.meta !== 'undefined' && import.meta.env) {
+    return import.meta.env.VITE_RESEND_API_KEY || 
+           import.meta.env.VITE_SelfMadeSweetCoBakery || 
+           import.meta.env.SelfMadeSweetCoBakery || 
+           '';
+  }
+  return '';
+}
+
+export function saveResendApiKey(key) {
+  try {
+    localStorage.setItem('julians_resend_api_key', key.trim());
+  } catch (e) {
+    console.error('Failed to save resend key to localStorage', e);
+  }
+}
+
 export async function sendAutomatedBackgroundReceipt(order, customResendKey = '') {
   console.log('⚡ Automated Background Email Agent: Dispatching receipt for Order:', order.id);
 
-  // Check for custom key, VITE_RESEND_API_KEY, or SelfMadeSweetCoBakery in Vercel env
-  const resendApiKey = customResendKey || (
-    typeof import.meta !== 'undefined' && import.meta.env ? (
-      import.meta.env.VITE_RESEND_API_KEY || 
-      import.meta.env.VITE_SelfMadeSweetCoBakery || 
-      import.meta.env.SelfMadeSweetCoBakery || 
-      ''
-    ) : ''
-  );
+  const resendApiKey = customResendKey || getResendApiKey();
 
   const itemsList = (order.items || []).map(i => `• ${i.qty || 1}x ${i.name} ($${((i.unitPrice || i.price || 0) * (i.qty || 1)).toFixed(2)})`).join('<br/>');
   const trackUrl = `https://self-made-sweet-co.vercel.app/?track=${order.id || 'ORD'}`;
@@ -63,40 +80,15 @@ export async function sendAutomatedBackgroundReceipt(order, customResendKey = ''
       if (resendResponse.ok) {
         console.log('✅ Resend.com Background Email Dispatched Successfully!');
         return { success: true, provider: 'Resend' };
+      } else {
+        const errorText = await resendResponse.text();
+        console.warn('Resend response notice:', errorText);
       }
     } catch (err) {
       console.warn('Resend API background error:', err);
     }
-  }
-
-  // 2. EmailJS REST API Background Dispatch
-  try {
-    const emailjsResponse = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        service_id: 'service_selfmadesweetco',
-        template_id: 'template_order_confirm',
-        user_id: 'user_selfmadesweetco_key',
-        template_params: {
-          order_id: order.id,
-          customer_name: order.customerName,
-          customer_email: order.email,
-          fulfillment: order.fulfillment,
-          date_slot: order.dateSlot,
-          total_price: `$${(order.total || 0).toFixed(2)}`,
-          track_url: trackUrl,
-          baker_email: 'jmedrano707@yahoo.com'
-        }
-      })
-    });
-
-    if (emailjsResponse.ok) {
-      console.log('✅ EmailJS Background Email Dispatched!');
-      return { success: true, provider: 'EmailJS' };
-    }
-  } catch (err) {
-    console.warn('Background email dispatch notice:', err);
+  } else {
+    console.warn('⚠️ Resend API Key is missing or empty. Please enter your key in Kitchen Portal or set VITE_RESEND_API_KEY in Vercel.');
   }
 
   return { success: false, fallback: true };
