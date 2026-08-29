@@ -401,12 +401,22 @@ export default function BakerDashboard({
                           </select>
                         </div>
 
-                        {/* Order Details */}
+                        {/* Contact & Receipt Bar */}
                         <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '16px' }}>
                           <div><strong>Fulfillment:</strong> {order.fulfillment}</div>
                           <div><strong>Time Slot:</strong> {order.dateSlot}</div>
                           <div><strong>Payment:</strong> {order.paymentMethod}</div>
-                          <div><strong>Contact:</strong> {order.email} • {order.phone}</div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span><strong>Contact:</strong> {order.email} • {order.phone}</span>
+                            <a
+                              href={`mailto:${order.email ? `${order.email},jmedrano707@yahoo.com` : 'jmedrano707@yahoo.com'}?subject=${encodeURIComponent(`Self-Made Sweet Co. Order Receipt #${order.id}`)}&body=${encodeURIComponent(`SELF-MADE SWEET CO. ORDER RECEIPT\nOrder #${order.id}\nCustomer: ${order.customerName}\nFulfillment: ${order.fulfillment} (${order.dateSlot})\nTotal: $${(order.total || 0).toFixed(2)}\n\nItems:\n` + (order.items || []).map(i => `• ${i.qty || 1}x ${i.name} ($${((i.unitPrice || i.price || 0) * (i.qty || 1)).toFixed(2)})`).join('\n') + `\n\nThank you for baking with Julian in Sacramento!`)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ color: 'var(--color-caramel)', fontWeight: 700, fontSize: '0.78rem', textDecoration: 'none' }}
+                            >
+                              📩 Send Receipt
+                            </a>
+                          </div>
                           {order.note && <div style={{ color: 'var(--color-espresso)', fontStyle: 'italic' }}><strong>Note:</strong> "{order.note}"</div>}
                         </div>
 

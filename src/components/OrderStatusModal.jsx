@@ -162,8 +162,18 @@ export default function OrderStatusModal({ order, onClose }) {
           </div>
         </div>
 
-        <div style={{ marginTop: '24px', textAlign: 'center' }}>
-          <button onClick={onClose} className="btn-primary" style={{ width: '100%' }}>
+        <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
+          <a
+            href={`mailto:${order.email ? `${order.email},jmedrano707@yahoo.com` : 'jmedrano707@yahoo.com'}?subject=${encodeURIComponent(`Self-Made Sweet Co. Order Receipt #${order.id}`)}&body=${encodeURIComponent(`SELF-MADE SWEET CO. ORDER RECEIPT\nOrder #${order.id}\nCustomer: ${order.customerName}\nFulfillment: ${order.fulfillment} (${order.dateSlot})\nTotal: $${(order.total || 0).toFixed(2)}\n\nItems:\n` + (order.items || []).map(i => `• ${i.qty || 1}x ${i.name} ($${((i.unitPrice || i.price || 0) * (i.qty || 1)).toFixed(2)})`).join('\n') + `\n\nThank you for baking with Julian in Sacramento!`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-secondary"
+            style={{ flex: 1, textDecoration: 'none', textAlign: 'center', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+          >
+            <span>📩 Send Email Receipt</span>
+          </a>
+
+          <button onClick={onClose} className="btn-primary" style={{ flex: 1 }}>
             Done / Return to Bakery
           </button>
         </div>
