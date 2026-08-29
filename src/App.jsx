@@ -61,6 +61,7 @@ export default function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [activeOrderTrack, setActiveOrderTrack] = useState(() => {
     try {
       const saved = localStorage.getItem('julians_active_customer_order');
