@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingBag, Sparkles, Heart, Star } from 'lucide-react';
+import { ShoppingBag, Sparkles, Heart, Star, Bot } from 'lucide-react';
 import CookieLogoIcon from './CookieLogoIcon';
 
 export default function Navbar({ 
@@ -7,6 +7,7 @@ export default function Navbar({
   onOpenCart, 
   onOpenQuiz, 
   onOpenAbout,
+  onOpenAIChat,
   activeTab, 
   setActiveTab,
   reviewsCount = 0,
@@ -108,6 +109,25 @@ export default function Navbar({
           >
             <Heart size={16} color="var(--color-terracotta)" fill="var(--color-terracotta)" />
             Meet Julian
+          </button>
+
+          <button 
+            onClick={onOpenAIChat}
+            style={{
+              padding: '8px 14px',
+              borderRadius: 'var(--radius-full)',
+              fontWeight: 600,
+              fontSize: '0.9rem',
+              backgroundColor: 'transparent',
+              color: 'var(--color-espresso)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              cursor: 'pointer'
+            }}
+          >
+            <Bot size={16} color="var(--color-caramel)" />
+            <span>AI Assistant</span>
           </button>
         </nav>
 

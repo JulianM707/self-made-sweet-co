@@ -301,6 +301,7 @@ export default function App() {
         onOpenCart={() => setIsCartOpen(true)}
         onOpenQuiz={() => setIsQuizOpen(true)}
         onOpenAbout={() => setIsAboutOpen(true)}
+        onOpenAIChat={() => setIsAIChatOpen(true)}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         reviewsCount={reviews.length}
@@ -348,52 +349,6 @@ export default function App() {
         onOpenBakerLogin={() => setIsBakerLoginOpen(true)}
         onOpenAbout={() => setIsAboutOpen(true)}
       />
-
-      {/* 24/7 AI Concierge Trigger Floating Badge */}
-      {!isAIChatOpen && (
-        <button
-          onClick={() => setIsAIChatOpen(true)}
-          style={{
-            position: 'fixed',
-            bottom: '24px',
-            right: '24px',
-            zIndex: 270,
-            backgroundColor: 'var(--color-espresso)',
-            color: '#FFFFFF',
-            border: '2px solid var(--color-caramel)',
-            padding: '12px 20px',
-            borderRadius: 'var(--radius-full)',
-            boxShadow: '0 12px 30px rgba(42, 27, 23, 0.35)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            cursor: 'pointer',
-            fontWeight: 700,
-            fontSize: '0.9rem'
-          }}
-        >
-          <div style={{
-            width: '28px',
-            height: '28px',
-            borderRadius: '50%',
-            backgroundColor: 'var(--color-caramel)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#FFF'
-          }}>
-            <Bot size={16} />
-          </div>
-          <span>Julian's 24/7 AI Concierge</span>
-          <span style={{
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            backgroundColor: '#2D7A42',
-            boxShadow: '0 0 8px #2D7A42'
-          }} />
-        </button>
-      )}
 
       {/* Modals & Drawers */}
       <ProductModal 
