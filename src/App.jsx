@@ -142,15 +142,19 @@ export default function App() {
           const merged = [...prev];
           let updated = false;
           remoteOrders.forEach(ro => {
-            if (!merged.some(o => o.id === ro.id)) {
+            const existingIndex = merged.findIndex(o => o.id === ro.id);
+            if (existingIndex === -1) {
               merged.unshift(ro);
+              updated = true;
+            } else if (merged[existingIndex].status !== ro.status) {
+              merged[existingIndex] = { ...merged[existingIndex], status: ro.status };
               updated = true;
             }
           });
           return updated ? merged : prev;
         });
       }
-    }, 4000);
+    }, 3000);
 
     return () => clearInterval(pollInterval);
   }, []);

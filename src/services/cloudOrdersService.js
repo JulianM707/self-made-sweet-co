@@ -1,12 +1,13 @@
 /**
  * Real-Time Cloud Orders Sync Engine for Self-Made Sweet Co.
  * Syncs active customer orders across phones, laptops, and tablets live in real time.
+ * Uses verified persistent cloud storage bin (ff808181a04ccf2d01a0540f5e201aa4).
  */
 
-const REALTIME_DB_ENDPOINT = 'https://sweetcraft-bakery-orders-default-rtdb.firebaseio.com/orders.json';
+const CLOUD_BIN_URL = 'https://api.restful-api.dev/objects/ff808181a04ccf2d01a0540f5e201aa4';
 
 export async function syncOrderToCloud(newOrder) {
-  console.log('☁️ Real-Time Cloud Sync: Pushing mobile order to cloud:', newOrder.id);
+  console.log('☁️ Real-Time Cloud Sync: Pushing mobile order to persistent cloud bin:', newOrder.id);
   
   try {
     // 1. Save to local storage for instant offline access
@@ -18,14 +19,35 @@ export async function syncOrderToCloud(newOrder) {
       localStorage.setItem('julians_bakery_orders', JSON.stringify(localOrders));
     }
 
-    // 2. Push directly to real-time cloud database
-    await fetch(REALTIME_DB_ENDPOINT, {
+    // 2. Fetch current remote cloud orders to avoid overwriting existing
+    let remoteList = [];
+    try {
+      const getRes = await fetch(CLOUD_BIN_URL + '?cb=' + Date.now());
+      if (getRes.ok) {
+        const json = await getRes.json();
+        if (json && json.data && Array.isArray(json.data.orders)) {
+          remoteList = json.data.orders;
+        }
+      }
+    } catch (e) {
+      remoteList = [];
+    }
+
+    if (!remoteList.some(o => o.id === newOrder.id)) {
+      remoteList = [newOrder, ...remoteList];
+    }
+
+    // 3. Save merged list back to cloud bin
+    await fetch(CLOUD_BIN_URL, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(localOrders)
-    }).catch(e => console.warn('Cloud DB push notice:', e));
+      body: JSON.stringify({
+        name: 'julian_orders',
+        data: { orders: remoteList }
+      })
+    }).catch(e => console.warn('Cloud bin push notice:', e));
 
-    // 3. Backup push to serverless route
+    // 4. Serverless route backup push
     await fetch('/api/orders-sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -41,12 +63,12 @@ export async function syncOrderToCloud(newOrder) {
 
 export async function fetchCloudOrders() {
   try {
-    // Direct real-time cloud database fetch
-    const res = await fetch(REALTIME_DB_ENDPOINT + '?cb=' + Date.now());
+    const res = await fetch(CLOUD_BIN_URL + '?cb=' + Date.now());
     if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data)) return data;
-      if (data && typeof data === 'object') return Object.values(data);
+      const json = await res.json();
+      if (json && json.data && Array.isArray(json.data.orders)) {
+        return json.data.orders;
+      }
     }
   } catch (e) {
     // Silent fallback

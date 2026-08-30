@@ -1,12 +1,12 @@
 /**
  * Vercel Serverless Function for Real-Time Cross-Device Orders Sync
- * Uses persistent cloud database storage so mobile phone orders sync live to baker laptops!
+ * Uses verified persistent cloud storage bin (ff808181a04ccf2d01a0540f5e201aa4).
  */
 
-const REALTIME_DB_ENDPOINT = 'https://sweetcraft-bakery-orders-default-rtdb.firebaseio.com/orders.json';
+const CLOUD_BIN_URL = 'https://api.restful-api.dev/objects/ff808181a04ccf2d01a0540f5e201aa4';
 
 export default async function handler(req, res) {
-  // Set CORS headers
+  // CORS Headers
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -19,15 +19,13 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  // GET: Fetch live orders from cloud database
+  // GET: Fetch live orders from cloud bin
   if (req.method === 'GET') {
     try {
-      const getRes = await fetch(REALTIME_DB_ENDPOINT + '?cb=' + Date.now());
+      const getRes = await fetch(CLOUD_BIN_URL + '?cb=' + Date.now());
       if (getRes.ok) {
-        const data = await getRes.json();
-        let orders = [];
-        if (Array.isArray(data)) orders = data;
-        else if (data && typeof data === 'object') orders = Object.values(data);
+        const json = await getRes.json();
+        const orders = json && json.data && Array.isArray(json.data.orders) ? json.data.orders : [];
         return res.status(200).json({ success: true, orders });
       }
     } catch (e) {
@@ -36,18 +34,19 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true, orders: [] });
   }
 
-  // POST: Add or update order in cloud database
+  // POST: Add or update order in cloud bin
   if (req.method === 'POST') {
     try {
       const { order, action, orderId, newStatus } = req.body || {};
 
       let currentOrders = [];
       try {
-        const getRes = await fetch(REALTIME_DB_ENDPOINT + '?cb=' + Date.now());
+        const getRes = await fetch(CLOUD_BIN_URL + '?cb=' + Date.now());
         if (getRes.ok) {
-          const data = await getRes.json();
-          if (Array.isArray(data)) currentOrders = data;
-          else if (data && typeof data === 'object') currentOrders = Object.values(data);
+          const json = await getRes.json();
+          if (json && json.data && Array.isArray(json.data.orders)) {
+            currentOrders = json.data.orders;
+          }
         }
       } catch (e) {
         currentOrders = [];
@@ -63,11 +62,14 @@ export default async function handler(req, res) {
         currentOrders = currentOrders.filter(o => o.id !== orderId);
       }
 
-      // Save updated list to cloud database
-      await fetch(REALTIME_DB_ENDPOINT, {
+      // Save updated list to cloud bin
+      await fetch(CLOUD_BIN_URL, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(currentOrders)
+        body: JSON.stringify({
+          name: 'julian_orders',
+          data: { orders: currentOrders }
+        })
       }).catch(e => console.warn('Cloud DB save notice:', e));
 
       return res.status(200).json({ success: true, orders: currentOrders });
