@@ -17,7 +17,7 @@ import Footer from './components/Footer';
 import { INITIAL_ORDERS, INITIAL_REVIEWS, PRODUCTS } from './data/bakeryData';
 import { sendOrderConfirmationEmail } from './services/emailService';
 import { sendAutomatedBackgroundReceipt } from './services/automatedEmailService';
-import { syncOrderToCloud, fetchCloudOrders } from './services/cloudOrdersService';
+import { syncOrderToCloud, fetchCloudOrders, deleteOrderFromCloud, updateOrderStatusInCloud, clearCompletedOrdersFromCloud } from './services/cloudOrdersService';
 import { ChefHat, LogOut, Lock, Bot, Sparkles } from 'lucide-react';
 
 export default function App() {
@@ -241,6 +241,7 @@ export default function App() {
     if (activeOrderTrack && activeOrderTrack.id === orderId) {
       setActiveOrderTrack(prev => ({ ...prev, status: newStatus }));
     }
+    updateOrderStatusInCloud(orderId, newStatus);
   };
 
   const handleDeleteOrder = (orderId) => {
@@ -248,10 +249,12 @@ export default function App() {
     if (activeOrderTrack && activeOrderTrack.id === orderId) {
       setActiveOrderTrack(null);
     }
+    deleteOrderFromCloud(orderId);
   };
 
   const handleClearCompletedOrders = () => {
     setOrders(prev => prev.filter(o => o.status !== 'Completed'));
+    clearCompletedOrdersFromCloud();
   };
 
   const cartTotalCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);

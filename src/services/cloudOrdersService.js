@@ -10,7 +10,6 @@ export async function syncOrderToCloud(newOrder) {
   console.log('☁️ Real-Time Cloud Sync: Pushing mobile order to persistent cloud bin:', newOrder.id);
   
   try {
-    // 1. Save to local storage for instant offline access
     const savedLocal = localStorage.getItem('julians_bakery_orders');
     let localOrders = savedLocal ? JSON.parse(savedLocal) : [];
     
@@ -19,7 +18,6 @@ export async function syncOrderToCloud(newOrder) {
       localStorage.setItem('julians_bakery_orders', JSON.stringify(localOrders));
     }
 
-    // 2. Fetch current remote cloud orders to avoid overwriting existing
     let remoteList = [];
     try {
       const getRes = await fetch(CLOUD_BIN_URL + '?cb=' + Date.now());
@@ -37,7 +35,6 @@ export async function syncOrderToCloud(newOrder) {
       remoteList = [newOrder, ...remoteList];
     }
 
-    // 3. Save merged list back to cloud bin
     await fetch(CLOUD_BIN_URL, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -47,7 +44,6 @@ export async function syncOrderToCloud(newOrder) {
       })
     }).catch(e => console.warn('Cloud bin push notice:', e));
 
-    // 4. Serverless route backup push
     await fetch('/api/orders-sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -57,6 +53,120 @@ export async function syncOrderToCloud(newOrder) {
     return { success: true };
   } catch (err) {
     console.warn('Cloud order push notice:', err);
+    return { success: false };
+  }
+}
+
+export async function deleteOrderFromCloud(orderId) {
+  console.log('🗑️ Cloud Sync: Deleting order from persistent cloud bin:', orderId);
+  try {
+    let remoteList = [];
+    try {
+      const getRes = await fetch(CLOUD_BIN_URL + '?cb=' + Date.now());
+      if (getRes.ok) {
+        const json = await getRes.json();
+        if (json && json.data && Array.isArray(json.data.orders)) {
+          remoteList = json.data.orders;
+        }
+      }
+    } catch (e) {
+      remoteList = [];
+    }
+
+    const filtered = remoteList.filter(o => o.id !== orderId);
+
+    await fetch(CLOUD_BIN_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'julian_orders',
+        data: { orders: filtered }
+      })
+    }).catch(e => console.warn('Cloud bin delete notice:', e));
+
+    await fetch('/api/orders-sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'DELETE_ORDER', orderId })
+    }).catch(e => console.warn('Backend orders-sync notice:', e));
+
+    return { success: true };
+  } catch (err) {
+    console.warn('Cloud delete notice:', err);
+    return { success: false };
+  }
+}
+
+export async function updateOrderStatusInCloud(orderId, newStatus) {
+  console.log('🔄 Cloud Sync: Updating status in persistent cloud bin:', orderId, newStatus);
+  try {
+    let remoteList = [];
+    try {
+      const getRes = await fetch(CLOUD_BIN_URL + '?cb=' + Date.now());
+      if (getRes.ok) {
+        const json = await getRes.json();
+        if (json && json.data && Array.isArray(json.data.orders)) {
+          remoteList = json.data.orders;
+        }
+      }
+    } catch (e) {
+      remoteList = [];
+    }
+
+    const updatedList = remoteList.map(o => o.id === orderId ? { ...o, status: newStatus } : o);
+
+    await fetch(CLOUD_BIN_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'julian_orders',
+        data: { orders: updatedList }
+      })
+    }).catch(e => console.warn('Cloud bin update notice:', e));
+
+    await fetch('/api/orders-sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'UPDATE_STATUS', orderId, newStatus })
+    }).catch(e => console.warn('Backend orders-sync notice:', e));
+
+    return { success: true };
+  } catch (err) {
+    console.warn('Cloud update status notice:', err);
+    return { success: false };
+  }
+}
+
+export async function clearCompletedOrdersFromCloud() {
+  console.log('🧹 Cloud Sync: Clearing completed orders from persistent cloud bin');
+  try {
+    let remoteList = [];
+    try {
+      const getRes = await fetch(CLOUD_BIN_URL + '?cb=' + Date.now());
+      if (getRes.ok) {
+        const json = await getRes.json();
+        if (json && json.data && Array.isArray(json.data.orders)) {
+          remoteList = json.data.orders;
+        }
+      }
+    } catch (e) {
+      remoteList = [];
+    }
+
+    const activeOnly = remoteList.filter(o => o.status !== 'Completed');
+
+    await fetch(CLOUD_BIN_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'julian_orders',
+        data: { orders: activeOnly }
+      })
+    }).catch(e => console.warn('Cloud bin clear notice:', e));
+
+    return { success: true };
+  } catch (err) {
+    console.warn('Cloud clear notice:', err);
     return { success: false };
   }
 }
