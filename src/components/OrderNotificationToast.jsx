@@ -124,9 +124,9 @@ export default function OrderNotificationToast({ order, onClose, onTrackOrder })
               backgroundColor: 'var(--color-caramel)',
               color: '#FFFFFF',
               border: 'none',
-              padding: '10px 14px',
+              padding: '12px 16px',
               borderRadius: 'var(--radius-full)',
-              fontSize: '0.82rem',
+              fontSize: '0.88rem',
               fontWeight: 700,
               display: 'flex',
               alignItems: 'center',
@@ -135,32 +135,9 @@ export default function OrderNotificationToast({ order, onClose, onTrackOrder })
               cursor: 'pointer'
             }}
           >
-            <Clock size={15} />
-            <span>Track Status</span>
+            <Clock size={16} />
+            <span>Track Baking Status</span>
           </button>
-
-          <a
-            href={`mailto:${order.email ? `${order.email},jmedrano707@yahoo.com` : 'jmedrano707@yahoo.com'}?subject=${encodeURIComponent(`Self-Made Sweet Co. Order Receipt #${order.id}`)}&body=${encodeURIComponent(`SELF-MADE SWEET CO. ORDER RECEIPT\nOrder #${order.id}\nCustomer: ${order.customerName}\nFulfillment: ${order.fulfillment} (${order.dateSlot})\nTotal: $${(order.total || 0).toFixed(2)}\n\nItems:\n` + (order.items || []).map(i => `• ${i.qty || 1}x ${i.name} ($${((i.unitPrice || i.price || 0) * (i.qty || 1)).toFixed(2)})`).join('\n') + `\n\nThank you for baking with Julian in Sacramento!`)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              backgroundColor: 'rgba(255,255,255,0.15)',
-              color: '#FFFFFF',
-              border: '1px solid rgba(255,255,255,0.3)',
-              padding: '10px 14px',
-              borderRadius: 'var(--radius-full)',
-              fontSize: '0.82rem',
-              fontWeight: 700,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '6px',
-              textDecoration: 'none'
-            }}
-          >
-            <ExternalLink size={14} />
-            <span>📩 Email Receipt</span>
-          </a>
         </div>
 
       </div>
