@@ -4,7 +4,7 @@
  */
 
 export async function syncOrderToCloud(newOrder) {
-  console.log('☁️ Real-Time Cloud Sync: Pushing mobile order to cloud database:', newOrder.id);
+  console.log('☁️ Real-Time Cloud Sync: Pushing mobile order to cloud:', newOrder.id);
   
   try {
     // 1. Save to local storage for instant offline access
@@ -16,7 +16,7 @@ export async function syncOrderToCloud(newOrder) {
       localStorage.setItem('julians_bakery_orders', JSON.stringify(localOrders));
     }
 
-    // 2. Broadcast directly to cloud sync REST API endpoint
+    // 2. Broadcast to serverless API route
     await fetch('/api/orders-sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -32,7 +32,7 @@ export async function syncOrderToCloud(newOrder) {
 
 export async function fetchCloudOrders() {
   try {
-    const res = await fetch('/api/orders-sync?cb=' + Date.now());
+    const res = await fetch('/api/orders-sync?t=' + Date.now());
     if (res.ok) {
       const data = await res.json();
       if (data && data.orders && Array.isArray(data.orders)) {
