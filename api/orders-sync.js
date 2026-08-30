@@ -3,9 +3,10 @@
  * Uses persistent cloud database storage so mobile phone orders sync live to baker laptops!
  */
 
-const CLOUD_DB_URL = 'https://api.myjson.online/v1/records/julians_bakery_orders_sacramento_95834';
+const REALTIME_DB_ENDPOINT = 'https://sweetcraft-bakery-orders-default-rtdb.firebaseio.com/orders.json';
 
 export default async function handler(req, res) {
+  // Set CORS headers
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -21,10 +22,12 @@ export default async function handler(req, res) {
   // GET: Fetch live orders from cloud database
   if (req.method === 'GET') {
     try {
-      const getRes = await fetch(CLOUD_DB_URL + '?cb=' + Date.now());
+      const getRes = await fetch(REALTIME_DB_ENDPOINT + '?cb=' + Date.now());
       if (getRes.ok) {
-        const json = await getRes.json();
-        const orders = json && json.data && Array.isArray(json.data) ? json.data : [];
+        const data = await getRes.json();
+        let orders = [];
+        if (Array.isArray(data)) orders = data;
+        else if (data && typeof data === 'object') orders = Object.values(data);
         return res.status(200).json({ success: true, orders });
       }
     } catch (e) {
@@ -40,12 +43,11 @@ export default async function handler(req, res) {
 
       let currentOrders = [];
       try {
-        const getRes = await fetch(CLOUD_DB_URL + '?cb=' + Date.now());
+        const getRes = await fetch(REALTIME_DB_ENDPOINT + '?cb=' + Date.now());
         if (getRes.ok) {
-          const json = await getRes.json();
-          if (json && json.data && Array.isArray(json.data)) {
-            currentOrders = json.data;
-          }
+          const data = await getRes.json();
+          if (Array.isArray(data)) currentOrders = data;
+          else if (data && typeof data === 'object') currentOrders = Object.values(data);
         }
       } catch (e) {
         currentOrders = [];
@@ -62,10 +64,10 @@ export default async function handler(req, res) {
       }
 
       // Save updated list to cloud database
-      await fetch(CLOUD_DB_URL, {
+      await fetch(REALTIME_DB_ENDPOINT, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: currentOrders })
+        body: JSON.stringify(currentOrders)
       }).catch(e => console.warn('Cloud DB save notice:', e));
 
       return res.status(200).json({ success: true, orders: currentOrders });

@@ -3,7 +3,7 @@
  * Syncs active customer orders across phones, laptops, and tablets live in real time.
  */
 
-const DIRECT_CLOUD_DB_URL = 'https://api.myjson.online/v1/records/julians_bakery_orders_sacramento_95834';
+const REALTIME_DB_ENDPOINT = 'https://sweetcraft-bakery-orders-default-rtdb.firebaseio.com/orders.json';
 
 export async function syncOrderToCloud(newOrder) {
   console.log('☁️ Real-Time Cloud Sync: Pushing mobile order to cloud:', newOrder.id);
@@ -18,14 +18,14 @@ export async function syncOrderToCloud(newOrder) {
       localStorage.setItem('julians_bakery_orders', JSON.stringify(localOrders));
     }
 
-    // 2. Direct client-to-cloud push for instant cross-device delivery
-    await fetch(DIRECT_CLOUD_DB_URL, {
+    // 2. Push directly to real-time cloud database
+    await fetch(REALTIME_DB_ENDPOINT, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ data: localOrders })
-    }).catch(e => console.warn('Direct cloud push notice:', e));
+      body: JSON.stringify(localOrders)
+    }).catch(e => console.warn('Cloud DB push notice:', e));
 
-    // 3. Serverless route backup push
+    // 3. Backup push to serverless route
     await fetch('/api/orders-sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -41,25 +41,28 @@ export async function syncOrderToCloud(newOrder) {
 
 export async function fetchCloudOrders() {
   try {
-    // Try direct cloud database fetch first
-    const directRes = await fetch(DIRECT_CLOUD_DB_URL + '?cb=' + Date.now());
-    if (directRes.ok) {
-      const json = await directRes.json();
-      if (json && json.data && Array.isArray(json.data)) {
-        return json.data;
-      }
-    }
-
-    // Fallback to serverless endpoint
-    const res = await fetch('/api/orders-sync?cb=' + Date.now());
+    // Direct real-time cloud database fetch
+    const res = await fetch(REALTIME_DB_ENDPOINT + '?cb=' + Date.now());
     if (res.ok) {
       const data = await res.json();
+      if (Array.isArray(data)) return data;
+      if (data && typeof data === 'object') return Object.values(data);
+    }
+  } catch (e) {
+    // Silent fallback
+  }
+
+  try {
+    const backupRes = await fetch('/api/orders-sync?cb=' + Date.now());
+    if (backupRes.ok) {
+      const data = await backupRes.json();
       if (data && data.orders && Array.isArray(data.orders)) {
         return data.orders;
       }
     }
   } catch (e) {
-    // Silent local fallback
+    // Silent fallback
   }
+
   return null;
 }
