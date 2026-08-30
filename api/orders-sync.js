@@ -1,13 +1,11 @@
 /**
  * Vercel Serverless Function for Real-Time Cross-Device Orders Sync
- * Allows orders placed on any mobile phone to pop up live on the baker's laptop!
+ * Uses persistent cloud KV storage so orders placed on mobile phones sync live to laptops!
  */
 
-// In-memory global store for active deployment session
-let GLOBAL_ORDERS_QUEUE = [];
+const KV_STORE_URL = 'https://kvdb.io/julian_bakery_orders_95834/active_orders';
 
 export default async function handler(req, res) {
-  // CORS Headers
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -22,35 +20,61 @@ export default async function handler(req, res) {
 
   if (req.method === 'POST') {
     try {
-      const { order, action } = req.body || {};
+      const { order, action, orderId, newStatus } = req.body || {};
       
-      if (action === 'PUSH_ORDER' && order) {
-        if (!GLOBAL_ORDERS_QUEUE.some(o => o.id === order.id)) {
-          GLOBAL_ORDERS_QUEUE.unshift(order);
+      // Fetch current persistent orders from cloud KV
+      let currentOrders = [];
+      try {
+        const kvRes = await fetch(KV_STORE_URL);
+        if (kvRes.ok) {
+          const text = await kvRes.text();
+          if (text) currentOrders = JSON.parse(text);
         }
-        return res.status(200).json({ success: true, count: GLOBAL_ORDERS_QUEUE.length, orders: GLOBAL_ORDERS_QUEUE });
+      } catch (e) {
+        currentOrders = [];
       }
 
-      if (action === 'UPDATE_STATUS') {
-        const { orderId, newStatus } = req.body;
-        GLOBAL_ORDERS_QUEUE = GLOBAL_ORDERS_QUEUE.map(o => o.id === orderId ? { ...o, status: newStatus } : o);
-        return res.status(200).json({ success: true, orders: GLOBAL_ORDERS_QUEUE });
+      if (!Array.isArray(currentOrders)) currentOrders = [];
+
+      if (action === 'PUSH_ORDER' && order) {
+        if (!currentOrders.some(o => o.id === order.id)) {
+          currentOrders.unshift(order);
+        }
+      } else if (action === 'UPDATE_STATUS' && orderId) {
+        currentOrders = currentOrders.map(o => o.id === orderId ? { ...o, status: newStatus } : o);
+      } else if (action === 'DELETE_ORDER' && orderId) {
+        currentOrders = currentOrders.filter(o => o.id !== orderId);
       }
 
-      if (action === 'DELETE_ORDER') {
-        const { orderId } = req.body;
-        GLOBAL_ORDERS_QUEUE = GLOBAL_ORDERS_QUEUE.filter(o => o.id !== orderId);
-        return res.status(200).json({ success: true, orders: GLOBAL_ORDERS_QUEUE });
-      }
+      // Save updated orders to persistent cloud KV store
+      await fetch(KV_STORE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(currentOrders)
+      }).catch(e => console.warn('KV save notice:', e));
 
-      return res.status(400).json({ error: 'Invalid action' });
+      return res.status(200).json({ success: true, count: currentOrders.length, orders: currentOrders });
     } catch (e) {
       return res.status(500).json({ error: e.message });
     }
   }
 
   if (req.method === 'GET') {
-    return res.status(200).json({ success: true, orders: GLOBAL_ORDERS_QUEUE });
+    try {
+      const kvRes = await fetch(KV_STORE_URL + '?t=' + Date.now());
+      if (kvRes.ok) {
+        const text = await kvRes.text();
+        if (text) {
+          const parsed = JSON.parse(text);
+          if (Array.isArray(parsed)) {
+            return res.status(200).json({ success: true, orders: parsed });
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('KV get notice:', e);
+    }
+    return res.status(200).json({ success: true, orders: [] });
   }
 
   return res.status(405).json({ error: 'Method not allowed' });

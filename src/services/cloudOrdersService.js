@@ -3,10 +3,8 @@
  * Syncs active customer orders across phones, laptops, and tablets live in real time.
  */
 
-const CLOUD_SYNC_ENDPOINT = 'https://api.jsonbin.io/v3/b'; // Fallback cloud sync key / store
-
 export async function syncOrderToCloud(newOrder) {
-  console.log('☁️ Cloud Orders Sync: Pushing order to cloud database:', newOrder.id);
+  console.log('☁️ Real-Time Cloud Sync: Pushing mobile order to cloud database:', newOrder.id);
   
   try {
     // 1. Save to local storage for instant offline access
@@ -18,18 +16,12 @@ export async function syncOrderToCloud(newOrder) {
       localStorage.setItem('julians_bakery_orders', JSON.stringify(localOrders));
     }
 
-    // 2. Broadcast via Web API channel if available on same network
-    if (typeof BroadcastChannel !== 'undefined') {
-      const channel = new BroadcastChannel('julians_orders_channel');
-      channel.postMessage({ type: 'NEW_ORDER', order: newOrder });
-    }
-
-    // 3. Post to Vercel KV / Serverless endpoint if configured
+    // 2. Broadcast to serverless persistent KV API endpoint
     await fetch('/api/orders-sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'PUSH_ORDER', order: newOrder })
-    }).catch(e => console.log('Vercel KV sync pending local fallback'));
+    }).catch(e => console.warn('Backend orders-sync notice:', e));
 
     return { success: true };
   } catch (err) {
@@ -40,10 +32,12 @@ export async function syncOrderToCloud(newOrder) {
 
 export async function fetchCloudOrders() {
   try {
-    const res = await fetch('/api/orders-sync');
+    const res = await fetch('/api/orders-sync?t=' + Date.now());
     if (res.ok) {
       const data = await res.json();
-      if (data && data.orders) return data.orders;
+      if (data && data.orders && Array.isArray(data.orders)) {
+        return data.orders;
+      }
     }
   } catch (e) {
     // Silent local fallback
