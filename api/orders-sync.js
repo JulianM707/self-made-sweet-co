@@ -1,26 +1,9 @@
 /**
  * Vercel Serverless Function for Real-Time Cross-Device Orders Sync
- * Provides instant high-speed order queue management for mobile & laptop devices.
+ * Uses persistent cloud database storage so mobile phone orders sync live to baker laptops!
  */
 
-let IN_MEMORY_ORDERS_QUEUE = [
-  {
-    id: 'ORD-9021',
-    customerName: 'Valerie R. (Natomas)',
-    fulfillment: 'Store Pickup',
-    dateSlot: 'Sat 10:00 AM',
-    paymentMethod: 'Venmo (@SelfMadeSweetCo)',
-    email: 'valerie.natomas@example.com',
-    phone: '(916) 555-0192',
-    status: 'In Oven',
-    items: [
-      { name: "Julian's Masterpiece Muffin 🏆", qty: 2, price: 4.50 },
-      { name: 'Classic Venetian Tiramisu', qty: 1, price: 8.50 }
-    ],
-    total: 17.50,
-    note: 'Extra streusel crunch please!'
-  }
-];
+const CLOUD_DB_URL = 'https://api.myjson.online/v1/records/julians_bakery_orders_sacramento_95834';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -35,32 +18,57 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
+  // GET: Fetch live orders from cloud database
   if (req.method === 'GET') {
-    return res.status(200).json({ success: true, orders: IN_MEMORY_ORDERS_QUEUE });
+    try {
+      const getRes = await fetch(CLOUD_DB_URL + '?cb=' + Date.now());
+      if (getRes.ok) {
+        const json = await getRes.json();
+        const orders = json && json.data && Array.isArray(json.data) ? json.data : [];
+        return res.status(200).json({ success: true, orders });
+      }
+    } catch (e) {
+      console.warn('GET sync error:', e);
+    }
+    return res.status(200).json({ success: true, orders: [] });
   }
 
+  // POST: Add or update order in cloud database
   if (req.method === 'POST') {
     try {
       const { order, action, orderId, newStatus } = req.body || {};
 
-      if (action === 'PUSH_ORDER' && order) {
-        if (!IN_MEMORY_ORDERS_QUEUE.some(o => o.id === order.id)) {
-          IN_MEMORY_ORDERS_QUEUE.unshift(order);
+      let currentOrders = [];
+      try {
+        const getRes = await fetch(CLOUD_DB_URL + '?cb=' + Date.now());
+        if (getRes.ok) {
+          const json = await getRes.json();
+          if (json && json.data && Array.isArray(json.data)) {
+            currentOrders = json.data;
+          }
         }
-        return res.status(200).json({ success: true, orders: IN_MEMORY_ORDERS_QUEUE });
+      } catch (e) {
+        currentOrders = [];
       }
 
-      if (action === 'UPDATE_STATUS' && orderId) {
-        IN_MEMORY_ORDERS_QUEUE = IN_MEMORY_ORDERS_QUEUE.map(o => o.id === orderId ? { ...o, status: newStatus } : o);
-        return res.status(200).json({ success: true, orders: IN_MEMORY_ORDERS_QUEUE });
+      if (action === 'PUSH_ORDER' && order) {
+        if (!currentOrders.some(o => o.id === order.id)) {
+          currentOrders.unshift(order);
+        }
+      } else if (action === 'UPDATE_STATUS' && orderId) {
+        currentOrders = currentOrders.map(o => o.id === orderId ? { ...o, status: newStatus } : o);
+      } else if (action === 'DELETE_ORDER' && orderId) {
+        currentOrders = currentOrders.filter(o => o.id !== orderId);
       }
 
-      if (action === 'DELETE_ORDER' && orderId) {
-        IN_MEMORY_ORDERS_QUEUE = IN_MEMORY_ORDERS_QUEUE.filter(o => o.id !== orderId);
-        return res.status(200).json({ success: true, orders: IN_MEMORY_ORDERS_QUEUE });
-      }
+      // Save updated list to cloud database
+      await fetch(CLOUD_DB_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: currentOrders })
+      }).catch(e => console.warn('Cloud DB save notice:', e));
 
-      return res.status(400).json({ error: 'Invalid action' });
+      return res.status(200).json({ success: true, orders: currentOrders });
     } catch (e) {
       return res.status(500).json({ error: e.message });
     }

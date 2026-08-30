@@ -3,6 +3,8 @@
  * Syncs active customer orders across phones, laptops, and tablets live in real time.
  */
 
+const DIRECT_CLOUD_DB_URL = 'https://api.myjson.online/v1/records/julians_bakery_orders_sacramento_95834';
+
 export async function syncOrderToCloud(newOrder) {
   console.log('☁️ Real-Time Cloud Sync: Pushing mobile order to cloud:', newOrder.id);
   
@@ -16,7 +18,14 @@ export async function syncOrderToCloud(newOrder) {
       localStorage.setItem('julians_bakery_orders', JSON.stringify(localOrders));
     }
 
-    // 2. Broadcast to serverless API route
+    // 2. Direct client-to-cloud push for instant cross-device delivery
+    await fetch(DIRECT_CLOUD_DB_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: localOrders })
+    }).catch(e => console.warn('Direct cloud push notice:', e));
+
+    // 3. Serverless route backup push
     await fetch('/api/orders-sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -32,7 +41,17 @@ export async function syncOrderToCloud(newOrder) {
 
 export async function fetchCloudOrders() {
   try {
-    const res = await fetch('/api/orders-sync?t=' + Date.now());
+    // Try direct cloud database fetch first
+    const directRes = await fetch(DIRECT_CLOUD_DB_URL + '?cb=' + Date.now());
+    if (directRes.ok) {
+      const json = await directRes.json();
+      if (json && json.data && Array.isArray(json.data)) {
+        return json.data;
+      }
+    }
+
+    // Fallback to serverless endpoint
+    const res = await fetch('/api/orders-sync?cb=' + Date.now());
     if (res.ok) {
       const data = await res.json();
       if (data && data.orders && Array.isArray(data.orders)) {
