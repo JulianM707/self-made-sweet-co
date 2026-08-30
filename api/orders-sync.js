@@ -1,11 +1,12 @@
 /**
  * Vercel Serverless Function for Real-Time Cross-Device Orders Sync
- * Uses persistent cloud KV storage so orders placed on mobile phones sync live to laptops!
+ * Uses persistent RESTful API cloud storage so mobile phone orders sync live to baker laptops!
  */
 
-const KV_STORE_URL = 'https://kvdb.io/julian_bakery_orders_95834/active_orders';
+const CLOUD_SYNC_URL = 'https://api.restful-api.dev/objects/julians_bakery_orders_sacramento_95834';
 
 export default async function handler(req, res) {
+  // CORS Headers
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -18,23 +19,39 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
+  // GET: Fetch live orders from cloud
+  if (req.method === 'GET') {
+    try {
+      const response = await fetch(CLOUD_SYNC_URL + '?cb=' + Date.now());
+      if (response.ok) {
+        const json = await response.json();
+        const orders = json && json.data && Array.isArray(json.data.orders) ? json.data.orders : [];
+        return res.status(200).json({ success: true, orders });
+      }
+    } catch (e) {
+      console.warn('GET sync error:', e);
+    }
+    return res.status(200).json({ success: true, orders: [] });
+  }
+
+  // POST / PUT: Update orders in cloud
   if (req.method === 'POST') {
     try {
       const { order, action, orderId, newStatus } = req.body || {};
       
-      // Fetch current persistent orders from cloud KV
+      // Fetch current list
       let currentOrders = [];
       try {
-        const kvRes = await fetch(KV_STORE_URL);
-        if (kvRes.ok) {
-          const text = await kvRes.text();
-          if (text) currentOrders = JSON.parse(text);
+        const getRes = await fetch(CLOUD_SYNC_URL + '?cb=' + Date.now());
+        if (getRes.ok) {
+          const json = await getRes.json();
+          if (json && json.data && Array.isArray(json.data.orders)) {
+            currentOrders = json.data.orders;
+          }
         }
       } catch (e) {
         currentOrders = [];
       }
-
-      if (!Array.isArray(currentOrders)) currentOrders = [];
 
       if (action === 'PUSH_ORDER' && order) {
         if (!currentOrders.some(o => o.id === order.id)) {
@@ -46,35 +63,33 @@ export default async function handler(req, res) {
         currentOrders = currentOrders.filter(o => o.id !== orderId);
       }
 
-      // Save updated orders to persistent cloud KV store
-      await fetch(KV_STORE_URL, {
-        method: 'POST',
+      // Save to cloud store
+      const putRes = await fetch(CLOUD_SYNC_URL, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(currentOrders)
-      }).catch(e => console.warn('KV save notice:', e));
+        body: JSON.stringify({
+          name: 'Self-Made Sweet Co. Orders Queue',
+          data: { orders: currentOrders }
+        })
+      });
 
-      return res.status(200).json({ success: true, count: currentOrders.length, orders: currentOrders });
+      // If object doesn't exist yet, create it with POST
+      if (!putRes.ok) {
+        await fetch('https://api.restful-api.dev/objects', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: 'julians_bakery_orders_sacramento_95834',
+            name: 'Self-Made Sweet Co. Orders Queue',
+            data: { orders: currentOrders }
+          })
+        });
+      }
+
+      return res.status(200).json({ success: true, orders: currentOrders });
     } catch (e) {
       return res.status(500).json({ error: e.message });
     }
-  }
-
-  if (req.method === 'GET') {
-    try {
-      const kvRes = await fetch(KV_STORE_URL + '?t=' + Date.now());
-      if (kvRes.ok) {
-        const text = await kvRes.text();
-        if (text) {
-          const parsed = JSON.parse(text);
-          if (Array.isArray(parsed)) {
-            return res.status(200).json({ success: true, orders: parsed });
-          }
-        }
-      }
-    } catch (e) {
-      console.warn('KV get notice:', e);
-    }
-    return res.status(200).json({ success: true, orders: [] });
   }
 
   return res.status(405).json({ error: 'Method not allowed' });

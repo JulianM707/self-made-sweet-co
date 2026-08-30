@@ -16,7 +16,7 @@ export async function syncOrderToCloud(newOrder) {
       localStorage.setItem('julians_bakery_orders', JSON.stringify(localOrders));
     }
 
-    // 2. Broadcast to serverless persistent KV API endpoint
+    // 2. Broadcast directly to cloud sync REST API endpoint
     await fetch('/api/orders-sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -32,7 +32,7 @@ export async function syncOrderToCloud(newOrder) {
 
 export async function fetchCloudOrders() {
   try {
-    const res = await fetch('/api/orders-sync?t=' + Date.now());
+    const res = await fetch('/api/orders-sync?cb=' + Date.now());
     if (res.ok) {
       const data = await res.json();
       if (data && data.orders && Array.isArray(data.orders)) {
