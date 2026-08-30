@@ -17,6 +17,7 @@ import Footer from './components/Footer';
 import { INITIAL_ORDERS, INITIAL_REVIEWS, PRODUCTS } from './data/bakeryData';
 import { sendOrderConfirmationEmail } from './services/emailService';
 import { sendAutomatedBackgroundReceipt } from './services/automatedEmailService';
+import { syncOrderToCloud, fetchCloudOrders } from './services/cloudOrdersService';
 import { ChefHat, LogOut, Lock, Bot, Sparkles } from 'lucide-react';
 
 export default function App() {
@@ -132,6 +133,28 @@ export default function App() {
     }
   }, [reviews]);
 
+  // Real-Time Cross-Device Orders Sync Polling (Phone ➔ Laptop)
+  useEffect(() => {
+    const pollInterval = setInterval(async () => {
+      const remoteOrders = await fetchCloudOrders();
+      if (remoteOrders && Array.isArray(remoteOrders) && remoteOrders.length > 0) {
+        setOrders(prev => {
+          const merged = [...prev];
+          let updated = false;
+          remoteOrders.forEach(ro => {
+            if (!merged.some(o => o.id === ro.id)) {
+              merged.unshift(ro);
+              updated = true;
+            }
+          });
+          return updated ? merged : prev;
+        });
+      }
+    }, 4000);
+
+    return () => clearInterval(pollInterval);
+  }, []);
+
   // Review handlers
   const handleAddReview = (newReview) => {
     setReviews(prev => [newReview, ...prev]);
@@ -206,6 +229,7 @@ export default function App() {
     setNotificationOrder(newOrder);
     sendOrderConfirmationEmail(newOrder);
     sendAutomatedBackgroundReceipt(newOrder);
+    syncOrderToCloud(newOrder);
   };
 
   const handleUpdateOrderStatus = (orderId, newStatus) => {
