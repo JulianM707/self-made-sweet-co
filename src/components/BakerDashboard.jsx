@@ -23,9 +23,10 @@ export default function BakerDashboard({
   const [showResendModal, setShowResendModal] = useState(false);
   const [resendKeyInput, setResendKeyInput] = useState(() => getResendApiKey());
 
-  const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
-  const activeOrdersCount = orders.filter(o => o.status !== 'Completed').length;
-  const completedOrdersCount = orders.filter(o => o.status === 'Completed').length;
+  const safeOrders = Array.isArray(orders) ? orders : [];
+  const totalRevenue = safeOrders.reduce((sum, o) => sum + (o?.total || 0), 0);
+  const activeOrdersCount = safeOrders.filter(o => o?.status !== 'Completed').length;
+  const completedOrdersCount = safeOrders.filter(o => o?.status === 'Completed').length;
 
   const STATUS_OPTIONS = [
     { id: 'Pending Prep', label: '📋 Pending Prep', color: '#D96B43', bg: 'rgba(217,107,67,0.1)' },
@@ -36,10 +37,11 @@ export default function BakerDashboard({
     { id: 'Completed', label: '✅ Completed', color: '#495057', bg: 'rgba(73,80,87,0.1)' }
   ];
 
-  const filteredOrders = orders.filter(o => {
+  const filteredOrders = safeOrders.filter(o => {
+    if (!o) return false;
     if (activeFilter === 'all') return true;
     if (activeFilter === 'active') return o.status !== 'Completed';
-    return o.status.toLowerCase() === activeFilter.toLowerCase();
+    return (o.status || '').toLowerCase() === activeFilter.toLowerCase();
   });
 
   // AI Ingredient Calculations for Kitchen Queue
@@ -52,12 +54,14 @@ export default function BakerDashboard({
     let butterLbs = 0;
     let flourLbs = 0;
 
-    orders.filter(o => o.status !== 'Completed').forEach(order => {
-      order.items.forEach(item => {
+    safeOrders.filter(o => o && o.status !== 'Completed').forEach(order => {
+      (order.items || []).forEach(item => {
+        if (!item) return;
         const qty = item.qty || 1;
-        const lower = item.name.toLowerCase();
+        const price = item.unitPrice || item.price || 0;
+        const lower = (item.name || '').toLowerCase();
         if (lower.includes('cheesecake')) {
-          creamCheeseLbs += (item.price > 25 ? 3.5 : 0.6) * qty;
+          creamCheeseLbs += (price > 25 ? 3.5 : 0.6) * qty;
           farmEggsDozen += 0.4 * qty;
           butterLbs += 0.3 * qty;
         } else if (lower.includes('muffin')) {
@@ -65,7 +69,7 @@ export default function BakerDashboard({
           farmEggsDozen += 0.2 * qty;
           flourLbs += 0.4 * qty;
         } else if (lower.includes('tiramisu')) {
-          mascarponeLbs += (item.price > 30 ? 2.5 : 0.5) * qty;
+          mascarponeLbs += (price > 30 ? 2.5 : 0.5) * qty;
           farmEggsDozen += 0.4 * qty;
         } else if (lower.includes('coffee cake')) {
           butterLbs += 0.4 * qty;
@@ -446,19 +450,24 @@ export default function BakerDashboard({
                         {/* Items List */}
                         <div style={{ backgroundColor: 'var(--color-cream-light)', padding: '12px 14px', borderRadius: 'var(--radius-md)', marginBottom: '16px' }}>
                           <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--color-espresso)', display: 'block', marginBottom: '6px' }}>Items:</span>
-                          {order.items.map((item, idx) => (
-                            <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '4px' }}>
-                              <span>{item.qty}x {item.name}</span>
-                              <span style={{ fontWeight: 700 }}>${(item.price * item.qty).toFixed(2)}</span>
-                            </div>
-                          ))}
+                          {(order.items || []).map((item, idx) => {
+                            const qty = item?.qty || 1;
+                            const price = item?.unitPrice || item?.price || 0;
+                            const itemTotal = price * qty;
+                            return (
+                              <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '4px' }}>
+                                <span>{qty}x {item?.name || 'Artisan Bake'}</span>
+                                <span style={{ fontWeight: 700 }}>${itemTotal.toFixed(2)}</span>
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
 
                       {/* Total */}
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--color-border)', paddingTop: '14px' }}>
                         <span style={{ fontSize: '0.88rem', fontWeight: 700 }}>Order Total</span>
-                        <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-espresso)' }}>${order.total.toFixed(2)}</span>
+                        <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-espresso)' }}>${(order.total || 0).toFixed(2)}</span>
                       </div>
 
                     </div>
