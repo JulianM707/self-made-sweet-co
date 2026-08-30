@@ -111,14 +111,11 @@ export async function sendOrderConfirmationEmail(order) {
       console.log('✅ Automated Email Confirmation Sent Successfully via EmailJS!');
       return { success: true, method: 'API' };
     } else {
-      console.warn('⚠️ EmailJS API Notice (Credentials Pending) — Activating Direct Email Receipt Fallback');
-      // Automatically trigger mailto link as fallback
-      window.location.href = generateMailtoReceiptUrl(order);
-      return { success: true, method: 'Mailto' };
+      console.warn('⚠️ EmailJS API Notice (Credentials Pending)');
+      return { success: false };
     }
   } catch (error) {
-    console.error('⚠️ Email Service Network Notice — Activating Direct Email Receipt Fallback:', error);
-    window.location.href = generateMailtoReceiptUrl(order);
-    return { success: true, method: 'Mailto' };
+    console.error('⚠️ Email Service Network Notice:', error);
+    return { success: false, error };
   }
 }
