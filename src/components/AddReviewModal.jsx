@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { X, Star, Camera, Upload, CheckCircle2, Sparkles, Image as ImageIcon } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-export default function AddReviewModal({ isOpen, onClose, products = [], onSubmitReview }) {
+import { PRODUCTS } from '../data/bakeryData';
+
+export default function AddReviewModal({ isOpen, onClose, products = PRODUCTS, onSubmitReview, onAddReview }) {
+  const safeProducts = (products && products.length > 0) ? products : PRODUCTS;
   const [rating, setRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
   const [customerName, setCustomerName] = useState('');
-  const [dishId, setDishId] = useState(products[0]?.id || 'classic-cheesecake');
+  const [dishId, setDishId] = useState(safeProducts[0]?.id || 'classic-cheesecake');
   const [customDishName, setCustomDishName] = useState('');
   const [title, setTitle] = useState('');
   const [comment, setComment] = useState('');
@@ -93,7 +96,10 @@ export default function AddReviewModal({ isOpen, onClose, products = [], onSubmi
     }
 
     setTimeout(() => {
-      onSubmitReview(newReview);
+      const submitFn = onSubmitReview || onAddReview;
+      if (typeof submitFn === 'function') {
+        submitFn(newReview);
+      }
       setIsSubmitting(false);
       // Reset form
       setRating(5);

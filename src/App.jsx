@@ -438,7 +438,9 @@ export default function App() {
       <AddReviewModal 
         isOpen={isAddReviewOpen}
         onClose={() => setIsAddReviewOpen(false)}
+        products={PRODUCTS}
         onAddReview={handleAddReview}
+        onSubmitReview={handleAddReview}
       />
 
       {/* Instant Purchase Order Notification Toast */}
