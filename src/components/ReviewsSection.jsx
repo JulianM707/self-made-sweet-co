@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Star, MessageSquare, Plus, CheckCircle2, Heart, ThumbsUp, Filter, Sparkles, MapPin, X, Camera, Upload } from 'lucide-react';
 import { PRODUCTS } from '../data/bakeryData';
 
-export default function ReviewsSection({ reviews, onAddReview }) {
+export default function ReviewsSection({ reviews, onAddReview, onOpenAddReview }) {
   const [selectedProductFilter, setSelectedProductFilter] = useState('all');
   const [isFormOpen, setIsFormOpen] = useState(false);
 
@@ -33,15 +33,37 @@ export default function ReviewsSection({ reviews, onAddReview }) {
     return name.toLowerCase().includes(selectedProductFilter.toLowerCase());
   });
 
+  // Handle image upload with automatic canvas compression
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setCustomImage(reader.result);
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 800;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > MAX_WIDTH) {
+          height = Math.round((height * MAX_WIDTH) / width);
+          width = MAX_WIDTH;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Export lightweight JPEG (~80KB)
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.75);
+        setCustomImage(compressedBase64);
       };
-      reader.readAsDataURL(file);
-    }
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSubmitReview = (e) => {
@@ -133,7 +155,7 @@ export default function ReviewsSection({ reviews, onAddReview }) {
           </div>
 
           <button
-            onClick={() => setIsFormOpen(true)}
+            onClick={() => onOpenAddReview ? onOpenAddReview() : setIsFormOpen(true)}
             className="btn-primary"
             style={{ padding: '12px 24px', display: 'flex', alignItems: 'center', gap: '8px' }}
           >
