@@ -192,6 +192,7 @@ export default function App() {
   // Review handlers
   const handleAddReview = (newReview) => {
     setReviews(prev => [newReview, ...prev]);
+    setActiveTab('reviews');
     syncReviewToCloud(newReview);
   };
 

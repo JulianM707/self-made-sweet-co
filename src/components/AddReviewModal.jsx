@@ -101,6 +101,7 @@ export default function AddReviewModal({ isOpen, onClose, products = PRODUCTS, o
         submitFn(newReview);
       }
       setIsSubmitting(false);
+      alert(`🎉 Thank you, ${customerName.trim()}! Your review for ${dishName} has been posted live!`);
       // Reset form
       setRating(5);
       setCustomerName('');
