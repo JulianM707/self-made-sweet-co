@@ -17,8 +17,8 @@ import Footer from './components/Footer';
 import { INITIAL_ORDERS, INITIAL_REVIEWS, PRODUCTS } from './data/bakeryData';
 import { sendOrderConfirmationEmail } from './services/emailService';
 import { sendAutomatedBackgroundReceipt } from './services/automatedEmailService';
-import { syncOrderToCloud, fetchCloudOrders, deleteOrderFromCloud, updateOrderStatusInCloud, clearCompletedOrdersFromCloud } from './services/cloudOrdersService';
-import { syncReviewToCloud, fetchCloudReviews, deleteReviewFromCloud } from './services/cloudReviewsService';
+import { syncOrderToCloud, fetchCloudOrders, deleteOrderFromCloud, updateOrderStatusInCloud, clearCompletedOrdersFromCloud, getDeletedOrderIds } from './services/cloudOrdersService';
+import { syncReviewToCloud, fetchCloudReviews, deleteReviewFromCloud, getDeletedReviewIds } from './services/cloudReviewsService';
 import { ChefHat, LogOut, Lock, Bot, Sparkles } from 'lucide-react';
 
 export default function App() {
@@ -145,11 +145,15 @@ export default function App() {
   useEffect(() => {
     const pollInterval = setInterval(async () => {
       const remoteOrders = await fetchCloudOrders();
-      if (remoteOrders && Array.isArray(remoteOrders) && remoteOrders.length > 0) {
+      if (remoteOrders && Array.isArray(remoteOrders)) {
+        const deletedOrderIds = getDeletedOrderIds();
+        const validOrders = remoteOrders.filter(o => !deletedOrderIds.includes(o.id));
         setOrders(prev => {
-          const merged = [...prev];
-          let updated = false;
-          remoteOrders.forEach(ro => {
+          const filteredPrev = prev.filter(o => !deletedOrderIds.includes(o.id));
+          const merged = [...filteredPrev];
+          let updated = filteredPrev.length !== prev.length;
+
+          validOrders.forEach(ro => {
             const existingIndex = merged.findIndex(o => o.id === ro.id);
             if (existingIndex === -1) {
               merged.unshift(ro);
@@ -171,11 +175,15 @@ export default function App() {
   useEffect(() => {
     const pollInterval = setInterval(async () => {
       const remoteReviews = await fetchCloudReviews();
-      if (remoteReviews && Array.isArray(remoteReviews) && remoteReviews.length > 0) {
+      if (remoteReviews && Array.isArray(remoteReviews)) {
+        const deletedReviewIds = getDeletedReviewIds();
+        const validReviews = remoteReviews.filter(r => !deletedReviewIds.includes(r.id));
         setReviews(prev => {
-          const merged = [...prev];
-          let updated = false;
-          remoteReviews.forEach(rr => {
+          const filteredPrev = prev.filter(r => !deletedReviewIds.includes(r.id));
+          const merged = [...filteredPrev];
+          let updated = filteredPrev.length !== prev.length;
+
+          validReviews.forEach(rr => {
             if (!merged.some(r => r.id === rr.id)) {
               merged.unshift(rr);
               updated = true;
