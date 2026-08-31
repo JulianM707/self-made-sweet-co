@@ -288,12 +288,31 @@ export default function BakerDashboard({
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
                 {reviews.map(r => (
-                  <div key={r.id} style={{ border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: '16px', position: 'relative' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                      <span style={{ fontWeight: 800 }}>{r.customerName || r.author}</span>
-                      <button onClick={() => onDeleteReview(r.id)} style={{ color: '#D96B43', background: 'none' }}><Trash2 size={16} /></button>
+                  <div key={r.id} style={{ border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: '16px', position: 'relative', backgroundColor: '#FFFFFF' }}>
+                    {r.image && (
+                      <div style={{ height: '140px', borderRadius: 'var(--radius-sm)', overflow: 'hidden', marginBottom: '12px' }}>
+                        <img src={r.image} alt={r.dishName || 'Review Photo'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                      <div>
+                        <span style={{ fontWeight: 800, color: 'var(--color-espresso)', fontSize: '0.98rem' }}>{r.customerName || r.author}</span>
+                        <div style={{ fontSize: '0.78rem', color: 'var(--color-caramel)', fontWeight: 700 }}>{r.dishName || 'Signature Bake'}</div>
+                      </div>
+                      <button 
+                        onClick={() => {
+                          if (window.confirm(`Delete review by ${r.customerName || 'customer'}?`)) {
+                            onDeleteReview(r.id);
+                          }
+                        }} 
+                        style={{ color: '#D96B43', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                        title="Delete Review"
+                      >
+                        <Trash2 size={18} />
+                      </button>
                     </div>
-                    <p style={{ fontSize: '0.88rem', color: 'var(--color-text-muted)' }}>"{r.comment}"</p>
+                    {r.title && <h5 style={{ fontSize: '0.88rem', fontWeight: 700, margin: '4px 0', color: 'var(--color-espresso)' }}>{r.title}</h5>}
+                    <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', lineHeight: 1.5, margin: '4px 0' }}>"{r.comment}"</p>
                   </div>
                 ))}
               </div>

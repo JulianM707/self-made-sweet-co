@@ -18,7 +18,7 @@ import { INITIAL_ORDERS, INITIAL_REVIEWS, PRODUCTS } from './data/bakeryData';
 import { sendOrderConfirmationEmail } from './services/emailService';
 import { sendAutomatedBackgroundReceipt } from './services/automatedEmailService';
 import { syncOrderToCloud, fetchCloudOrders, deleteOrderFromCloud, updateOrderStatusInCloud, clearCompletedOrdersFromCloud } from './services/cloudOrdersService';
-import { syncReviewToCloud, fetchCloudReviews } from './services/cloudReviewsService';
+import { syncReviewToCloud, fetchCloudReviews, deleteReviewFromCloud } from './services/cloudReviewsService';
 import { ChefHat, LogOut, Lock, Bot, Sparkles } from 'lucide-react';
 
 export default function App() {
@@ -207,6 +207,7 @@ export default function App() {
 
   const handleDeleteReview = (reviewId) => {
     setReviews(prev => prev.filter(r => r.id !== reviewId));
+    deleteReviewFromCloud(reviewId);
   };
 
   const handleToggleFeatureReview = (reviewId) => {
