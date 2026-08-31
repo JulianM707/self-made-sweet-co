@@ -215,15 +215,9 @@ export default function ReviewsSection({ reviews, onAddReview, onOpenAddReview }
             <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '60px 20px', backgroundColor: '#FFF', borderRadius: 'var(--radius-lg)', border: '1px dashed var(--color-border)' }}>
               <Sparkles size={36} color="var(--color-caramel)" style={{ marginBottom: '12px' }} />
               <h3 style={{ fontSize: '1.25rem', color: 'var(--color-espresso)', marginBottom: '6px' }}>No Customer Reviews Yet</h3>
-              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.92rem', marginBottom: '20px' }}>
-                Be the very first customer to submit a review and photo for Julian’s signature bakes!
+              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.92rem', margin: 0 }}>
+                Be the very first customer to submit a review and photo for Julian’s signature bakes using the button above!
               </p>
-              <button 
-                onClick={() => setIsFormOpen(true)}
-                className="btn-primary"
-              >
-                + Submit First Review
-              </button>
             </div>
           ) : (
             filteredReviews.map(review => {
