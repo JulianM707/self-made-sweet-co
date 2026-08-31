@@ -367,6 +367,7 @@ export default function App() {
           /* Customer Photo Reviews View */
           <ReviewsSection 
             reviews={reviews}
+            onAddReview={handleAddReview}
             onOpenAddReview={() => setIsAddReviewOpen(true)}
             onHelpfulReview={handleHelpfulReview}
           />

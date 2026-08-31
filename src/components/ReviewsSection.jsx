@@ -86,7 +86,10 @@ export default function ReviewsSection({ reviews, onAddReview, onOpenAddReview }
       verified: true
     };
 
-    onAddReview(newReview);
+    if (typeof onAddReview === 'function') {
+      onAddReview(newReview);
+    }
+    alert(`🎉 Thank you, ${customerName.trim()}! Your review for ${dishName} has been posted live!`);
     setCustomerName('');
     setLocation('');
     setTitle('');
