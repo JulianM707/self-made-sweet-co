@@ -4,7 +4,9 @@ import confetti from 'canvas-confetti';
 
 // Generate arranged weekend kitchen time slots (Saturday & Sunday 8:00 AM - 8:00 PM)
 function getArrangedTimeSlots() {
-  const slots = [];
+  const slots = [
+    '⚡ Next Available Warm Batch (As Soon As Ready)'
+  ];
   const now = new Date();
 
   const getNextDayOfWeek = (date, dayOfWeek) => {
@@ -27,11 +29,11 @@ function getArrangedTimeSlots() {
 
   const hours = [
     '8:00 AM (Opening Batch)',
-    '10:00 AM',
-    '12:00 PM (Noon)',
-    '2:00 PM',
-    '4:00 PM',
-    '6:00 PM',
+    '10:00 AM Batch',
+    '12:00 PM (Noon Batch)',
+    '2:00 PM Batch',
+    '4:00 PM Batch',
+    '6:00 PM Batch',
     '7:30 PM (Final Evening Batch)'
   ];
 
@@ -44,6 +46,10 @@ function getArrangedTimeSlots() {
   hours.forEach(h => {
     slots.push(`Sun, ${formatDate(targetSun)} @ ${h}`);
   });
+
+  // Special Flexible & Catering Options
+  slots.push('💬 Custom Time Request (Specify exact time in Order Notes below)');
+  slots.push('🎉 Custom Weekday Catering / Large Event (Contact Julian)');
 
   return slots;
 }
