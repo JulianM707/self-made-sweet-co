@@ -15,16 +15,37 @@ export default function AddReviewModal({ isOpen, onClose, products = [], onSubmi
 
   if (!isOpen) return null;
 
-  // Handle local file selection and convert to Base64 Data URL
+  // Handle local file selection with automatic canvas image compression
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 800;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > MAX_WIDTH) {
+          height = Math.round((height * MAX_WIDTH) / width);
+          width = MAX_WIDTH;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Export lightweight JPEG data URL (~80KB)
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.75);
+        setImagePreview(compressedBase64);
       };
-      reader.readAsDataURL(file);
-    }
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
   };
 
   // Quick preset photos for easy testing

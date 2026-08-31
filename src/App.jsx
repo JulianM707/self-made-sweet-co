@@ -18,6 +18,7 @@ import { INITIAL_ORDERS, INITIAL_REVIEWS, PRODUCTS } from './data/bakeryData';
 import { sendOrderConfirmationEmail } from './services/emailService';
 import { sendAutomatedBackgroundReceipt } from './services/automatedEmailService';
 import { syncOrderToCloud, fetchCloudOrders, deleteOrderFromCloud, updateOrderStatusInCloud, clearCompletedOrdersFromCloud } from './services/cloudOrdersService';
+import { syncReviewToCloud, fetchCloudReviews } from './services/cloudReviewsService';
 import { ChefHat, LogOut, Lock, Bot, Sparkles } from 'lucide-react';
 
 export default function App() {
@@ -47,7 +48,14 @@ export default function App() {
     }
   });
 
-  const [reviews, setReviews] = useState([]);
+  const [reviews, setReviews] = useState(() => {
+    try {
+      const saved = localStorage.getItem('julians_bakery_reviews');
+      return saved ? JSON.parse(saved) : INITIAL_REVIEWS;
+    } catch (e) {
+      return INITIAL_REVIEWS;
+    }
+  });
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
@@ -159,9 +167,32 @@ export default function App() {
     return () => clearInterval(pollInterval);
   }, []);
 
+  // Real-Time Cross-Device Reviews Sync Polling
+  useEffect(() => {
+    const pollInterval = setInterval(async () => {
+      const remoteReviews = await fetchCloudReviews();
+      if (remoteReviews && Array.isArray(remoteReviews) && remoteReviews.length > 0) {
+        setReviews(prev => {
+          const merged = [...prev];
+          let updated = false;
+          remoteReviews.forEach(rr => {
+            if (!merged.some(r => r.id === rr.id)) {
+              merged.unshift(rr);
+              updated = true;
+            }
+          });
+          return updated ? merged : prev;
+        });
+      }
+    }, 4000);
+
+    return () => clearInterval(pollInterval);
+  }, []);
+
   // Review handlers
   const handleAddReview = (newReview) => {
     setReviews(prev => [newReview, ...prev]);
+    syncReviewToCloud(newReview);
   };
 
   const handleHelpfulReview = (reviewId) => {
