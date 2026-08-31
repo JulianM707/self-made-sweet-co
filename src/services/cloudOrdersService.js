@@ -40,19 +40,20 @@ export async function syncOrderToCloud(newOrder) {
       localStorage.setItem('julians_bakery_orders', JSON.stringify(localOrders));
     }
 
-    let remoteList = [];
+    let existingData = {};
     try {
       const getRes = await fetch(CLOUD_BIN_URL + '?cb=' + Date.now());
       if (getRes.ok) {
         const json = await getRes.json();
-        if (json && json.data && Array.isArray(json.data.orders)) {
-          remoteList = json.data.orders;
+        if (json && json.data) {
+          existingData = json.data;
         }
       }
     } catch (e) {
-      remoteList = [];
+      existingData = {};
     }
 
+    let remoteList = Array.isArray(existingData.orders) ? existingData.orders : [];
     if (!remoteList.some(o => o.id === newOrder.id)) {
       remoteList = [newOrder, ...remoteList];
     }
@@ -64,8 +65,8 @@ export async function syncOrderToCloud(newOrder) {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        name: 'julian_orders',
-        data: { orders: remoteList }
+        name: 'julian_orders_and_reviews',
+        data: { ...existingData, orders: remoteList }
       })
     }).catch(e => console.warn('Cloud bin push notice:', e));
 
@@ -87,19 +88,20 @@ export async function deleteOrderFromCloud(orderId) {
   markOrderAsDeleted(orderId);
 
   try {
-    let remoteList = [];
+    let existingData = {};
     try {
       const getRes = await fetch(CLOUD_BIN_URL + '?cb=' + Date.now());
       if (getRes.ok) {
         const json = await getRes.json();
-        if (json && json.data && Array.isArray(json.data.orders)) {
-          remoteList = json.data.orders;
+        if (json && json.data) {
+          existingData = json.data;
         }
       }
     } catch (e) {
-      remoteList = [];
+      existingData = {};
     }
 
+    let remoteList = Array.isArray(existingData.orders) ? existingData.orders : [];
     const deletedIds = getDeletedOrderIds();
     const filtered = remoteList.filter(o => o.id !== orderId && !deletedIds.includes(o.id));
 
@@ -107,8 +109,8 @@ export async function deleteOrderFromCloud(orderId) {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        name: 'julian_orders',
-        data: { orders: filtered }
+        name: 'julian_orders_and_reviews',
+        data: { ...existingData, orders: filtered }
       })
     }).catch(e => console.warn('Cloud bin delete notice:', e));
 
@@ -128,27 +130,28 @@ export async function deleteOrderFromCloud(orderId) {
 export async function updateOrderStatusInCloud(orderId, newStatus) {
   console.log('🔄 Cloud Sync: Updating status in cloud bin:', orderId, newStatus);
   try {
-    let remoteList = [];
+    let existingData = {};
     try {
       const getRes = await fetch(CLOUD_BIN_URL + '?cb=' + Date.now());
       if (getRes.ok) {
         const json = await getRes.json();
-        if (json && json.data && Array.isArray(json.data.orders)) {
-          remoteList = json.data.orders;
+        if (json && json.data) {
+          existingData = json.data;
         }
       }
     } catch (e) {
-      remoteList = [];
+      existingData = {};
     }
 
+    let remoteList = Array.isArray(existingData.orders) ? existingData.orders : [];
     const updatedList = remoteList.map(o => o.id === orderId ? { ...o, status: newStatus } : o);
 
     await fetch(CLOUD_BIN_URL, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        name: 'julian_orders',
-        data: { orders: updatedList }
+        name: 'julian_orders_and_reviews',
+        data: { ...existingData, orders: updatedList }
       })
     }).catch(e => console.warn('Cloud bin update notice:', e));
 
@@ -168,27 +171,28 @@ export async function updateOrderStatusInCloud(orderId, newStatus) {
 export async function clearCompletedOrdersFromCloud() {
   console.log('🧹 Cloud Sync: Clearing completed orders from cloud bin');
   try {
-    let remoteList = [];
+    let existingData = {};
     try {
       const getRes = await fetch(CLOUD_BIN_URL + '?cb=' + Date.now());
       if (getRes.ok) {
         const json = await getRes.json();
-        if (json && json.data && Array.isArray(json.data.orders)) {
-          remoteList = json.data.orders;
+        if (json && json.data) {
+          existingData = json.data;
         }
       }
     } catch (e) {
-      remoteList = [];
+      existingData = {};
     }
 
+    let remoteList = Array.isArray(existingData.orders) ? existingData.orders : [];
     const activeOnly = remoteList.filter(o => o.status !== 'Completed');
 
     await fetch(CLOUD_BIN_URL, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        name: 'julian_orders',
-        data: { orders: activeOnly }
+        name: 'julian_orders_and_reviews',
+        data: { ...existingData, orders: activeOnly }
       })
     }).catch(e => console.warn('Cloud bin clear notice:', e));
 

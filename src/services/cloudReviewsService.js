@@ -31,7 +31,7 @@ export function markReviewAsDeleted(reviewId) {
 }
 
 export async function syncReviewToCloud(newReview) {
-  console.log('☁️ Real-Time Cloud Reviews: Pushing review to cloud:', newReview.id);
+  console.log('☁️ Real-Time Cloud Reviews: Pushing review to persistent cloud bin:', newReview.id);
   
   try {
     const savedLocal = localStorage.getItem('julians_bakery_reviews');
@@ -46,7 +46,38 @@ export async function syncReviewToCloud(newReview) {
       }
     }
 
-    // Broadcast to serverless API
+    let existingData = {};
+    try {
+      const getRes = await fetch(CLOUD_BIN_URL + '?cb=' + Date.now());
+      if (getRes.ok) {
+        const json = await getRes.json();
+        if (json && json.data) {
+          existingData = json.data;
+        }
+      }
+    } catch (e) {
+      existingData = {};
+    }
+
+    let remoteReviews = Array.isArray(existingData.reviews) ? existingData.reviews : [];
+    if (!remoteReviews.some(r => r.id === newReview.id)) {
+      remoteReviews = [newReview, ...remoteReviews];
+    }
+
+    const deletedIds = getDeletedReviewIds();
+    remoteReviews = remoteReviews.filter(r => !deletedIds.includes(r.id));
+
+    // Direct write to persistent Cloud Storage Bin
+    await fetch(CLOUD_BIN_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'julian_orders_and_reviews',
+        data: { ...existingData, reviews: remoteReviews }
+      })
+    }).catch(e => console.warn('Direct cloud review push notice:', e));
+
+    // Also notify serverless endpoint
     await fetch('/api/reviews-sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -74,6 +105,32 @@ export async function deleteReviewFromCloud(reviewId) {
       console.warn('LocalStorage quota warning:', e);
     }
 
+    let existingData = {};
+    try {
+      const getRes = await fetch(CLOUD_BIN_URL + '?cb=' + Date.now());
+      if (getRes.ok) {
+        const json = await getRes.json();
+        if (json && json.data) {
+          existingData = json.data;
+        }
+      }
+    } catch (e) {
+      existingData = {};
+    }
+
+    let remoteReviews = Array.isArray(existingData.reviews) ? existingData.reviews : [];
+    const deletedIds = getDeletedReviewIds();
+    const filtered = remoteReviews.filter(r => r.id !== reviewId && !deletedIds.includes(r.id));
+
+    await fetch(CLOUD_BIN_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'julian_orders_and_reviews',
+        data: { ...existingData, reviews: filtered }
+      })
+    }).catch(e => console.warn('Cloud bin delete review notice:', e));
+
     await fetch('/api/reviews-sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -89,6 +146,21 @@ export async function deleteReviewFromCloud(reviewId) {
 
 export async function fetchCloudReviews() {
   const deletedIds = getDeletedReviewIds();
+
+  // Try direct fetch from Cloud Bin first
+  try {
+    const res = await fetch(CLOUD_BIN_URL + '?cb=' + Date.now());
+    if (res.ok) {
+      const json = await res.json();
+      if (json && json.data && Array.isArray(json.data.reviews)) {
+        return json.data.reviews.filter(r => !deletedIds.includes(r.id));
+      }
+    }
+  } catch (e) {
+    // Silent fallback
+  }
+
+  // Backup fetch from serverless API
   try {
     const res = await fetch('/api/reviews-sync?cb=' + Date.now());
     if (res.ok) {
@@ -100,5 +172,6 @@ export async function fetchCloudReviews() {
   } catch (e) {
     // Silent fallback
   }
+
   return null;
 }
