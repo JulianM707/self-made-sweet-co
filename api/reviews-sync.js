@@ -1,6 +1,7 @@
 /**
  * Vercel Serverless Function for Real-Time Cross-Device Reviews Sync
  * Allows customer photo reviews posted on mobile & desktop to sync live!
+ * Preserves orders data object during PUT requests.
  */
 
 const CLOUD_REVIEWS_URL = 'https://api.restful-api.dev/objects/ff808181a04ccf2d01a0540f5e201aa4';
@@ -36,13 +37,17 @@ export default async function handler(req, res) {
     try {
       const { review, action, reviewId } = req.body || {};
 
+      let existingData = {};
       let currentReviews = [];
       try {
         const getRes = await fetch(CLOUD_REVIEWS_URL + '?cb=' + Date.now());
         if (getRes.ok) {
           const json = await getRes.json();
-          if (json && json.data && Array.isArray(json.data.reviews)) {
-            currentReviews = json.data.reviews;
+          if (json && json.data) {
+            existingData = json.data;
+            if (Array.isArray(json.data.reviews)) {
+              currentReviews = json.data.reviews;
+            }
           }
         }
       } catch (e) {
@@ -57,12 +62,13 @@ export default async function handler(req, res) {
         currentReviews = currentReviews.filter(r => r.id !== reviewId);
       }
 
+      // Save updated reviews list while PRESERVING existing orders!
       await fetch(CLOUD_REVIEWS_URL, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: 'julian_orders_and_reviews',
-          data: { ...((await (await fetch(CLOUD_REVIEWS_URL)).json())?.data || {}), reviews: currentReviews }
+          data: { ...existingData, reviews: currentReviews }
         })
       }).catch(e => console.warn('Cloud reviews save notice:', e));
 

@@ -1,6 +1,7 @@
 /**
  * Vercel Serverless Function for Real-Time Cross-Device Orders Sync
- * Uses verified persistent cloud storage bin (ff808181a04ccf2d01a0540f5e201aa4).
+ * Uses persistent cloud storage bin (ff808181a04ccf2d01a0540f5e201aa4).
+ * Preserves reviews data object during PUT requests.
  */
 
 const CLOUD_BIN_URL = 'https://api.restful-api.dev/objects/ff808181a04ccf2d01a0540f5e201aa4';
@@ -39,13 +40,17 @@ export default async function handler(req, res) {
     try {
       const { order, action, orderId, newStatus } = req.body || {};
 
+      let existingData = {};
       let currentOrders = [];
       try {
         const getRes = await fetch(CLOUD_BIN_URL + '?cb=' + Date.now());
         if (getRes.ok) {
           const json = await getRes.json();
-          if (json && json.data && Array.isArray(json.data.orders)) {
-            currentOrders = json.data.orders;
+          if (json && json.data) {
+            existingData = json.data;
+            if (Array.isArray(json.data.orders)) {
+              currentOrders = json.data.orders;
+            }
           }
         }
       } catch (e) {
@@ -62,13 +67,13 @@ export default async function handler(req, res) {
         currentOrders = currentOrders.filter(o => o.id !== orderId);
       }
 
-      // Save updated list to cloud bin
+      // Save updated list to cloud bin while PRESERVING existing reviews!
       await fetch(CLOUD_BIN_URL, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: 'julian_orders',
-          data: { orders: currentOrders }
+          name: 'julian_orders_and_reviews',
+          data: { ...existingData, orders: currentOrders }
         })
       }).catch(e => console.warn('Cloud DB save notice:', e));
 
