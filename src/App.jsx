@@ -147,23 +147,26 @@ export default function App() {
       const remoteOrders = await fetchCloudOrders();
       if (remoteOrders && Array.isArray(remoteOrders)) {
         const deletedOrderIds = getDeletedOrderIds();
-        const validOrders = remoteOrders.filter(o => !deletedOrderIds.includes(o.id));
-        setOrders(prev => {
-          const filteredPrev = prev.filter(o => !deletedOrderIds.includes(o.id));
-          const merged = [...filteredPrev];
-          let updated = filteredPrev.length !== prev.length;
+        const validRemoteOrders = remoteOrders.filter(o => !deletedOrderIds.includes(o.id));
 
-          validOrders.forEach(ro => {
-            const existingIndex = merged.findIndex(o => o.id === ro.id);
-            if (existingIndex === -1) {
-              merged.unshift(ro);
-              updated = true;
-            } else if (merged[existingIndex].status !== ro.status) {
-              merged[existingIndex] = { ...merged[existingIndex], status: ro.status };
-              updated = true;
+        setOrders(prev => {
+          const mergedMap = new Map();
+          validRemoteOrders.forEach(o => mergedMap.set(o.id, o));
+
+          // Retain local pending orders created within last 15s
+          prev.forEach(o => {
+            if (!deletedOrderIds.includes(o.id) && !mergedMap.has(o.id)) {
+              if (o.timestamp && (Date.now() - o.timestamp < 15000)) {
+                mergedMap.set(o.id, o);
+              }
             }
           });
-          return updated ? merged : prev;
+
+          const synchronizedList = Array.from(mergedMap.values());
+          if (JSON.stringify(synchronizedList) !== JSON.stringify(prev)) {
+            return synchronizedList;
+          }
+          return prev;
         });
       }
     }, 3000);
@@ -171,28 +174,35 @@ export default function App() {
     return () => clearInterval(pollInterval);
   }, []);
 
-  // Real-Time Cross-Device Reviews Sync Polling
+  // Real-Time Bidirectional Cross-Device Reviews Sync Polling
   useEffect(() => {
     const pollInterval = setInterval(async () => {
       const remoteReviews = await fetchCloudReviews();
       if (remoteReviews && Array.isArray(remoteReviews)) {
         const deletedReviewIds = getDeletedReviewIds();
-        const validReviews = remoteReviews.filter(r => !deletedReviewIds.includes(r.id));
-        setReviews(prev => {
-          const filteredPrev = prev.filter(r => !deletedReviewIds.includes(r.id));
-          const merged = [...filteredPrev];
-          let updated = filteredPrev.length !== prev.length;
+        const validRemoteReviews = remoteReviews.filter(r => !deletedReviewIds.includes(r.id));
 
-          validReviews.forEach(rr => {
-            if (!merged.some(r => r.id === rr.id)) {
-              merged.unshift(rr);
-              updated = true;
+        setReviews(prev => {
+          const mergedMap = new Map();
+          validRemoteReviews.forEach(r => mergedMap.set(r.id, r));
+
+          // Retain local pending reviews created within last 15s
+          prev.forEach(r => {
+            if (!deletedReviewIds.includes(r.id) && !mergedMap.has(r.id)) {
+              if (r.timestamp && (Date.now() - r.timestamp < 15000)) {
+                mergedMap.set(r.id, r);
+              }
             }
           });
-          return updated ? merged : prev;
+
+          const synchronizedList = Array.from(mergedMap.values());
+          if (JSON.stringify(synchronizedList) !== JSON.stringify(prev)) {
+            return synchronizedList;
+          }
+          return prev;
         });
       }
-    }, 4000);
+    }, 3000);
 
     return () => clearInterval(pollInterval);
   }, []);
