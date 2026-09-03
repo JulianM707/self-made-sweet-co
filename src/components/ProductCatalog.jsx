@@ -241,38 +241,43 @@ export default function ProductCatalog({ onSelectProduct, onAddToCart }) {
                         ${product.priceSlice.toFixed(2)}
                       </span>
                       <span style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>
-                        / Slice • ${product.priceWhole.toFixed(2)} Whole
+                        {product.category === 'muffins' ? '/ Muffin • $' + product.priceWhole.toFixed(2) + ' Box' :
+                         product.category === 'cookies' ? '/ Cookie • $' + product.priceWhole.toFixed(2) + ' Box' :
+                         '/ Slice • $' + product.priceWhole.toFixed(2) + ' Whole'}
                       </span>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '10px' }}>
-                      <button 
-                        onClick={() => onSelectProduct(product)}
-                        className="btn-secondary"
-                        style={{ padding: '10px', fontSize: '0.85rem' }}
-                      >
-                        <Eye size={15} />
-                        <span>Details</span>
-                      </button>
+                    {/* Single Full-Width Smart Add Button */}
+                    {(() => {
+                      const actionLabel = product.category === 'muffins' ? 'Add Muffin' : product.category === 'cookies' ? 'Add Cookie' : 'Add Slice';
+                      const isAdded = addedId === product.id;
 
-                      <button 
-                        onClick={() => handleAddSlice(product)}
-                        disabled={product.isOutOfStock}
-                        className={product.isOutOfStock ? "btn-secondary" : addedId === product.id ? "btn-secondary" : "btn-primary"}
-                        style={{ 
-                          padding: '10px', 
-                          fontSize: '0.85rem',
-                          opacity: product.isOutOfStock ? 0.6 : 1,
-                          backgroundColor: addedId === product.id ? '#2D7A42' : undefined,
-                          color: addedId === product.id ? '#FFFFFF' : undefined,
-                          borderColor: addedId === product.id ? '#2D7A42' : undefined,
-                          cursor: product.isOutOfStock ? 'not-allowed' : 'pointer'
-                        }}
-                      >
-                        {addedId === product.id ? <Check size={15} /> : <Plus size={15} />}
-                        <span>{product.isOutOfStock ? 'Sold Out' : addedId === product.id ? 'Added!' : 'Add Slice'}</span>
-                      </button>
-                    </div>
+                      return (
+                        <button 
+                          onClick={() => handleAddSlice(product)}
+                          disabled={product.isOutOfStock}
+                          className={product.isOutOfStock ? "btn-secondary" : isAdded ? "btn-secondary" : "btn-primary"}
+                          style={{ 
+                            width: '100%',
+                            padding: '12px 16px', 
+                            fontSize: '0.92rem',
+                            fontWeight: 700,
+                            opacity: product.isOutOfStock ? 0.6 : 1,
+                            backgroundColor: isAdded ? '#2D7A42' : undefined,
+                            color: isAdded ? '#FFFFFF' : undefined,
+                            borderColor: isAdded ? '#2D7A42' : undefined,
+                            cursor: product.isOutOfStock ? 'not-allowed' : 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px'
+                          }}
+                        >
+                          {isAdded ? <Check size={18} /> : <Plus size={18} />}
+                          <span>{product.isOutOfStock ? 'Sold Out' : isAdded ? 'Added to Cart!' : `+ ${actionLabel}`}</span>
+                        </button>
+                      );
+                    })()}
                   </div>
 
                 </div>
