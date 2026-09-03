@@ -111,7 +111,7 @@ export default function AboutJulianModal({ isOpen, onClose }) {
               fontWeight: 500,
               margin: 0
             }}>
-              "I built Self-Made Sweet Co. on hard work, discipline, and passion. There is nothing in the world quite like watching someone’s face light up with a genuine smile after their first bite of a fresh bake."
+              "Rooted in Vallejo and inspired by a beautiful aspiring teacher, I built Self-Made Sweet Co. on hard work, discipline, and love. There is nothing quite like watching someone’s face light up with a genuine smile after their first bite of a fresh bake."
             </p>
             <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-caramel)', display: 'block', marginTop: '10px' }}>
               — Julian Medrano, Founder of Self-Made Sweet Co.
@@ -134,6 +134,22 @@ export default function AboutJulianModal({ isOpen, onClose }) {
               </div>
               <p style={{ fontSize: '0.88rem', color: 'var(--color-text-muted)', lineHeight: 1.55 }}>
                 Born & raised in Vallejo, CA, Julian worked relentlessly to beat the odds—getting out of the hood and earning his Bachelor’s degree from <strong>UC Santa Cruz</strong> and an <strong>MBA from SDSU</strong>.
+              </p>
+            </div>
+
+            <div style={{
+              backgroundColor: '#FFFFFF',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-md)',
+              padding: '20px',
+              boxShadow: 'var(--shadow-sm)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--color-caramel)', marginBottom: '8px' }}>
+                <Sparkles size={22} />
+                <h4 style={{ fontSize: '1.05rem', color: 'var(--color-espresso)' }}>Inspiration & Purpose</h4>
+              </div>
+              <p style={{ fontSize: '0.88rem', color: 'var(--color-text-muted)', lineHeight: 1.55 }}>
+                Inspired by a beautiful aspiring teacher, Julian turned his culinary dream into reality—baking with love, heart, and purpose for every customer.
               </p>
             </div>
 
