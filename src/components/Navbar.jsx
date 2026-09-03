@@ -78,18 +78,6 @@ export default function Navbar({
           >
             <Star size={16} color="var(--color-gold)" fill="var(--color-gold)" />
             <span>Customer Reviews</span>
-            {reviewsCount > 0 && (
-              <span style={{
-                backgroundColor: 'var(--color-caramel)',
-                color: '#FFF',
-                fontSize: '0.72rem',
-                fontWeight: 700,
-                padding: '2px 7px',
-                borderRadius: '10px'
-              }}>
-                {reviewsCount}
-              </span>
-            )}
           </button>
 
           <button 
