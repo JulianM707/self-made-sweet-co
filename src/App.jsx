@@ -262,7 +262,7 @@ export default function App() {
         }]);
       }
     }
-    setIsCartOpen(true);
+    // Items are added silently to cart while counter badge updates in top Navbar!
   };
 
   const handleUpdateQty = (index, newQty) => {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CATEGORIES, PRODUCTS } from '../data/bakeryData';
-import { Search, Star, Plus, Eye, Sparkles, PieChart, Coffee, Cake, Cookie, Gift } from 'lucide-react';
+import { Search, Star, Plus, Eye, Sparkles, PieChart, Coffee, Cake, Cookie, Gift, Check } from 'lucide-react';
 
 const ICON_MAP = {
   Sparkles: Sparkles,
@@ -15,6 +15,14 @@ export default function ProductCatalog({ onSelectProduct, onAddToCart }) {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDietary, setSelectedDietary] = useState('all');
+  const [addedId, setAddedId] = useState(null);
+
+  const handleAddSlice = (product) => {
+    if (product.isOutOfStock) return;
+    onAddToCart(product, 'slice');
+    setAddedId(product.id);
+    setTimeout(() => setAddedId(null), 1500);
+  };
 
   const filteredProducts = PRODUCTS.filter(product => {
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
@@ -248,18 +256,21 @@ export default function ProductCatalog({ onSelectProduct, onAddToCart }) {
                       </button>
 
                       <button 
-                        onClick={() => !product.isOutOfStock && onAddToCart(product, 'slice')}
+                        onClick={() => handleAddSlice(product)}
                         disabled={product.isOutOfStock}
-                        className={product.isOutOfStock ? "btn-secondary" : "btn-primary"}
+                        className={product.isOutOfStock ? "btn-secondary" : addedId === product.id ? "btn-secondary" : "btn-primary"}
                         style={{ 
                           padding: '10px', 
                           fontSize: '0.85rem',
                           opacity: product.isOutOfStock ? 0.6 : 1,
+                          backgroundColor: addedId === product.id ? '#2D7A42' : undefined,
+                          color: addedId === product.id ? '#FFFFFF' : undefined,
+                          borderColor: addedId === product.id ? '#2D7A42' : undefined,
                           cursor: product.isOutOfStock ? 'not-allowed' : 'pointer'
                         }}
                       >
-                        <Plus size={15} />
-                        <span>{product.isOutOfStock ? 'Sold Out' : 'Add Slice'}</span>
+                        {addedId === product.id ? <Check size={15} /> : <Plus size={15} />}
+                        <span>{product.isOutOfStock ? 'Sold Out' : addedId === product.id ? 'Added!' : 'Add Slice'}</span>
                       </button>
                     </div>
                   </div>
