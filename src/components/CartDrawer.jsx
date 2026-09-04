@@ -99,10 +99,8 @@ export default function CartDrawer({
       });
 
       const paymentLabelMap = {
-        cash: 'Cash (On Pickup/Delivery)',
-        venmo: 'Venmo (@SelfMadeSweetCo)',
-        cashapp: 'Cash App ($SelfMadeSweetCo)',
-        paypal: 'PayPal (@SelfMadeSweetCo)'
+        cash: 'Cash / In-Person Payment (Venmo, Cash App, PayPal & Cards available at pickup/delivery)',
+        inperson: 'Cash / In-Person Payment (Venmo, Cash App, PayPal & Cards available at pickup/delivery)'
       };
 
       const newOrder = {
@@ -392,132 +390,30 @@ export default function CartDrawer({
                     style={{ padding: '10px 14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', fontSize: '0.88rem' }}
                   />
 
-                  {/* Payment Method Selector (Cash, Venmo, Cash App, PayPal) */}
+                  {/* Payment Method Selector (Cash / In-Person Payment) */}
                   <div style={{ marginTop: '8px', marginBottom: '8px' }}>
                     <label style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-espresso)', display: 'block', marginBottom: '8px' }}>
-                      Select Payment Method:
+                      Payment Method:
                     </label>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod('cash')}
-                        style={{
-                          padding: '10px 12px',
-                          borderRadius: 'var(--radius-md)',
-                          border: paymentMethod === 'cash' ? '2px solid var(--color-caramel)' : '1px solid var(--color-border)',
-                          backgroundColor: paymentMethod === 'cash' ? 'var(--color-cream-light)' : '#FFF',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          cursor: 'pointer',
-                          textAlign: 'left'
-                        }}
-                      >
-                        <DollarSign size={18} color="var(--color-caramel)" />
-                        <div>
-                          <div style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--color-espresso)' }}>Cash</div>
-                          <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>On Pickup/Delivery</div>
+                    
+                    <div style={{
+                      padding: '14px 16px',
+                      borderRadius: 'var(--radius-md)',
+                      border: '2px solid var(--color-caramel)',
+                      backgroundColor: 'var(--color-cream-light)',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '12px'
+                    }}>
+                      <DollarSign size={22} color="var(--color-caramel)" style={{ marginTop: '2px', flexShrink: 0 }} />
+                      <div>
+                        <div style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--color-espresso)', marginBottom: '4px' }}>
+                          Cash / In-Person Payment
                         </div>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod('venmo')}
-                        style={{
-                          padding: '10px 12px',
-                          borderRadius: 'var(--radius-md)',
-                          border: paymentMethod === 'venmo' ? '2px solid #008CFF' : '1px solid var(--color-border)',
-                          backgroundColor: paymentMethod === 'venmo' ? 'rgba(0,140,255,0.06)' : '#FFF',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          cursor: 'pointer',
-                          textAlign: 'left'
-                        }}
-                      >
-                        <div style={{
-                          width: '22px',
-                          height: '22px',
-                          borderRadius: '50%',
-                          backgroundColor: '#008CFF',
-                          color: '#FFF',
-                          fontWeight: 800,
-                          fontSize: '0.75rem',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}>V</div>
-                        <div>
-                          <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#008CFF' }}>Venmo</div>
-                          <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>@SelfMadeSweetCo</div>
-                        </div>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod('cashapp')}
-                        style={{
-                          padding: '10px 12px',
-                          borderRadius: 'var(--radius-md)',
-                          border: paymentMethod === 'cashapp' ? '2px solid #00D632' : '1px solid var(--color-border)',
-                          backgroundColor: paymentMethod === 'cashapp' ? 'rgba(0,214,50,0.06)' : '#FFF',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          cursor: 'pointer',
-                          textAlign: 'left'
-                        }}
-                      >
-                        <div style={{
-                          width: '22px',
-                          height: '22px',
-                          borderRadius: '50%',
-                          backgroundColor: '#00D632',
-                          color: '#FFF',
-                          fontWeight: 800,
-                          fontSize: '0.75rem',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}>$</div>
-                        <div>
-                          <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#00B82B' }}>Cash App</div>
-                          <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>$SelfMadeSweetCo</div>
-                        </div>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod('paypal')}
-                        style={{
-                          padding: '10px 12px',
-                          borderRadius: 'var(--radius-md)',
-                          border: paymentMethod === 'paypal' ? '2px solid #003087' : '1px solid var(--color-border)',
-                          backgroundColor: paymentMethod === 'paypal' ? 'rgba(0,48,135,0.06)' : '#FFF',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          cursor: 'pointer',
-                          textAlign: 'left'
-                        }}
-                      >
-                        <div style={{
-                          width: '22px',
-                          height: '22px',
-                          borderRadius: '50%',
-                          backgroundColor: '#003087',
-                          color: '#FFF',
-                          fontWeight: 800,
-                          fontSize: '0.75rem',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}>P</div>
-                        <div>
-                          <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#003087' }}>PayPal</div>
-                          <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>@SelfMadeSweetCo</div>
-                        </div>
-                      </button>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', margin: 0, lineHeight: 1.45 }}>
+                          Pay with <strong>Cash</strong>, <strong>Venmo</strong> (@SelfMadeSweetCo), <strong>Cash App</strong> ($SelfMadeSweetCo), <strong>PayPal</strong>, or <strong>Card</strong> in person at pickup or delivery!
+                        </p>
+                      </div>
                     </div>
                   </div>
 
