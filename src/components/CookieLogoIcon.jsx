@@ -11,11 +11,10 @@ export default function CookieLogoIcon({ size = 48, className = '', style = {} }
         height: `${size}px`,
         objectFit: 'cover',
         borderRadius: '50%',
-        boxShadow: '0 3px 10px rgba(42, 27, 23, 0.18)',
         flexShrink: 0,
         display: 'inline-block',
         verticalAlign: 'middle',
-        border: '2px solid #FFFFFF',
+        filter: 'drop-shadow(0 2px 6px rgba(42, 27, 23, 0.22))',
         ...style
       }}
     />
