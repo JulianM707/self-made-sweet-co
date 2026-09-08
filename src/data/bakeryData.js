@@ -93,11 +93,16 @@ export const PRODUCTS = [
     rating: 5.0,
     reviewsCount: 0,
     image: '/images/berry_muffins_1786065279996.jpg',
-    description: 'Julian’s signature fluffy artisan muffin base loaded with rich melted Ghirardelli semi-sweet chocolate chips and topped with a brown sugar streusel crumble.',
+    description: 'Julian’s signature fluffy artisan muffin base loaded with rich melted Ghirardelli chocolate chips and topped with a brown sugar streusel crumble.',
     dietary: ['Nut-Free', 'Ghirardelli Chocolate'],
     prepTime: 'Baked Fresh 8AM Daily',
+    chocolateOptions: [
+      { id: 'semi-sweet', name: 'Ghirardelli Semi-Sweet (Classic & Balanced)', price: 0 },
+      { id: 'milk-chocolate', name: 'Ghirardelli Milk Chocolate (Sweet & Creamy)', price: 0 },
+      { id: 'dark-60', name: 'Ghirardelli 60% Dark Chocolate (Rich & Decadent)', price: 0 }
+    ],
     ingredients: [
-      'Ghirardelli Semi-Sweet Chocolate Chips', 
+      'Ghirardelli Chocolate Chips (Your Choice)', 
       'Julian’s Signature Artisan Muffin Base', 
       'Brown Sugar Cinnamon Streusel', 
       'Unsalted Butter & Farm Eggs', 
@@ -135,11 +140,16 @@ export const PRODUCTS = [
     rating: 5.0,
     reviewsCount: 0,
     image: '/images/chocolate_chip_cookies.jpg',
-    description: 'Golden-brown crisp edges with soft, warm gooey melted chocolate centers. Baked fresh daily with Ghirardelli semi-sweet chocolate chips, real creamy butter, dark brown sugar, and pure vanilla extract.',
+    description: 'Golden-brown crisp edges with soft, warm gooey melted chocolate centers. Baked fresh daily with Ghirardelli chocolate chips (Semi-Sweet, Milk, or 60% Dark), real creamy butter, dark brown sugar, and pure vanilla extract.',
     dietary: ['Nut-Free', 'Fresh Baked Daily'],
     prepTime: 'Baked Fresh Daily',
+    chocolateOptions: [
+      { id: 'semi-sweet', name: 'Ghirardelli Semi-Sweet (Classic & Balanced)', price: 0 },
+      { id: 'milk-chocolate', name: 'Ghirardelli Milk Chocolate (Sweet & Creamy)', price: 0 },
+      { id: 'dark-60', name: 'Ghirardelli 60% Dark Chocolate (Rich & Decadent)', price: 0 }
+    ],
     ingredients: [
-      'Ghirardelli Semi-Sweet Chocolate Chips',
+      'Ghirardelli Chocolate Chips (Your Choice)',
       'Real Creamy Butter', 
       'Dark Brown & Granulated Sugar', 
       'Pure Vanilla Extract', 

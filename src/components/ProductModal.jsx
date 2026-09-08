@@ -11,6 +11,9 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
   const [selectedCrust, setSelectedCrust] = useState(
     product.crustOptions ? product.crustOptions[0] : null
   );
+  const [selectedChocolate, setSelectedChocolate] = useState(
+    product.chocolateOptions ? product.chocolateOptions[0] : null
+  );
   const [quantity, setQuantity] = useState(1);
   const [specialNotes, setSpecialNotes] = useState('');
 
@@ -27,6 +30,9 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
   const handleAdd = () => {
     let customName = product.name;
     const detailsArray = [];
+    if (selectedChocolate) {
+      detailsArray.push(`Chocolate: ${selectedChocolate.name.split(' (')[0]}`);
+    }
     if (selectedTopping && selectedTopping.id !== 'plain') {
       detailsArray.push(`Topping: ${selectedTopping.name}`);
     }
@@ -46,6 +52,7 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
       unitPrice,
       totalPrice,
       specialNotes,
+      selectedChocolate: selectedChocolate ? selectedChocolate.name : null,
       selectedTopping: selectedTopping ? selectedTopping.name : null,
       selectedCrust: selectedCrust ? selectedCrust.name : null
     });
@@ -170,8 +177,43 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
                     <div style={{ fontWeight: 700, fontSize: '0.88rem' }}>
                       {product.category === 'muffins' ? 'Half-Dozen Box (6 Muffins)' : product.category === 'cookies' ? '6-Pack Cookie Box (6 Cookies)' : 'Full Bake / Cake'}
                     </div>
-                    <div style={{ fontSize: '0.82rem', color: 'var(--color-caramel)', fontWeight: 600 }}>${product.priceWhole.toFixed(2)}</div>
                   </button>
+                </div>
+              </div>
+            )}
+
+            {/* Ghirardelli Chocolate Variety Selector */}
+            {product.chocolateOptions && (
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-espresso)', display: 'block', marginBottom: '6px' }}>
+                  🍫 Select Ghirardelli Chocolate Variety:
+                </label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  {product.chocolateOptions.map(choc => {
+                    const isSelected = selectedChocolate && selectedChocolate.id === choc.id;
+                    return (
+                      <button
+                        key={choc.id}
+                        onClick={() => setSelectedChocolate(choc)}
+                        style={{
+                          padding: '8px 12px',
+                          borderRadius: 'var(--radius-md)',
+                          border: isSelected ? '2px solid var(--color-caramel)' : '1px solid var(--color-border)',
+                          backgroundColor: isSelected ? 'var(--color-cream-light)' : '#FFF',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          fontSize: '0.85rem',
+                          fontWeight: 600,
+                          color: 'var(--color-espresso)',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <span>{choc.name}</span>
+                        <span style={{ color: 'var(--color-caramel)' }}>Included</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
