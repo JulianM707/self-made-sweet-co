@@ -393,7 +393,13 @@ export default function App() {
         ) : (
           /* Standard Customer Storefront View */
           <>
-            <Hero onOpenQuiz={() => setIsQuizOpen(true)} />
+            <Hero 
+              onExploreMenu={() => {
+                const el = document.getElementById('menu-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              onOpenAbout={() => setIsAboutOpen(true)} 
+            />
             
             <ProductCatalog 
               onSelectProduct={(product) => setSelectedProduct(product)}
