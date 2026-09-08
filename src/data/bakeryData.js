@@ -132,8 +132,8 @@ export const PRODUCTS = [
         ]
       },
       proTricks: [
+        'Sugar is whisked into the WET mix with eggs (not dry flour) until pale & fluffy to dissolve sugar crystals and create a tender crumb!',
         'Toss Ghirardelli chips with 1 tbsp reserved flour so they do not sink to the bottom!',
-        'Vigorously whisk sugar & eggs first until pale & fluffy.',
         'Fold wet into dry gently with a spatula just until flour disappears (no overmixing!).',
         'Preheat at 400°F, drop to 375°F as muffins enter oven.',
         'Cool in hot metal pan for only 2-3 mins, then move to wire rack.',
