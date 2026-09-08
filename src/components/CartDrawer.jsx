@@ -431,7 +431,7 @@ export default function CartDrawer({
                           Cash / In-Person Payment
                         </div>
                         <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', margin: 0, lineHeight: 1.45 }}>
-                          Pay with <strong>Cash</strong>, <strong>Venmo</strong> (@SelfMadeSweetCo), <strong>Cash App</strong> ($SelfMadeSweetCo), or <strong>PayPal</strong> in person at pickup or delivery!
+                          Pay with <strong>Cash</strong>, <strong>Venmo</strong>, <strong>Cash App</strong>, or <strong>PayPal</strong> in person at pickup or delivery!
                         </p>
                       </div>
                     </div>
