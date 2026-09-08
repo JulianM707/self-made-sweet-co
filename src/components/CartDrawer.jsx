@@ -318,6 +318,26 @@ export default function CartDrawer({
                   </button>
                 </div>
 
+                {fulfillment === 'pickup' && (
+                  <div style={{
+                    backgroundColor: 'var(--color-cream-light)',
+                    border: '1px solid var(--color-caramel)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '8px 12px',
+                    fontSize: '0.8rem',
+                    color: 'var(--color-espresso)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    marginBottom: '16px'
+                  }}>
+                    <MapPin size={16} color="var(--color-caramel)" style={{ flexShrink: 0 }} />
+                    <div>
+                      <strong>Pickup Location:</strong> Natomas, Sacramento, CA (ZIP 95834)
+                    </div>
+                  </div>
+                )}
+
                 {/* Chronologically Arranged Time Slot Picker */}
                 <div style={{ marginBottom: '16px' }}>
                   <label style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--color-text-muted)', display: 'block', marginBottom: '4px' }}>
