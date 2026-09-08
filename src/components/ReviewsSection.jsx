@@ -66,20 +66,53 @@ export default function ReviewsSection({ reviews, onAddReview, onOpenAddReview }
     reader.readAsDataURL(file);
   };
 
+  // Helper to format review date realistically (mins ago, hours ago, days ago, or date string)
+  const formatReviewDate = (review) => {
+    if (!review) return 'Recently';
+
+    const timestamp = review.timestamp || (review.id && Number(review.id.replace('REV-', '')));
+    if (timestamp && !isNaN(timestamp) && timestamp > 1600000000000) {
+      const diffMs = Date.now() - timestamp;
+      const diffMins = Math.floor(diffMs / (1000 * 60));
+      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+      if (diffMins < 2) return 'Just now';
+      if (diffMins < 60) return `${diffMins}m ago`;
+      if (diffHours < 24) return `${diffHours}h ago`;
+      if (diffDays === 1) return 'Yesterday';
+      if (diffDays < 7) return `${diffDays}d ago`;
+
+      return new Date(timestamp).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    }
+
+    if (review.date && review.date.toLowerCase() !== 'just now') {
+      return review.date;
+    }
+
+    return 'Recently';
+  };
+
   const handleSubmitReview = (e) => {
     e.preventDefault();
     if (!customerName || !comment) return;
 
     const matchedProduct = PRODUCTS.find(p => p.name === dishName) || PRODUCTS[0];
+    const now = Date.now();
 
     const newReview = {
-      id: `REV-${Date.now()}`,
+      id: `REV-${now}`,
+      timestamp: now,
       customerName: customerName.trim(),
       location: location.trim() || 'Sacramento, CA',
       dishName: dishName,
       productName: dishName,
       rating: Number(rating),
-      date: 'Just now',
+      date: new Date(now).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
       title: title.trim() || `${rating} Stars for ${dishName}!`,
       comment: comment.trim(),
       image: customImage || matchedProduct.image,
@@ -300,7 +333,7 @@ export default function ReviewsSection({ reviews, onAddReview, onOpenAddReview }
                       <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#2D7A42', fontWeight: 700 }}>
                         <CheckCircle2 size={13} /> Verified Buyer
                       </span>
-                      <span>{review.date}</span>
+                      <span>{formatReviewDate(review)}</span>
                     </div>
 
                   </div>
