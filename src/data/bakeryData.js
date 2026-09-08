@@ -92,7 +92,7 @@ export const PRODUCTS = [
     priceWhole: 24.00,
     rating: 5.0,
     reviewsCount: 0,
-    image: '/images/berry_muffins_1786065279996.jpg',
+    image: '/images/chocolate_chip_muffins.jpg',
     description: 'Julian’s signature fluffy artisan muffin base loaded with rich melted Ghirardelli chocolate chips and topped with a brown sugar streusel crumble.',
     dietary: ['Nut-Free', 'Ghirardelli Chocolate'],
     prepTime: 'Baked Fresh 8AM Daily',
