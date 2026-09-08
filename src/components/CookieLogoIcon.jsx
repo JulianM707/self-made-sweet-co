@@ -1,42 +1,23 @@
 import React from 'react';
 
-export default function CookieLogoIcon({ size = 28, color = '#2A1B17', cookieBg = '#C88D51', chipColor = '#2A1B17' }) {
+export default function CookieLogoIcon({ size = 48, className = '', style = {} }) {
   return (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 44 44" 
-      fill="none" 
-      xmlns="http://www.w3.org/2000/svg"
-      style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}
-    >
-      {/* Outer Golden Cookie Circle */}
-      <circle cx="22" cy="22" r="21" fill={cookieBg} stroke="#B37A40" strokeWidth="1.5" />
-      
-      {/* Baked Texture Inner Ring */}
-      <circle cx="22" cy="22" r="18.5" stroke="rgba(255, 255, 255, 0.25)" strokeWidth="1" strokeDasharray="3 2" />
-
-      {/* Chocolate Chips around edges */}
-      <circle cx="10" cy="14" r="2.2" fill={chipColor} opacity="0.85" />
-      <circle cx="34" cy="13" r="2.4" fill={chipColor} opacity="0.85" />
-      <circle cx="9" cy="28" r="2.2" fill={chipColor} opacity="0.85" />
-      <circle cx="35" cy="29" r="2.2" fill={chipColor} opacity="0.85" />
-      <circle cx="22" cy="7" r="2" fill={chipColor} opacity="0.8" />
-      <circle cx="22" cy="37" r="2" fill={chipColor} opacity="0.8" />
-
-      {/* SM Monogram Text in Center (Dark Chocolate #2A1B17) */}
-      <text 
-        x="22" 
-        y="27" 
-        textAnchor="middle" 
-        fill={color} 
-        fontSize="15" 
-        fontWeight="900" 
-        fontFamily="'Plus Jakarta Sans', system-ui, sans-serif"
-        letterSpacing="-0.3px"
-      >
-        SM
-      </text>
-    </svg>
+    <img 
+      src="/images/sm_cookie_logo.png" 
+      alt="Self-Made Sweet Co. Authentic SM Cookie Logo"
+      className={className}
+      style={{
+        width: `${size}px`,
+        height: `${size}px`,
+        objectFit: 'cover',
+        borderRadius: '50%',
+        boxShadow: '0 3px 10px rgba(42, 27, 23, 0.18)',
+        flexShrink: 0,
+        display: 'inline-block',
+        verticalAlign: 'middle',
+        border: '2px solid #FFFFFF',
+        ...style
+      }}
+    />
   );
 }

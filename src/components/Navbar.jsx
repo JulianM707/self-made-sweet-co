@@ -21,19 +21,9 @@ export default function Navbar({
         {/* Brand Logo (Front Left Corner) */}
         <div 
           onClick={() => setActiveTab('menu')} 
-          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}
+          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '14px' }}
         >
-          <div style={{
-            width: '46px',
-            height: '46px',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: 'var(--shadow-sm)'
-          }}>
-            <CookieLogoIcon size={44} />
-          </div>
+          <CookieLogoIcon size={52} />
           <div>
             <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.45rem', fontWeight: 800, color: 'var(--color-espresso)', letterSpacing: '-0.3px', display: 'block', lineHeight: 1 }}>
               Self-Made Sweet Co.
