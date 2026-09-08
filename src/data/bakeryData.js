@@ -108,6 +108,38 @@ export const PRODUCTS = [
       'Unsalted Butter & Farm Eggs', 
       'Pure Vanilla Extract'
     ],
+    recipe: {
+      title: 'Moist Ghirardelli Chocolate Chip Muffins',
+      prepTime: '15 mins',
+      cookTime: '20–22 mins @ 400°F ➔ 375°F',
+      yield: '12 Muffins',
+      ingredients: {
+        dry: [
+          '2 cups All-Purpose Flour (reserve 1 tbsp to coat chips)',
+          '2 tsp Baking Powder',
+          '½ tsp Salt'
+        ],
+        wet: [
+          '1 cup Granulated Sugar',
+          '2 Large Eggs',
+          '¼ cup (4 tbsp) Unsalted Butter (melted & cooled)',
+          '¼ cup Neutral Oil (Canola, Vegetable, or Avocado)',
+          '½ cup Milk',
+          '1 tsp Pure Vanilla Extract'
+        ],
+        mixIn: [
+          '1 to 1 ½ cups Ghirardelli Chocolate Chips (Semi-Sweet, Milk, or 60% Dark)'
+        ]
+      },
+      proTricks: [
+        'Toss Ghirardelli chips with 1 tbsp reserved flour so they do not sink to the bottom!',
+        'Vigorously whisk sugar & eggs first until pale & fluffy.',
+        'Fold wet into dry gently with a spatula just until flour disappears (no overmixing!).',
+        'Preheat at 400°F, drop to 375°F as muffins enter oven.',
+        'Cool in hot metal pan for only 2-3 mins, then move to wire rack.',
+        'Store with a slice of plain white bread in container to keep soft for days!'
+      ]
+    },
     badge: 'Fresh Baked Specialty 🍫'
   },
   {
