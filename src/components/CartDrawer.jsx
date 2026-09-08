@@ -333,7 +333,7 @@ export default function CartDrawer({
                   }}>
                     <MapPin size={16} color="var(--color-caramel)" style={{ flexShrink: 0 }} />
                     <div>
-                      <strong>Pickup Location:</strong> Natomas, Sacramento, CA (ZIP 95834)
+                      <strong>Pickup Location:</strong> 4500 Truxel Rd, Natomas, Sacramento, CA 95834
                     </div>
                   </div>
                 )}
