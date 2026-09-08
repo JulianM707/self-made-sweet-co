@@ -85,6 +85,27 @@ export const PRODUCTS = [
     badge: "Julian's Masterpiece 🏆"
   },
   {
+    id: 'ghirardelli-chocolate-chip-muffin',
+    name: 'Ghirardelli Chocolate Chip Muffin',
+    category: 'muffins',
+    priceSlice: 4.50,
+    priceWhole: 24.00,
+    rating: 5.0,
+    reviewsCount: 0,
+    image: '/images/berry_muffins_1786065279996.jpg',
+    description: 'Julian’s signature fluffy artisan muffin base loaded with rich melted Ghirardelli semi-sweet chocolate chips and topped with a brown sugar streusel crumble.',
+    dietary: ['Nut-Free', 'Ghirardelli Chocolate'],
+    prepTime: 'Baked Fresh 8AM Daily',
+    ingredients: [
+      'Ghirardelli Semi-Sweet Chocolate Chips', 
+      'Julian’s Signature Artisan Muffin Base', 
+      'Brown Sugar Cinnamon Streusel', 
+      'Unsalted Butter & Farm Eggs', 
+      'Pure Vanilla Extract'
+    ],
+    badge: 'Fresh Baked Specialty 🍫'
+  },
+  {
     id: 'cinnamon-coffee-cake',
     name: 'Cinnamon Streusel Coffee Cake',
     category: 'cakes',
@@ -114,15 +135,15 @@ export const PRODUCTS = [
     rating: 5.0,
     reviewsCount: 0,
     image: '/images/chocolate_chip_cookies.jpg',
-    description: 'Golden-brown crisp edges with soft, warm gooey melted chocolate centers. Baked fresh daily with real creamy butter, dark brown sugar, and pure vanilla extract.',
+    description: 'Golden-brown crisp edges with soft, warm gooey melted chocolate centers. Baked fresh daily with Ghirardelli semi-sweet chocolate chips, real creamy butter, dark brown sugar, and pure vanilla extract.',
     dietary: ['Nut-Free', 'Fresh Baked Daily'],
     prepTime: 'Baked Fresh Daily',
     ingredients: [
+      'Ghirardelli Semi-Sweet Chocolate Chips',
       'Real Creamy Butter', 
       'Dark Brown & Granulated Sugar', 
       'Pure Vanilla Extract', 
       'Farm Eggs & All-Purpose Flour', 
-      'Melted Chocolate Chunks', 
       'Baking Soda & Sea Salt'
     ],
     badge: 'Customer Favorite'
